@@ -10,7 +10,7 @@
   <meta name="MobileOptimized" content="320" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <link rel="stylesheet" type="text/css" href="/hexo/css/screen.css" />
+  <link rel="stylesheet" type="text/css" href="/css/screen.css" />
   <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Noto+Serif:400,700,400italic|Open+Sans:700,400" />
 
   <meta name="generator" content="日常点滴">
@@ -29,10 +29,10 @@
 
 <body class="post-template">
 
-  <header class="site-head"  style="background-image: url(/image/cover.png)" >
+  <header class="site-head"  style="background-image: url(/hexo/image/cover.jpg)" >
     <div class="vertical">
         <div class="site-head-content inner">
-             <a class="blog-logo" href="/hexo/"><img src="https://avatars.githubusercontent.com/u/26755276" alt="Blog Logo"/></a> 
+             <a class="blog-logo" href="/"><img src="https://avatars.githubusercontent.com/u/26755276" alt="Blog Logo"/></a> 
             <h1 class="blog-title">日常点滴</h1>
             <h2 class="blog-description"></h2>
         </div>
@@ -49,7 +49,7 @@
     
     
     | 
-    <a href='/hexo/tags/opengl/'>opengl</a>
+    <a href='/tags/opengl/'>opengl</a>
     
     
 </span>
@@ -241,8 +241,8 @@ triangle_strip 类似 line_strip，新的点与前两个点组成三角形，即
 <p>显示法线的几何着色器如下</p>
 <figure class="highlight glsl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#version 330 core</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">layout</span> (<span class="keyword">triangles</span>) <span class="keyword">in</span>;</span><br><span class="line"><span class="keyword">layout</span> (<span class="keyword">line_strip</span>, <span class="keyword">max_vertices</span> = <span class="number">6</span>) <span class="keyword">out</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">in</span> VS_OUT &#123;</span><br><span class="line">    <span class="type">vec2</span> texCoords;</span><br><span class="line">    <span class="type">vec4</span> normal;</span><br><span class="line">&#125; gs_in[];</span><br><span class="line"></span><br><span class="line"><span class="keyword">out</span> <span class="type">vec2</span> TexCoords;</span><br><span class="line"><span class="keyword">out</span> <span class="type">vec4</span> Normal;</span><br><span class="line"><span class="keyword">uniform</span> <span class="type">float</span> time;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span> GenerateLine(<span class="type">int</span> <span class="keyword">index</span>)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">// 选取过顶点并且和该点法向量平行的直线上的两点</span></span><br><span class="line">    <span class="built_in">gl_Position</span> = <span class="built_in">gl_in</span>[<span class="keyword">index</span>].<span class="built_in">gl_Position</span>;</span><br><span class="line">    <span class="built_in">EmitVertex</span>();</span><br><span class="line">    <span class="built_in">gl_Position</span> = <span class="built_in">gl_in</span>[<span class="keyword">index</span>].<span class="built_in">gl_Position</span> + <span class="type">vec4</span>(gs_in[<span class="keyword">index</span>].normal.xyz, <span class="number">0.0</span>) * <span class="number">0.05</span>;</span><br><span class="line">    <span class="built_in">EmitVertex</span>();</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 结束单个图元绘制</span></span><br><span class="line">    <span class="built_in">EndPrimitive</span>();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span> main()</span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">// 三个顶点的法线都要绘制</span></span><br><span class="line">    GenerateLine(<span class="number">0</span>);</span><br><span class="line">    GenerateLine(<span class="number">1</span>);</span><br><span class="line">    GenerateLine(<span class="number">2</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>效果图如下</p>
-<p><img src="/hexo/image/opengl/show_normal.png" alt="图片无法显示"><br>
-<img src="/hexo/image/opengl/object_blast.png" alt="图片无法显示"></p>
+<p><img src="/image/opengl/show_normal.png" alt="图片无法显示"><br>
+<img src="/image/opengl/object_blast.png" alt="图片无法显示"></p>
 <h1>实例化</h1>
 <p>使用<code>glDrawArraysInstanced</code>和<code>glDrawElementsInstanced</code>能有效减少 cpu 和 gpu 间的通信，此时顶点着色器中可以读取到名为 gl_InstanceID 的变量，该变量的值为当前实例序号，从 0 开始。</p>
 <p>两函数定义如下</p>
@@ -279,11 +279,11 @@ triangle_strip 类似 line_strip，新的点与前两个点组成三角形，即
 <p><strong>程序代码改为如下</strong></p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// ...</span></span><br><span class="line"><span class="comment">// 生成偏移量数据</span></span><br><span class="line">glm::vec2 translations[<span class="number">100</span>];</span><br><span class="line"><span class="keyword">int</span> index = <span class="number">0</span>;</span><br><span class="line"><span class="keyword">float</span> offset = <span class="number">0.1f</span>;</span><br><span class="line"><span class="keyword">for</span>(<span class="keyword">int</span> y = <span class="number">-10</span>; y &lt; <span class="number">10</span>; y += <span class="number">2</span>)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">for</span>(<span class="keyword">int</span> x = <span class="number">-10</span>; x &lt; <span class="number">10</span>; x += <span class="number">2</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        glm::vec2 translation;</span><br><span class="line">        translation.x = (<span class="keyword">float</span>)x / <span class="number">10.0f</span> + offset;</span><br><span class="line">        translation.y = (<span class="keyword">float</span>)y / <span class="number">10.0f</span> + offset;</span><br><span class="line">        translations[index++] = translation;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// ...</span></span><br><span class="line">glGenVertexArrays(<span class="number">1</span>, &amp;vao);</span><br><span class="line">glGenBuffers(<span class="number">1</span>, &amp;vbo);</span><br><span class="line">glGenBuffers(<span class="number">1</span>, &amp;vbo2);</span><br><span class="line">glBindVertexArray(vao);</span><br><span class="line">glBindBuffer(GL_ARRAY_BUFFER, vbo);</span><br><span class="line">glBufferData(GL_ARRAY_BUFFER, <span class="keyword">sizeof</span>(glm::vec2) * <span class="number">100</span>, translations,GL_STATIC_DRAW);</span><br><span class="line">glEnableVertexAttribArray(<span class="number">2</span>);</span><br><span class="line">glVertexAttribPointer(<span class="number">2</span>, <span class="number">2</span>, GL_FLOAT, GL_FALSE, <span class="number">0</span>, (<span class="keyword">void</span> *)<span class="number">0</span>);</span><br><span class="line">glVertexAttribDivisor(<span class="number">2</span>, <span class="number">1</span>);</span><br><span class="line"><span class="comment">// ...</span></span><br></pre></td></tr></table></figure>
 <h2 id="实现小行星的示例程序效果">实现小行星的示例程序效果</h2>
-<p><img src="/hexo/image/opengl/instancing.png" alt="图片无法显示"></p>
+<p><img src="/image/opengl/instancing.png" alt="图片无法显示"></p>
 <p>没有使用实例化的情况下，绘制 70000 个小行星较明显卡顿</p>
-<p><img src="/hexo/image/opengl/instancing2.png" alt="图片无法显示"></p>
+<p><img src="/image/opengl/instancing2.png" alt="图片无法显示"></p>
 <p>使用实例化的情况下，绘制 1400000 个小行星较明显卡顿，但还是比没有使用实例化绘制 70000 个时的情况要好</p>
-<p><img src="/hexo/image/opengl/instancing3.png" alt="图片无法显示"></p>
+<p><img src="/image/opengl/instancing3.png" alt="图片无法显示"></p>
 <blockquote>
 <p>glBufferData 多次调用时后一次会释放前一次的内存，并创建新的内存，因此可以放心重复调用来改变缓冲对象内存区大小</p>
 </blockquote>
@@ -291,8 +291,8 @@ triangle_strip 类似 line_strip，新的点与前两个点组成三角形，即
 <h2 id="锯齿产生原因">锯齿产生原因</h2>
 <p>由于屏幕像素实际上是一格格的固定宽高的方格，因此斜线映射到屏幕上时实际上无法将屏幕像素与斜线上的点准确地对应。</p>
 <p>光栅器采用的办法简化一下很像小学教的估算三角形面积的方法（占方格超过一半的也计一个方格，少于一半的不计），过像素中心点的着色，不过的着色，这种做法就会如下图一样</p>
-<p><img src="/hexo/image/opengl/anti_aliasing_rasterization.png" alt="图片无法显示"><br>
-<img src="/hexo/image/opengl/anti_aliasing_rasterization_filled.png" alt="图片无法显示"></p>
+<p><img src="/image/opengl/anti_aliasing_rasterization.png" alt="图片无法显示"><br>
+<img src="/image/opengl/anti_aliasing_rasterization_filled.png" alt="图片无法显示"></p>
 <h2 id="抗锯齿">抗锯齿</h2>
 <p>为了解决上面的问题需要抗锯齿技术</p>
 <h3 id="SSAA">SSAA</h3>
@@ -373,13 +373,13 @@ triangle_strip 类似 line_strip，新的点与前两个点组成三角形，即
 <h3 id="最终效果">最终效果</h3>
 <p>自定义抗锯齿的效果和抗锯齿是一样的</p>
 <p><strong>无抗锯齿</strong></p>
-<p><img src="/hexo/image/opengl/msaa_off.png" alt="图片无法显示"></p>
+<p><img src="/image/opengl/msaa_off.png" alt="图片无法显示"></p>
 <p><strong>抗锯齿</strong></p>
-<p><img src="/hexo/image/opengl/msaa_on.png" alt="图片无法显示"></p>
+<p><img src="/image/opengl/msaa_on.png" alt="图片无法显示"></p>
 <p><strong>抗锯齿+模糊</strong></p>
-<p><img src="/hexo/image/opengl/msaa_blur.png" alt="图片无法显示"></p>
+<p><img src="/image/opengl/msaa_blur.png" alt="图片无法显示"></p>
 <p><strong>自定义抗锯齿</strong></p>
-<p><img src="/hexo/image/opengl/msaa_custom.png" alt="图片无法显示"></p>
+<p><img src="/image/opengl/msaa_custom.png" alt="图片无法显示"></p>
 <h1>参考</h1>
 <ol>
 <li><a href="https://blog.csdn.net/msk1111/article/details/103796757" target="_blank" rel="noopener">《GLES3.0 中文 API-glGetUniformIndices》</a> authored by <a href="https://blog.csdn.net/MSK1111" target="_blank" rel="noopener">MSK1111</a>@<a href="https://www.csdn.net/" target="_blank" rel="noopener">csdn</a></li>
@@ -395,15 +395,15 @@ triangle_strip 类似 line_strip，新的点与前两个点组成三角形，即
 </section>
       <section class="share">
     <h4>Share this post</h4>
-    <a class="icon-twitter" href="http://twitter.com/share?url=https://github.flyingfishman.io/hexo/2021/02/25/opengl8/"
+    <a class="icon-twitter" href="http://twitter.com/share?url=https://github.flyingfishman.io/2021/02/25/opengl8/"
        onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
         <span class="hidden">Twitter</span>
     </a>
-    <a class="icon-facebook" href="https://www.facebook.com/sharer/sharer.php?u=https://github.flyingfishman.io/hexo/2021/02/25/opengl8/"
+    <a class="icon-facebook" href="https://www.facebook.com/sharer/sharer.php?u=https://github.flyingfishman.io/2021/02/25/opengl8/"
        onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
         <span class="hidden">Facebook</span>
     </a>
-    <a class="icon-google-plus" href="https://plus.google.com/share?url=https://github.flyingfishman.io/hexo/2021/02/25/opengl8/"
+    <a class="icon-google-plus" href="https://plus.google.com/share?url=https://github.flyingfishman.io/2021/02/25/opengl8/"
        onclick="window.open(this.href, 'google-plus-share', 'width=490,height=530');return false;">
         <span class="hidden">Google+</span>
     </a>
@@ -412,13 +412,13 @@ triangle_strip 类似 line_strip，新的点与前两个点组成三角形，即
   </article>
   <nav class="pagination" role="pagination">
     
-    <a class="newer-posts" href="/hexo/2021/03/30/opengl9/">
+    <a class="newer-posts" href="/2021/03/30/opengl9/">
         ← opengl(9):高级光照，gamma校正，阴影
     </a>
     
     <span class="page-number">•</span>
     
-    <a class="older-posts" href="/hexo/2021/02/12/opengl7/">
+    <a class="older-posts" href="/2021/02/12/opengl7/">
         opengl(7):深度测试、模板测试、混合、面剔除、帧缓冲、立方体贴图 →
     </a>
     
@@ -437,15 +437,15 @@ triangle_strip 类似 line_strip，新的点与前两个点组成三角形，即
   <a class="subscribe icon-feed" href="/rss.xml"><span class="tooltip">Subscribe!</span></a>
   
   <div class="inner">
-     <section class="copyright">All content copyright <a href="/hexo/">日常点滴</a> &copy; 2014 &bull; All rights reserved.</section>
+     <section class="copyright">All content copyright <a href="/">日常点滴</a> &copy; 2014 &bull; All rights reserved.</section>
      <section class="poweredby">Proudly published with <a class="icon-ghost" href="http://zespia.tw/hexo/">Hexo</a></section>
   </div>
 </footer>
 
   <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
 
-<script type="text/javascript" src="/hexo/js/jquery.fitvids.js"></script>
-<script type="text/javascript" src="/hexo/js/index.js"></script>
+<script type="text/javascript" src="/js/jquery.fitvids.js"></script>
+<script type="text/javascript" src="/js/index.js"></script>
 
 
 

@@ -10,7 +10,7 @@
   <meta name="MobileOptimized" content="320" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <link rel="stylesheet" type="text/css" href="/hexo/css/screen.css" />
+  <link rel="stylesheet" type="text/css" href="/css/screen.css" />
   <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Noto+Serif:400,700,400italic|Open+Sans:700,400" />
 
   <meta name="generator" content="日常点滴">
@@ -29,10 +29,10 @@
 
 <body class="post-template">
 
-  <header class="site-head"  style="background-image: url(/image/cover.png)" >
+  <header class="site-head"  style="background-image: url(/hexo/image/cover.jpg)" >
     <div class="vertical">
         <div class="site-head-content inner">
-             <a class="blog-logo" href="/hexo/"><img src="https://avatars.githubusercontent.com/u/26755276" alt="Blog Logo"/></a> 
+             <a class="blog-logo" href="/"><img src="https://avatars.githubusercontent.com/u/26755276" alt="Blog Logo"/></a> 
             <h1 class="blog-title">日常点滴</h1>
             <h2 class="blog-description"></h2>
         </div>
@@ -49,7 +49,7 @@
     
     
     | 
-    <a href='/hexo/tags/opengl/'>opengl</a>
+    <a href='/tags/opengl/'>opengl</a>
     
     
 </span>
@@ -124,7 +124,7 @@
 <p><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><msub><mi>F</mi><mrow><mi>d</mi><mi>e</mi><mi>p</mi><mi>t</mi><mi>h</mi></mrow></msub><mo>=</mo><mfrac><mrow><mi>z</mi><mo>−</mo><mi>n</mi><mi>e</mi><mi>a</mi><mi>r</mi></mrow><mrow><mi>f</mi><mi>a</mi><mi>r</mi><mo>−</mo><mi>n</mi><mi>e</mi><mi>a</mi><mi>r</mi></mrow></mfrac></mrow><annotation encoding="application/x-tex">F_{depth} = \frac{z - near}{far - near}
 </annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.969438em;vertical-align:-0.286108em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.13889em;">F</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361079999999999em;"><span style="top:-2.5500000000000003em;margin-left:-0.13889em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">d</span><span class="mord mathnormal mtight">e</span><span class="mord mathnormal mtight">p</span><span class="mord mathnormal mtight">t</span><span class="mord mathnormal mtight">h</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.286108em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:2.1407700000000003em;vertical-align:-0.8804400000000001em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.2603300000000002em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.10764em;">f</span><span class="mord mathnormal">a</span><span class="mord mathnormal" style="margin-right:0.02778em;">r</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mord mathnormal">n</span><span class="mord mathnormal">e</span><span class="mord mathnormal">a</span><span class="mord mathnormal" style="margin-right:0.02778em;">r</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.04398em;">z</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mord mathnormal">n</span><span class="mord mathnormal">e</span><span class="mord mathnormal">a</span><span class="mord mathnormal" style="margin-right:0.02778em;">r</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.8804400000000001em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span></span></p>
 <p>关系图像如下</p>
-<p><img src="/hexo/image/opengl/depth_linear_graph.png" alt="图片无法显示"></p>
+<p><img src="/image/opengl/depth_linear_graph.png" alt="图片无法显示"></p>
 <p>但是这种关系几乎不会被使用，原因是不满足&quot;使近处的物体深度精确度高，远处的物体深度精确度低&quot;这一需要（远处的物体相对近处不用太精细）。</p>
 <div style="padding: 20px; background-color: #00000055">
 <p>另外我认为还有一个原因是使用线性关系的话，深度只能在片段着色器中计算，没办法通过投影矩阵直接转化。理由如下：</p>
@@ -150,7 +150,7 @@ x_e\\y_e\\z_e\\w_e
 <p><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><msub><mi>F</mi><mrow><mi>d</mi><mi>e</mi><mi>p</mi><mi>t</mi><mi>h</mi></mrow></msub><mo>=</mo><mfrac><mrow><mn>1</mn><mi mathvariant="normal">/</mi><mi>z</mi><mo>−</mo><mn>1</mn><mi mathvariant="normal">/</mi><mi>n</mi><mi>e</mi><mi>a</mi><mi>r</mi></mrow><mrow><mn>1</mn><mi mathvariant="normal">/</mi><mi>f</mi><mi>a</mi><mi>r</mi><mo>−</mo><mn>1</mn><mi mathvariant="normal">/</mi><mi>n</mi><mi>e</mi><mi>a</mi><mi>r</mi></mrow></mfrac></mrow><annotation encoding="application/x-tex">F_{depth} = \frac{1/z - 1/near}{1/far - 1/near}
 </annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.969438em;vertical-align:-0.286108em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.13889em;">F</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361079999999999em;"><span style="top:-2.5500000000000003em;margin-left:-0.13889em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">d</span><span class="mord mathnormal mtight">e</span><span class="mord mathnormal mtight">p</span><span class="mord mathnormal mtight">t</span><span class="mord mathnormal mtight">h</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.286108em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:2.363em;vertical-align:-0.936em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.427em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">1</span><span class="mord">/</span><span class="mord mathnormal" style="margin-right:0.10764em;">f</span><span class="mord mathnormal">a</span><span class="mord mathnormal" style="margin-right:0.02778em;">r</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mord">1</span><span class="mord">/</span><span class="mord mathnormal">n</span><span class="mord mathnormal">e</span><span class="mord mathnormal">a</span><span class="mord mathnormal" style="margin-right:0.02778em;">r</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">1</span><span class="mord">/</span><span class="mord mathnormal" style="margin-right:0.04398em;">z</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mord">1</span><span class="mord">/</span><span class="mord mathnormal">n</span><span class="mord mathnormal">e</span><span class="mord mathnormal">a</span><span class="mord mathnormal" style="margin-right:0.02778em;">r</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.936em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span></span></p>
 <p>图像如下</p>
-<p><img src="/hexo/image/opengl/depth_non_linear_graph.png" alt="图片无法显示"></p>
+<p><img src="/image/opengl/depth_non_linear_graph.png" alt="图片无法显示"></p>
 <p>这个公式取<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>n</mi><mi>e</mi><mi>a</mi><mi>r</mi><mo>=</mo><mo>−</mo><mi>n</mi><mo separator="true">,</mo><mi>f</mi><mi>a</mi><mi>r</mi><mo>=</mo><mo>−</mo><mi>f</mi></mrow><annotation encoding="application/x-tex">near = -n, far = -f</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.43056em;vertical-align:0em;"></span><span class="mord mathnormal">n</span><span class="mord mathnormal">e</span><span class="mord mathnormal">a</span><span class="mord mathnormal" style="margin-right:0.02778em;">r</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.8888799999999999em;vertical-align:-0.19444em;"></span><span class="mord">−</span><span class="mord mathnormal">n</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord mathnormal" style="margin-right:0.10764em;">f</span><span class="mord mathnormal">a</span><span class="mord mathnormal" style="margin-right:0.02778em;">r</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.8888799999999999em;vertical-align:-0.19444em;"></span><span class="mord">−</span><span class="mord mathnormal" style="margin-right:0.10764em;">f</span></span></span></span>进行一定运算，就能得到前面 opengl(3)中的结果</p>
 <p><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mtable rowspacing="0.24999999999999992em" columnalign="right left" columnspacing="0em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><msub><mi>z</mi><mi>n</mi></msub></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mn>2</mn><msub><mi>F</mi><mrow><mi>d</mi><mi>e</mi><mi>p</mi><mi>t</mi><mi>h</mi></mrow></msub><mo>−</mo><mn>1</mn></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mfrac><mrow><mn>2</mn><mi>f</mi><mi>n</mi></mrow><mrow><mo stretchy="false">(</mo><mi>f</mi><mo>−</mo><mi>n</mi><mo stretchy="false">)</mo><mi>z</mi></mrow></mfrac><mo>+</mo><mfrac><mrow><mn>2</mn><mi>f</mi></mrow><mrow><mi>f</mi><mo>−</mo><mi>n</mi></mrow></mfrac><mo>−</mo><mn>1</mn></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mfrac><mrow><mi>n</mi><mo>+</mo><mi>f</mi></mrow><mrow><mi>f</mi><mo>−</mo><mi>n</mi></mrow></mfrac><mo>+</mo><mfrac><mrow><mn>2</mn><mi>f</mi><mi>n</mi></mrow><mrow><mo stretchy="false">(</mo><mi>f</mi><mo>−</mo><mi>n</mi><mo stretchy="false">)</mo><mi>z</mi></mrow></mfrac></mrow></mstyle></mtd></mtr></mtable><annotation encoding="application/x-tex">\begin{aligned}
 z_n &amp;= 2F_{depth} - 1 \\
@@ -174,7 +174,7 @@ F_{depth} &amp;= \frac{z_e - (-n)}{(-f) - (-n)}\\
 <h2 id="深度冲突">深度冲突</h2>
 <p>按我的理解，举个简单例子，假设深度精确到 0.01，将 1000 映射到<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false">[</mo><mn>0.00</mn><mo separator="true">,</mo><mn>1.00</mn><mo stretchy="false">]</mo></mrow><annotation encoding="application/x-tex">[0.00, 1.00]</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">[</span><span class="mord">0</span><span class="mord">.</span><span class="mord">0</span><span class="mord">0</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord">1</span><span class="mord">.</span><span class="mord">0</span><span class="mord">0</span><span class="mclose">]</span></span></span></span>区间内，其中 1 映射为<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>0.001</mn></mrow><annotation encoding="application/x-tex">0.001</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.64444em;vertical-align:0em;"></span><span class="mord">0</span><span class="mord">.</span><span class="mord">0</span><span class="mord">0</span><span class="mord">1</span></span></span></span>，2 映射为<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>0.002</mn></mrow><annotation encoding="application/x-tex">0.002</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.64444em;vertical-align:0em;"></span><span class="mord">0</span><span class="mord">.</span><span class="mord">0</span><span class="mord">0</span><span class="mord">2</span></span></span></span>，但由于精确度的关系，两者都被认为是<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>0.00</mn></mrow><annotation encoding="application/x-tex">0.00</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.64444em;vertical-align:0em;"></span><span class="mord">0</span><span class="mord">.</span><span class="mord">0</span><span class="mord">0</span></span></span></span>，无法判断哪个大。</p>
 <p>导致的结果如下</p>
-<p><img src="/hexo/image/opengl/z_fight.png" alt="图片无法显示"></p>
+<p><img src="/image/opengl/z_fight.png" alt="图片无法显示"></p>
 <blockquote>
 <p>上面这个情况是不是还可以得到执行深度测试的片段顺序是随机的？不然的话，如果按照物体调用<code>glDrawArrays</code>的顺序进行深度测试，且判断方式是单纯的<code>depth = gl_FragCoord.z &lt; depth ? gl_FragCoord.z : depth</code>，即使<code>gl_FragCoord.z</code>的值相同，后调用<code>glDrawArrays</code>的物体的片段就会被舍去了。（或者说不是这么简单的机制？）</p>
 </blockquote>
@@ -193,7 +193,7 @@ F_{depth} &amp;= \frac{z_e - (-n)}{(-f) - (-n)}\\
 <li>glfw 自动创建了一个模板缓冲，其他库有可能有差别</li>
 </ul>
 <p>模板缓冲的一个简单的例子如下：</p>
-<p><img src="/hexo/image/opengl/stencil_buffer.png" alt="图片无法显示"></p>
+<p><img src="/image/opengl/stencil_buffer.png" alt="图片无法显示"></p>
 <p>模板缓冲操作允许我们在渲染片段时将模板缓冲设定为一个特定的值。通过在渲染时修改模板缓冲的内容，我们写入了模板缓冲。在同一个（或者接下来的）渲染迭代中，我们可以读取这些值，来决定丢弃还是保留某个片段。使用模板缓冲的时候你可以尽情发挥，但大体的步骤如下：</p>
 <ul>
 <li>启用模板缓冲的写入。</li>
@@ -396,7 +396,7 @@ c-16-25.333-24-45-24-59z"/></svg></span></span></span></span></span></span></spa
 </table>
 <h2 id="用法">用法</h2>
 <p>如下若想将透明的绿色绘制到红色前面，启用混合后，调用<code>glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)</code>设置了两个因子值</p>
-<p><img src="/hexo/image/opengl/blending_equation.png" alt="图片无法显示"></p>
+<p><img src="/image/opengl/blending_equation.png" alt="图片无法显示"></p>
 <p>最终得到的结果就是</p>
 <p><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><msub><mover accent="true"><mi>C</mi><mo>⃗</mo></mover><mrow><mi>r</mi><mi>e</mi><mi>s</mi><mi>u</mi><mi>l</mi><mi>t</mi></mrow></msub><mo>=</mo><mrow><mo fence="true">(</mo><mtable rowspacing="0.15999999999999992em" columnspacing="1em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>1.0</mn></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>0.0</mn></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>0.0</mn></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>1.0</mn></mstyle></mtd></mtr></mtable><mo fence="true">)</mo></mrow><mo>∗</mo><mo stretchy="false">(</mo><mn>1.0</mn><mo>−</mo><mn>0.6</mn><mo stretchy="false">)</mo><mo>+</mo><mrow><mo fence="true">(</mo><mtable rowspacing="0.15999999999999992em" columnspacing="1em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>0.0</mn></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>1.0</mn></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>0.0</mn></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>0.6</mn></mstyle></mtd></mtr></mtable><mo fence="true">)</mo></mrow><mo>∗</mo><mn>0.6</mn></mrow><annotation encoding="application/x-tex">\vec{C}_{result} = \begin{pmatrix}
 1.0\\0.0\\0.0\\1.0
@@ -418,12 +418,12 @@ c-16-25.333-24-45-24-59z"/></svg></span></span></span></span></span></span></spa
 <p>另外似乎还可以如下，这样可以不排序</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 即使深度测试通过也不写入深度缓冲</span></span><br><span class="line">glDepthMask(GL_FALSE);</span><br><span class="line"><span class="built_in">map</span>&lt;<span class="keyword">float</span>, glm::vec3&gt; sorted;</span><br><span class="line"><span class="keyword">float</span> distance;</span><br><span class="line"><span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; vegetation.size(); i++)</span><br><span class="line">&#123;</span><br><span class="line">    model = glm::translate(glm::mat4(<span class="number">1.0f</span>), vegetation[i - <span class="number">1</span>]);</span><br><span class="line">    shader.setUniformMatrix4(<span class="string">"model"</span>, model);</span><br><span class="line">    glDrawElements(GL_TRIANGLES, <span class="number">6</span>, GL_UNSIGNED_INT, <span class="number">0</span>);</span><br><span class="line">&#125;</span><br><span class="line">glDepthMask(GL_TRUE);</span><br></pre></td></tr></table></figure>
 <p>最后效果</p>
-<p><img src="/hexo/image/opengl/blend.png" alt="图片无法显示"></p>
+<p><img src="/image/opengl/blend.png" alt="图片无法显示"></p>
 <h1>面剔除</h1>
 <p>剔除看不到的片段可以大量节省片段着色器的调用。opengl 通过三角形顶点的环绕顺序决定哪些是正向面（面向观察者的面），哪些是负向面（观察者看不到的面）。</p>
 <h2 id="环绕顺序">环绕顺序</h2>
 <p>按特定顺序定义每个面点的顺序，当这些面面向观察者时，会沿一个方向环绕，背向观察者时则沿另一个方向环绕，如下</p>
-<p><img src="/hexo/image/opengl/faceculling_frontback.png" alt="图片无法显示"></p>
+<p><img src="/image/opengl/faceculling_frontback.png" alt="图片无法显示"></p>
 <blockquote>
 <p>我记得 3dmax 中插入的平面、图片就是这样，正面看正常，但转到背面就看不到，不知道是不是面剔除起的作用。</p>
 </blockquote>
@@ -446,11 +446,11 @@ c-16-25.333-24-45-24-59z"/></svg></span></span></span></span></span></span></spa
 <p>首先需要调整三角形点的顺逆时针方向，全部调整为正面逆时针<br>
 然后启用面剔除效果如下</p>
 <p>剔除正面</p>
-<p><img src="/hexo/image/opengl/cull_front.png" alt="图片无法显示"></p>
+<p><img src="/image/opengl/cull_front.png" alt="图片无法显示"></p>
 <p>剔除背面，看起来很正常</p>
-<p><img src="/hexo/image/opengl/cull_face.png" alt="图片无法显示"></p>
+<p><img src="/image/opengl/cull_face.png" alt="图片无法显示"></p>
 <p>剔除正面，从远处看</p>
-<p><img src="/hexo/image/opengl/cull_ccw.png" alt="图片无法显示"></p>
+<p><img src="/image/opengl/cull_ccw.png" alt="图片无法显示"></p>
 <h1>帧缓冲</h1>
 <p>之前绘制到的都是默认的帧缓冲，是创建窗口时 glfw 替我们生成的，绘制到默认缓冲会显示在窗口中。</p>
 <p>帧缓冲创建也是老三样</p>
@@ -513,11 +513,11 @@ c-16-25.333-24-45-24-59z"/></svg></span></span></span></span></span></span></spa
 <p>绘制代码</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="keyword">void</span> Framebuffers::draw()</span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">// 先绘制到自定义帧缓冲</span></span><br><span class="line">    glBindFramebuffer(GL_FRAMEBUFFER, fbo);</span><br><span class="line">    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);</span><br><span class="line"></span><br><span class="line">    glm::<span class="function">mat4 <span class="title">model</span><span class="params">(<span class="number">1.0f</span>)</span></span>;</span><br><span class="line">    glm::mat4 view = camera.getViewMatrix();</span><br><span class="line"></span><br><span class="line">    shader.useProgram();</span><br><span class="line">    shader.setUniform1i(<span class="string">"is_texture"</span>, <span class="number">1</span>);</span><br><span class="line">    <span class="comment">// glDepthFunc(GL_ALWAYS);</span></span><br><span class="line">    glActiveTexture(GL_TEXTURE1);</span><br><span class="line">    glBindTexture(GL_TEXTURE_2D, texture2);</span><br><span class="line">    shader.setUniform1i(<span class="string">"tex"</span>, <span class="number">1</span>);</span><br><span class="line">    shader.setUniformMatrix4(<span class="string">"model"</span>, glm::mat4(<span class="number">1.0f</span>));</span><br><span class="line">    shader.setUniformMatrix4(<span class="string">"view"</span>, view);</span><br><span class="line">    shader.setUniformMatrix4(<span class="string">"projection"</span>, projection);</span><br><span class="line">    glBindVertexArray(vao);</span><br><span class="line">    glDrawArrays(GL_TRIANGLE_STRIP, <span class="number">0</span>, <span class="number">6</span>);</span><br><span class="line"></span><br><span class="line">    glActiveTexture(GL_TEXTURE0);</span><br><span class="line">    glBindTexture(GL_TEXTURE_2D, texture1);</span><br><span class="line">    shader.setUniform1i(<span class="string">"tex"</span>, <span class="number">0</span>);</span><br><span class="line"></span><br><span class="line">    model = glm::translate(model, glm::vec3(<span class="number">-1.0f</span>, <span class="number">0.0f</span>, <span class="number">-1.0f</span>));</span><br><span class="line">    shader.setUniformMatrix4(<span class="string">"model"</span>, model);</span><br><span class="line">    box.bind();</span><br><span class="line">    box.draw();</span><br><span class="line"></span><br><span class="line">    model = glm::translate(glm::mat4(<span class="number">1.0f</span>), glm::vec3(<span class="number">2.0f</span>, <span class="number">0.0f</span>, <span class="number">0.0f</span>));</span><br><span class="line">    shader.setUniformMatrix4(<span class="string">"model"</span>, model);</span><br><span class="line">    box.draw();</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 改用默认帧缓冲</span></span><br><span class="line">    glBindFramebuffer(GL_FRAMEBUFFER, <span class="number">0</span>);</span><br><span class="line"></span><br><span class="line">    framebuffers_shader.useProgram();</span><br><span class="line"></span><br><span class="line">    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);</span><br><span class="line"></span><br><span class="line">    glBindVertexArray(vao1);</span><br><span class="line"></span><br><span class="line">    glActiveTexture(GL_TEXTURE0);</span><br><span class="line">    <span class="comment">// 绑定帧缓冲使用的纹理</span></span><br><span class="line">    glBindTexture(GL_TEXTURE_2D, texture3);</span><br><span class="line">    framebuffers_shader.setUniform1i(<span class="string">"tex"</span>, <span class="number">0</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// imgui控制后期效果切换</span></span><br><span class="line">    framebuffers_shader.setUniform1i(<span class="string">"effect"</span>, c.effect);</span><br><span class="line">    <span class="keyword">if</span> (c.effect == <span class="number">-2</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        glDrawElements(GL_LINE_STRIP, <span class="number">6</span>, GL_UNSIGNED_INT, <span class="number">0</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">    &#123;</span><br><span class="line">        glDrawElements(GL_TRIANGLES, <span class="number">6</span>, GL_UNSIGNED_INT, <span class="number">0</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// imgui窗口绘制</span></span><br><span class="line">    c.effectSwitch();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>最终效果</p>
-<p><img src="/hexo/image/opengl/grayscale.png" alt="图片无法显示"><br>
-<img src="/hexo/image/opengl/edge_detection.png" alt="图片无法显示"></p>
+<p><img src="/image/opengl/grayscale.png" alt="图片无法显示"><br>
+<img src="/image/opengl/edge_detection.png" alt="图片无法显示"></p>
 <h1>立方体贴图</h1>
 <p>立方体贴图由 6 张图片组成，好处在于可以直接通过一个方向向量得到对应位置纹理值，而不再需要纹理坐标。只要立方体在原点，应用立方体贴图的立方体可以比较简单地根据某点在局部坐标系的坐标得到对应位置的纹理。</p>
-<p><img src="/hexo/image/opengl/cubemaps_sampling.png" alt="图片无法显示"></p>
+<p><img src="/image/opengl/cubemaps_sampling.png" alt="图片无法显示"></p>
 <h2 id="加载方法">加载方法</h2>
 <p>大部分方法没变，改变如下</p>
 <ul>
@@ -588,7 +588,7 @@ c-16-25.333-24-45-24-59z"/></svg></span></span></span></span></span></span></spa
 <p>立方体贴图另一个应用就是环境映射，其中最流行的两个是反射(Reflection)和折射(Refraction)。</p>
 <h3 id="反射">反射</h3>
 <p>根据视线方向向量的反射向量取立方体贴图对应位置的纹理，如下图</p>
-<p><img src="/hexo/image/opengl/cubemaps_reflection_theory.png" alt="图片无法显示"></p>
+<p><img src="/image/opengl/cubemaps_reflection_theory.png" alt="图片无法显示"></p>
 <p>所以只需要计算出反射向量即可，反射向量的计算方法在之前的 opengl(4)有说明，着色器中提供了现成的<code>reflect</code>函数</p>
 <p>所以片段着色器中如下即可</p>
 <figure class="highlight glsl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 立方体贴图只在乎方向，不需要标准化</span></span><br><span class="line"><span class="type">vec3</span> viewDir = FragPos - cameraPosition;</span><br><span class="line"><span class="type">vec3</span> reflectDir = <span class="built_in">reflect</span>(viewDir, Normal);</span><br><span class="line"><span class="comment">// ...</span></span><br><span class="line"><span class="type">vec4</span> reflectTexture = <span class="built_in">texture</span>(samplerTexture, reflectDir);</span><br><span class="line">FragColor = reflectTexture;</span><br></pre></td></tr></table></figure>
@@ -597,9 +597,9 @@ c-16-25.333-24-45-24-59z"/></svg></span></span></span></span></span></span></spa
 </blockquote>
 <h3 id="折射">折射</h3>
 <p>根据视线方向向量的折射向量取立方体贴图对应位置的纹理，如下图</p>
-<p><img src="/hexo/image/opengl/cubemaps_refraction_theory.png" alt="图片无法显示"></p>
+<p><img src="/image/opengl/cubemaps_refraction_theory.png" alt="图片无法显示"></p>
 <p><strong>折射向量计算方法</strong></p>
-<p><img src="/hexo/image/opengl/refraction.png" alt="图片无法显示"></p>
+<p><img src="/image/opengl/refraction.png" alt="图片无法显示"></p>
 <p>如图设交界面法向量为<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover accent="true"><mi>n</mi><mo>⃗</mo></mover></mrow><annotation encoding="application/x-tex">\vec{n}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.714em;vertical-align:0em;"></span><span class="mord accent"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.714em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathnormal">n</span></span></span><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.2355em;"><span class="overlay" style="height:0.714em;width:0.471em;"><svg width="0.471em" height="0.714em" style="width:0.471em" viewbox="0 0 471 714" preserveaspectratio="xMinYMin"><path d="M377 20c0-5.333 1.833-10 5.5-14S391 0 397 0c4.667 0 8.667 1.667 12 5
 3.333 2.667 6.667 9 10 19 6.667 24.667 20.333 43.667 41 57 7.333 4.667 11
 10.667 11 18 0 6-1 10-3 12s-6.667 5-14 9c-28.667 14.667-53.667 35.667-75 63
@@ -895,7 +895,7 @@ c-16-25.333-24-45-24-59z"/></svg></span></span></span></span></span></span></spa
 <p>片段着色器</p>
 <figure class="highlight glsl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#version 330 core</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">in</span> <span class="type">vec3</span> Normal;</span><br><span class="line"><span class="keyword">in</span> <span class="type">vec3</span> FragPos;</span><br><span class="line"><span class="keyword">in</span> <span class="type">vec2</span> TexCoords;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 只需要反射贴图和漫反射贴图</span></span><br><span class="line">struct Material</span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">sampler2D</span> texture_diffuse1;</span><br><span class="line">    <span class="type">sampler2D</span> texture_reflection1;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">uniform</span> <span class="type">samplerCube</span> samplerTexture;</span><br><span class="line"><span class="keyword">uniform</span> <span class="type">vec3</span> cameraPosition;</span><br><span class="line"><span class="keyword">uniform</span> Material material;</span><br><span class="line"><span class="keyword">uniform</span> <span class="type">int</span> mapping;</span><br><span class="line"></span><br><span class="line"><span class="keyword">out</span> <span class="type">vec4</span> FragColor;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span> main()</span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">float</span> ratio = <span class="number">1.00</span> / <span class="number">1.52</span>;</span><br><span class="line">    <span class="type">vec3</span> viewDir = FragPos - cameraPosition;</span><br><span class="line">    <span class="comment">// 反射向量</span></span><br><span class="line">    <span class="type">vec3</span> reflectDir = <span class="built_in">reflect</span>(viewDir, Normal);</span><br><span class="line">    <span class="comment">// 折射向量</span></span><br><span class="line">    <span class="type">vec3</span> refractDir = <span class="built_in">refract</span>(viewDir, Normal, ratio);</span><br><span class="line">    <span class="type">vec4</span> reflectTexture = <span class="built_in">texture</span>(samplerTexture, reflectDir);</span><br><span class="line">    <span class="type">vec4</span> reflectionTexture = <span class="built_in">texture</span>(material.texture_reflection1, TexCoords);</span><br><span class="line">    <span class="type">vec4</span> diffuseTexture = <span class="built_in">texture</span>(material.texture_diffuse1, TexCoords);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span>(mapping == <span class="number">0</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="comment">// 反射</span></span><br><span class="line">        FragColor = reflectTexture;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span> <span class="keyword">if</span>(mapping == <span class="number">1</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="comment">// 折射</span></span><br><span class="line">        FragColor = <span class="built_in">texture</span>(samplerTexture, refractDir);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span> <span class="keyword">if</span>(mapping == <span class="number">2</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="comment">// 使用反射贴图</span></span><br><span class="line">        FragColor = <span class="type">vec4</span>((reflectionTexture * reflectTexture + diffuseTexture).xyz, <span class="number">1.0</span>f);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>效果</p>
-<p><img src="/hexo/image/opengl/%E6%95%88%E6%9E%9C%E6%BC%94%E7%A4%BA.gif" alt="图片无法显示"></p>
+<p><img src="/image/opengl/%E6%95%88%E6%9E%9C%E6%BC%94%E7%A4%BA.gif" alt="图片无法显示"></p>
 <h1>参考</h1>
 <ol>
 <li><a href="https://www.cnblogs.com/night-ride-depart/p/7429618.html" target="_blank" rel="noopener">《【3D数学基础】三维空间折射向量计算》</a> authored by <a href="https://home.cnblogs.com/u/night-ride-depart/" target="_blank" rel="noopener">无尽的数字眩晕症</a>@<a href="https://www.cnblogs.com/" target="_blank" rel="noopener">博客园</a></li>
@@ -910,15 +910,15 @@ c-16-25.333-24-45-24-59z"/></svg></span></span></span></span></span></span></spa
 </section>
       <section class="share">
     <h4>Share this post</h4>
-    <a class="icon-twitter" href="http://twitter.com/share?url=https://github.flyingfishman.io/hexo/2021/02/12/opengl7/"
+    <a class="icon-twitter" href="http://twitter.com/share?url=https://github.flyingfishman.io/2021/02/12/opengl7/"
        onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
         <span class="hidden">Twitter</span>
     </a>
-    <a class="icon-facebook" href="https://www.facebook.com/sharer/sharer.php?u=https://github.flyingfishman.io/hexo/2021/02/12/opengl7/"
+    <a class="icon-facebook" href="https://www.facebook.com/sharer/sharer.php?u=https://github.flyingfishman.io/2021/02/12/opengl7/"
        onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
         <span class="hidden">Facebook</span>
     </a>
-    <a class="icon-google-plus" href="https://plus.google.com/share?url=https://github.flyingfishman.io/hexo/2021/02/12/opengl7/"
+    <a class="icon-google-plus" href="https://plus.google.com/share?url=https://github.flyingfishman.io/2021/02/12/opengl7/"
        onclick="window.open(this.href, 'google-plus-share', 'width=490,height=530');return false;">
         <span class="hidden">Google+</span>
     </a>
@@ -927,13 +927,13 @@ c-16-25.333-24-45-24-59z"/></svg></span></span></span></span></span></span></spa
   </article>
   <nav class="pagination" role="pagination">
     
-    <a class="newer-posts" href="/hexo/2021/02/25/opengl8/">
+    <a class="newer-posts" href="/2021/02/25/opengl8/">
         ← opengl(8):高级数据、高级glsl、几何着色器、实例化、抗锯齿
     </a>
     
     <span class="page-number">•</span>
     
-    <a class="older-posts" href="/hexo/2021/02/08/opengl6/">
+    <a class="older-posts" href="/2021/02/08/opengl6/">
         opengl(6):模型加载 →
     </a>
     
@@ -952,15 +952,15 @@ c-16-25.333-24-45-24-59z"/></svg></span></span></span></span></span></span></spa
   <a class="subscribe icon-feed" href="/rss.xml"><span class="tooltip">Subscribe!</span></a>
   
   <div class="inner">
-     <section class="copyright">All content copyright <a href="/hexo/">日常点滴</a> &copy; 2014 &bull; All rights reserved.</section>
+     <section class="copyright">All content copyright <a href="/">日常点滴</a> &copy; 2014 &bull; All rights reserved.</section>
      <section class="poweredby">Proudly published with <a class="icon-ghost" href="http://zespia.tw/hexo/">Hexo</a></section>
   </div>
 </footer>
 
   <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
 
-<script type="text/javascript" src="/hexo/js/jquery.fitvids.js"></script>
-<script type="text/javascript" src="/hexo/js/index.js"></script>
+<script type="text/javascript" src="/js/jquery.fitvids.js"></script>
+<script type="text/javascript" src="/js/index.js"></script>
 
 
 

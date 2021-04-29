@@ -10,7 +10,7 @@
   <meta name="MobileOptimized" content="320" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <link rel="stylesheet" type="text/css" href="/hexo/css/screen.css" />
+  <link rel="stylesheet" type="text/css" href="/css/screen.css" />
   <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Noto+Serif:400,700,400italic|Open+Sans:700,400" />
 
   <meta name="generator" content="日常点滴">
@@ -29,10 +29,10 @@
 
 <body class="post-template">
 
-  <header class="site-head"  style="background-image: url(/image/cover.png)" >
+  <header class="site-head"  style="background-image: url(/hexo/image/cover.jpg)" >
     <div class="vertical">
         <div class="site-head-content inner">
-             <a class="blog-logo" href="/hexo/"><img src="https://avatars.githubusercontent.com/u/26755276" alt="Blog Logo"/></a> 
+             <a class="blog-logo" href="/"><img src="https://avatars.githubusercontent.com/u/26755276" alt="Blog Logo"/></a> 
             <h1 class="blog-title">日常点滴</h1>
             <h2 class="blog-description"></h2>
         </div>
@@ -49,9 +49,9 @@
     
     
     | 
-    <a href='/hexo/tags/windows/'>windows</a>,
+    <a href='/tags/windows/'>windows</a>,
     
-    <a href='/hexo/tags/命令行/'>命令行</a>
+    <a href='/tags/命令行/'>命令行</a>
     
     
 </span>
@@ -97,28 +97,28 @@ details>
 <summary>失败尝试</summary>
 <p>一开始不知道哪出了问题，就想寻找替代方案打开管理员命令行，runas 因此登场（其实 runas 之前试过每次都以失败告终此已经是第 N 次尝试）。</p>
 <h2 id="runas-尝试">runas 尝试</h2>
-<p><img src="/hexo/image/runas/%E6%89%BE%E4%B8%8D%E5%88%B0%E8%B7%AF%E5%BE%84.png" alt="图片无法显示"></p>
+<p><img src="/image/runas/%E6%89%BE%E4%B8%8D%E5%88%B0%E8%B7%AF%E5%BE%84.png" alt="图片无法显示"></p>
 <p>runas 的使用格式<code>runas /user:domain\username &quot;要执行的命令&quot;</code>，其他的可在命令行下<code>runas /?</code>查看。<br>
 可以不输入 domain，不输入时为当前主机<br>
 网上都说<code>runas /user:admin &quot;你的命令&quot;</code>或者<code>runas /user:administrator &quot;你的命令&quot;</code>就行。<br>
 然而至少 win10 下并不是这样：<br>
 执行<code>runas /user:我的当前用户名（有管理员身份） &quot;cmd /k&quot;</code>输入密码打开新的 cmd 的窗口发现并没什么用，得到的窗口还是普通用户权限，试了另一个由管理员账号的用户名，发现还是普通用户权限。</p>
-<p><img src="/hexo/image/runas/%E6%97%A0%E6%95%88.png" alt="图片无法显示"></p>
+<p><img src="/image/runas/%E6%97%A0%E6%95%88.png" alt="图片无法显示"></p>
 <p>按网上教的直接执行<code>runas /user:administrator &quot;cmd /k&quot;</code>，也要求输入 administrator 用户的密码，但是我根本没有设置这个用户的密码。我电脑唯一设置的密码只有我的当前用户的密码，输入这个密码提示用户名和密码错误，不输入直接回车提示 runas 不能不输入密码执行。。。</p>
-<p><img src="/hexo/image/runas/%E5%AF%86%E7%A0%81%E4%B8%8D%E6%AD%A3%E7%A1%AE.png" alt="图片无法显示"></p>
+<p><img src="/image/runas/%E5%AF%86%E7%A0%81%E4%B8%8D%E6%AD%A3%E7%A1%AE.png" alt="图片无法显示"></p>
 <p>另外 runsa 不管输入什么用户名都会提示输入密码，而不会检查用户是否存在，也就是说 administrator 用户不一定存在，需要查看我的电脑上到底有哪些用户，哪些用户是管理员，于是打开了控制面板，系统用户、管理其他用户，发现只有一个当前用户，但是我明明记得之前还有一个用户名不同的本地用户，一个是用邮箱注册的 microsoft 官网用户，都可以用 runas 登录，和当前账户的性质肯定不同，难道又是什么别名。</p>
 <p><strong>能看到的用户(另一个是我后来加的)</strong></p>
-<p><img src="/hexo/image/runas/%E7%B3%BB%E7%BB%9F%E7%94%A8%E6%88%B7.png" alt="图片无法显示"></p>
+<p><img src="/image/runas/%E7%B3%BB%E7%BB%9F%E7%94%A8%E6%88%B7.png" alt="图片无法显示"></p>
 <p>我还发现控制面板改不了用户密码了，只能到 win10 的设置里改当前用户密码，改不了其他用户的密码。</p>
-<p><img src="/hexo/image/runas/%E5%BD%93%E5%89%8D%E7%94%A8%E6%88%B7.png" alt="图片无法显示"></p>
+<p><img src="/image/runas/%E5%BD%93%E5%89%8D%E7%94%A8%E6%88%B7.png" alt="图片无法显示"></p>
 <p>另外计算机管理里面没有了用户和组管理，根据百度用 mmc 控制台打开也没有用，直接提示不能用。<br>
 根本看不到具体有哪些用户了，真的是越更新越难用。</p>
-<p><img src="/hexo/image/runas/mmc.png" alt="图片无法显示"></p>
+<p><img src="/image/runas/mmc.png" alt="图片无法显示"></p>
 <p>然后再用<code>net user</code>命令查看用户，发现能看到本地，但看不到不是本地的当前用户，而且还多了一个奇怪的名字是我邮箱开头五个字母的奇怪用户，我不记得我创建过，以及一个默认的 guest 用户。越看越糊涂。这两个查看到的用户都明显不全。</p>
-<p><img src="/hexo/image/runas/netuser.png" alt="图片无法显示">v</p>
+<p><img src="/image/runas/netuser.png" alt="图片无法显示">v</p>
 <h3 id="runas-结论">runas 结论</h3>
 <p>最后我通过<strong>修改文件属性–&gt;安全–&gt;高级–&gt;添加</strong>里的<strong>搜索用户</strong>功能终于搜到了比较全面的用户列表。</p>
-<p><img src="/hexo/image/runas/%E7%94%A8%E6%88%B7%E5%88%97%E8%A1%A8.png" alt="图片无法显示"></p>
+<p><img src="/image/runas/%E7%94%A8%E6%88%B7%E5%88%97%E8%A1%A8.png" alt="图片无法显示"></p>
 <p>确实存在 administrator 这个用户，但是不知道这个用户的密码，于是又百度，得到的解答是<strong>必须得为执行<code>runas</code>命令的用户设置一个密码</strong>，但是像上文说的，win10 上我无法更改其他用户的密码，甚至无法在设置里看到这个 administrator 用户。。。并且以 administartor 身份执行 runas 命令打开的命令行窗口不一定就有管理员权限，毕竟我的当前用户也有管理员身份，因此最终得到结论 win10 上 runas 以管理员身份运行命令不可行（至少我目前这么低的水平做不到），顶多是以其他用户身份普通用户权限执行命令执行。</p>
 </details>
 <h2 id="解决问题">解决问题</h2>
@@ -145,15 +145,15 @@ details>
 </section>
       <section class="share">
     <h4>Share this post</h4>
-    <a class="icon-twitter" href="http://twitter.com/share?url=https://github.flyingfishman.io/hexo/2020/10/10/runas/"
+    <a class="icon-twitter" href="http://twitter.com/share?url=https://github.flyingfishman.io/2020/10/10/runas/"
        onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
         <span class="hidden">Twitter</span>
     </a>
-    <a class="icon-facebook" href="https://www.facebook.com/sharer/sharer.php?u=https://github.flyingfishman.io/hexo/2020/10/10/runas/"
+    <a class="icon-facebook" href="https://www.facebook.com/sharer/sharer.php?u=https://github.flyingfishman.io/2020/10/10/runas/"
        onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
         <span class="hidden">Facebook</span>
     </a>
-    <a class="icon-google-plus" href="https://plus.google.com/share?url=https://github.flyingfishman.io/hexo/2020/10/10/runas/"
+    <a class="icon-google-plus" href="https://plus.google.com/share?url=https://github.flyingfishman.io/2020/10/10/runas/"
        onclick="window.open(this.href, 'google-plus-share', 'width=490,height=530');return false;">
         <span class="hidden">Google+</span>
     </a>
@@ -162,13 +162,13 @@ details>
   </article>
   <nav class="pagination" role="pagination">
     
-    <a class="newer-posts" href="/hexo/2020/11/23/程序作为服务启动/">
+    <a class="newer-posts" href="/2020/11/23/程序作为服务启动/">
         ← centos下程序作为服务启动
     </a>
     
     <span class="page-number">•</span>
     
-    <a class="older-posts" href="/hexo/2020/08/08/record/">
+    <a class="older-posts" href="/2020/08/08/record/">
         rainmeter皮肤google翻译工具编写 →
     </a>
     
@@ -187,15 +187,15 @@ details>
   <a class="subscribe icon-feed" href="/rss.xml"><span class="tooltip">Subscribe!</span></a>
   
   <div class="inner">
-     <section class="copyright">All content copyright <a href="/hexo/">日常点滴</a> &copy; 2014 &bull; All rights reserved.</section>
+     <section class="copyright">All content copyright <a href="/">日常点滴</a> &copy; 2014 &bull; All rights reserved.</section>
      <section class="poweredby">Proudly published with <a class="icon-ghost" href="http://zespia.tw/hexo/">Hexo</a></section>
   </div>
 </footer>
 
   <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
 
-<script type="text/javascript" src="/hexo/js/jquery.fitvids.js"></script>
-<script type="text/javascript" src="/hexo/js/index.js"></script>
+<script type="text/javascript" src="/js/jquery.fitvids.js"></script>
+<script type="text/javascript" src="/js/index.js"></script>
 
 
 

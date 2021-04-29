@@ -10,7 +10,7 @@
   <meta name="MobileOptimized" content="320" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <link rel="stylesheet" type="text/css" href="/hexo/css/screen.css" />
+  <link rel="stylesheet" type="text/css" href="/css/screen.css" />
   <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Noto+Serif:400,700,400italic|Open+Sans:700,400" />
 
   <meta name="generator" content="日常点滴">
@@ -29,10 +29,10 @@
 
 <body class="post-template">
 
-  <header class="site-head"  style="background-image: url(/image/cover.png)" >
+  <header class="site-head"  style="background-image: url(/hexo/image/cover.jpg)" >
     <div class="vertical">
         <div class="site-head-content inner">
-             <a class="blog-logo" href="/hexo/"><img src="https://avatars.githubusercontent.com/u/26755276" alt="Blog Logo"/></a> 
+             <a class="blog-logo" href="/"><img src="https://avatars.githubusercontent.com/u/26755276" alt="Blog Logo"/></a> 
             <h1 class="blog-title">日常点滴</h1>
             <h2 class="blog-description"></h2>
         </div>
@@ -49,7 +49,7 @@
     
     
     | 
-    <a href='/hexo/tags/opengl/'>opengl</a>
+    <a href='/tags/opengl/'>opengl</a>
     
     
 </span>
@@ -97,7 +97,7 @@
 <p>编译时有个选项<code>BUILD_SHARED_LIBS</code>默认是勾选的，编译后生成的是动态库，需要放到合适的路径。</p>
 <p><strong>碰到的错误</strong></p>
 <p>编译时出了如下错误，似乎是链接什么可执行文件时出错了，但仍在<code>输出文件夹/tools/assimp_cmd</code>和<code>输出文件夹/code</code>下生成了libassimp.dll，但似乎没法使用。</p>
-<p><img src="/hexo/image/opengl/compile_error.png" alt="图片无法显示"></p>
+<p><img src="/image/opengl/compile_error.png" alt="图片无法显示"></p>
 <p>使用的c编译器是mingw64的gcc.exe，c++编译器是mingw64的g++.exe。</p>
 <blockquote>
 <p>解决方案</p>
@@ -112,7 +112,7 @@
 <li>每个节点存储了一个网格的索引列表，以及子节点列表</li>
 <li>网格则包括顶点、顶点法向量、材质索引、纹理坐标</li>
 </ul>
-<p><img src="/hexo/image/opengl/assimp_structure.png" alt="图片无法显示"></p>
+<p><img src="/image/opengl/assimp_structure.png" alt="图片无法显示"></p>
 <h2 id="model类">model类</h2>
 <p>可以根据结点的结构自行编写加载模型的model类，将assimp数据结构转化为自己操作方便的结构，或者直接用assimp的数据结构绘图。</p>
 <blockquote>
@@ -126,7 +126,7 @@
 <p><strong>Model.cpp</strong></p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// ...</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">void</span> Model::loadModel(<span class="built_in">std</span>::<span class="built_in">string</span> path)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="built_in">std</span>::<span class="built_in">cout</span> &lt;&lt; <span class="string">"start importer"</span> &lt;&lt; <span class="built_in">std</span>::<span class="built_in">endl</span>;</span><br><span class="line">    Assimp::Importer importer;</span><br><span class="line">    <span class="keyword">const</span> aiScene *scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs);</span><br><span class="line">    <span class="keyword">if</span> (!scene || scene-&gt;mFlags &amp; AI_SCENE_FLAGS_INCOMPLETE || !scene-&gt;mRootNode)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="built_in">std</span>::<span class="built_in">cout</span> &lt;&lt; <span class="string">"ERROR::ASSIMP::"</span> &lt;&lt; importer.GetErrorString() &lt;&lt; <span class="built_in">std</span>::<span class="built_in">endl</span>;</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    directory = path.substr(<span class="number">0</span>, path.find_last_of(<span class="string">'/'</span>) + <span class="number">1</span>);</span><br><span class="line">    <span class="built_in">std</span>::<span class="built_in">cout</span> &lt;&lt; <span class="string">"start node processor"</span> &lt;&lt; <span class="built_in">std</span>::<span class="built_in">endl</span>;</span><br><span class="line">    processNode(scene-&gt;mRootNode, scene);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">void</span> Model::processNode(aiNode *node, <span class="keyword">const</span> aiScene *scene)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">unsigned</span> <span class="keyword">int</span> i = <span class="number">0</span>; i &lt; node-&gt;mNumMeshes; i++)</span><br><span class="line">    &#123;</span><br><span class="line">        aiMesh *mesh = scene-&gt;mMeshes[node-&gt;mMeshes[i]];</span><br><span class="line">        meshes.push_back(processMesh(mesh, scene));</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">unsigned</span> <span class="keyword">int</span> i = <span class="number">0</span>; i &lt; node-&gt;mNumChildren; i++)</span><br><span class="line">    &#123;</span><br><span class="line">        processNode(node-&gt;mChildren[i], scene);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">Mesh Model::processMesh(aiMesh *mesh, <span class="keyword">const</span> aiScene *scene)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="built_in">vector</span>&lt;mesh::Vertex&gt; vertices;</span><br><span class="line">    <span class="built_in">vector</span>&lt;<span class="keyword">unsigned</span> <span class="keyword">int</span>&gt; indices;</span><br><span class="line">    <span class="comment">// 网格纹理列表</span></span><br><span class="line">    <span class="built_in">vector</span>&lt;mesh::Texture&gt; textures;</span><br><span class="line">    <span class="comment">// 材质结构体，包含环境、镜面、漫反射颜色</span></span><br><span class="line">    mesh::Material mesh_material;</span><br><span class="line">    <span class="comment">// 标志位</span></span><br><span class="line">    <span class="keyword">bool</span> has_texture = <span class="literal">false</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">unsigned</span> <span class="keyword">int</span> i = <span class="number">0</span>; i &lt; mesh-&gt;mNumVertices; i++)</span><br><span class="line">    &#123;</span><br><span class="line">        mesh::Vertex vertex;</span><br><span class="line">        vertex.Position.x = mesh-&gt;mVertices[i].x;</span><br><span class="line">        vertex.Position.y = mesh-&gt;mVertices[i].y;</span><br><span class="line">        vertex.Position.z = mesh-&gt;mVertices[i].z;</span><br><span class="line">        <span class="keyword">if</span> (mesh-&gt;HasNormals())</span><br><span class="line">        &#123;</span><br><span class="line">            vertex.Normal.x = mesh-&gt;mNormals[i].x;</span><br><span class="line">            vertex.Normal.y = mesh-&gt;mNormals[i].y;</span><br><span class="line">            vertex.Normal.z = mesh-&gt;mNormals[i].z;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span> (mesh-&gt;mTextureCoords[<span class="number">0</span>])</span><br><span class="line">        &#123;</span><br><span class="line">            vertex.TexCoord.x = mesh-&gt;mTextureCoords[<span class="number">0</span>][i].x;</span><br><span class="line">            vertex.TexCoord.y = mesh-&gt;mTextureCoords[<span class="number">0</span>][i].y;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span></span><br><span class="line">        &#123;</span><br><span class="line">            vertex.TexCoord = glm::vec2(<span class="number">0.0f</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        vertices.push_back(vertex);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">unsigned</span> <span class="keyword">int</span> i = <span class="number">0</span>; i &lt; mesh-&gt;mNumFaces; i++)</span><br><span class="line">    &#123;</span><br><span class="line">        aiFace face = mesh-&gt;mFaces[i];</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">unsigned</span> <span class="keyword">int</span> j = <span class="number">0</span>; j &lt; face.mNumIndices; j++)</span><br><span class="line">        &#123;</span><br><span class="line">            indices.push_back(face.mIndices[j]);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (mesh-&gt;mMaterialIndex &gt;= <span class="number">0</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        aiMaterial *material = scene-&gt;mMaterials[mesh-&gt;mMaterialIndex];</span><br><span class="line">        aiString material_name = material-&gt;GetName();</span><br><span class="line">        <span class="keyword">unsigned</span> <span class="keyword">int</span> len = material-&gt;GetTextureCount(aiTextureType_DIFFUSE);</span><br><span class="line">        <span class="comment">// 纹理作为材质时</span></span><br><span class="line">        <span class="keyword">if</span> (len &gt; <span class="number">0</span>)</span><br><span class="line">        &#123;</span><br><span class="line">            has_texture = <span class="literal">true</span>;</span><br><span class="line">            loadMaterialTextures(material, aiTextureType_DIFFUSE, <span class="string">"texture_diffuse"</span>, textures, len);</span><br><span class="line">            loadMaterialTextures(material, aiTextureType_SPECULAR, <span class="string">"texture_specular"</span>, textures, len);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 颜色作为材质时</span></span><br><span class="line">        <span class="keyword">else</span></span><br><span class="line">        &#123;</span><br><span class="line">            aiColor3D diffuse, specular, ambient;</span><br><span class="line">            material-&gt;Get(AI_MATKEY_COLOR_DIFFUSE, diffuse);</span><br><span class="line">            mesh_material.diffuse = diffuse;</span><br><span class="line">            material-&gt;Get(AI_MATKEY_COLOR_SPECULAR, specular);</span><br><span class="line">            mesh_material.specular = specular;</span><br><span class="line">            material-&gt;Get(AI_MATKEY_COLOR_AMBIENT, ambient);</span><br><span class="line">            mesh_material.ambient = ambient;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 创建匿名网格对象</span></span><br><span class="line">    <span class="comment">// 编译时只要启用了优化，返回对象似乎不会对性能有影响</span></span><br><span class="line">    <span class="keyword">return</span> Mesh(vertices, indices, textures, mesh_material, has_texture);</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// ...</span></span><br></pre></td></tr></table></figure>
 <p>成果如下，从<a href="https://free3d.com/" target="_blank" rel="noopener">free3d</a>下载的obj格式的钢铁侠模型，虽然似乎有些地方材质颜色加载失败</p>
-<p><img src="/hexo/image/opengl/model_loading.gif" alt="图片无法显示"></p>
+<p><img src="/image/opengl/model_loading.gif" alt="图片无法显示"></p>
 <h1>参考</h1>
 <ol>
 <li><a href="https://en.wikipedia.org/wiki/Wavefront_.obj_file" target="_blank" rel="noopener">wikipedia:Wavefront .obj file</a></li>
@@ -141,15 +141,15 @@
 </section>
       <section class="share">
     <h4>Share this post</h4>
-    <a class="icon-twitter" href="http://twitter.com/share?url=https://github.flyingfishman.io/hexo/2021/02/08/opengl6/"
+    <a class="icon-twitter" href="http://twitter.com/share?url=https://github.flyingfishman.io/2021/02/08/opengl6/"
        onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
         <span class="hidden">Twitter</span>
     </a>
-    <a class="icon-facebook" href="https://www.facebook.com/sharer/sharer.php?u=https://github.flyingfishman.io/hexo/2021/02/08/opengl6/"
+    <a class="icon-facebook" href="https://www.facebook.com/sharer/sharer.php?u=https://github.flyingfishman.io/2021/02/08/opengl6/"
        onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
         <span class="hidden">Facebook</span>
     </a>
-    <a class="icon-google-plus" href="https://plus.google.com/share?url=https://github.flyingfishman.io/hexo/2021/02/08/opengl6/"
+    <a class="icon-google-plus" href="https://plus.google.com/share?url=https://github.flyingfishman.io/2021/02/08/opengl6/"
        onclick="window.open(this.href, 'google-plus-share', 'width=490,height=530');return false;">
         <span class="hidden">Google+</span>
     </a>
@@ -158,13 +158,13 @@
   </article>
   <nav class="pagination" role="pagination">
     
-    <a class="newer-posts" href="/hexo/2021/02/12/opengl7/">
+    <a class="newer-posts" href="/2021/02/12/opengl7/">
         ← opengl(7):深度测试、模板测试、混合、面剔除、帧缓冲、立方体贴图
     </a>
     
     <span class="page-number">•</span>
     
-    <a class="older-posts" href="/hexo/2021/02/04/opengl5/">
+    <a class="older-posts" href="/2021/02/04/opengl5/">
         opengl(5):光照贴图、投光物、多光源 →
     </a>
     
@@ -183,15 +183,15 @@
   <a class="subscribe icon-feed" href="/rss.xml"><span class="tooltip">Subscribe!</span></a>
   
   <div class="inner">
-     <section class="copyright">All content copyright <a href="/hexo/">日常点滴</a> &copy; 2014 &bull; All rights reserved.</section>
+     <section class="copyright">All content copyright <a href="/">日常点滴</a> &copy; 2014 &bull; All rights reserved.</section>
      <section class="poweredby">Proudly published with <a class="icon-ghost" href="http://zespia.tw/hexo/">Hexo</a></section>
   </div>
 </footer>
 
   <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
 
-<script type="text/javascript" src="/hexo/js/jquery.fitvids.js"></script>
-<script type="text/javascript" src="/hexo/js/index.js"></script>
+<script type="text/javascript" src="/js/jquery.fitvids.js"></script>
+<script type="text/javascript" src="/js/index.js"></script>
 
 
 
