@@ -10,7 +10,7 @@
   <meta name="MobileOptimized" content="320" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <link rel="stylesheet" type="text/css" href="/css/screen.css" />
+  <link rel="stylesheet" type="text/css" href="/mynote/css/screen.css" />
   <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Noto+Serif:400,700,400italic|Open+Sans:700,400" />
 
   <meta name="generator" content="日常点滴">
@@ -32,7 +32,7 @@
   <header class="site-head"  style="background-image: url(/hexo/image/cover.jpg)" >
     <div class="vertical">
         <div class="site-head-content inner">
-             <a class="blog-logo" href="/"><img src="https://avatars.githubusercontent.com/u/26755276" alt="Blog Logo"/></a> 
+             <a class="blog-logo" href="/mynote/"><img src="https://avatars.githubusercontent.com/u/26755276" alt="Blog Logo"/></a> 
             <h1 class="blog-title">日常点滴</h1>
             <h2 class="blog-description"></h2>
         </div>
@@ -49,7 +49,7 @@
     
     
     | 
-    <a href='/tags/opengl/'>opengl</a>
+    <a href='/mynote/tags/opengl/'>opengl</a>
     
     
 </span>
@@ -66,29 +66,29 @@
 <li>当光源位于平面背面，视点位于平面正面时，理论上说，光线是被遮挡的，但按照冯氏光照的计算方法，只要反射光与视线方向形成锐角，镜面分量就不为 0，如下，由于设置了光照半径（shininesss），大部分情况这产生的影响微乎其微，将光照半径（shininess）调小就可看出影响。</li>
 </ol>
 <div style="text-align:center" id="img1-1">
-<p style="margin-bottom: 5px"><img style="margin-bottom: 0px" src="/image/opengl/phong_shading_problem.png" alt="图片加载失败"></p>
+<p style="margin-bottom: 5px"><img style="margin-bottom: 0px" src="/mynote/image/opengl/phong_shading_problem.png" alt="图片加载失败"></p>
 <p style="margin-bottom: 20px; line-height:1.5"><span style="font-size:12px">图1-1：如图将shininess设为1后可以看到，即使背面的光源也产生了镜面光</span></p>
 </div>
 <div style="text-align:center" id="img1-2">
-<p style="margin-bottom: 5px"><img style="margin-bottom: 0px" src="/image/opengl/problem_cause1.png" alt="图片加载失败"></p>
+<p style="margin-bottom: 5px"><img style="margin-bottom: 0px" src="/mynote/image/opengl/problem_cause1.png" alt="图片加载失败"></p>
 <p style="margin-bottom: 20px; line-height:1.5"><span style="font-size:12px">图1-2: 引发原因</span></p>
 </div>
 <ol start="2">
 <li>某些情况下会造成如下的光线产生明显的分割线现象产生。</li>
 </ol>
 <div style="text-align:center" id="img1-3">
-<p style="margin-bottom: 5px"><img style="margin-bottom: 0px" src="/image/opengl/advanced_lighting_phong_limit.png" alt="图片加载失败"></p>
+<p style="margin-bottom: 5px"><img style="margin-bottom: 0px" src="/mynote/image/opengl/advanced_lighting_phong_limit.png" alt="图片加载失败"></p>
 <p style="margin-bottom: 20px; line-height:1.5"><span style="font-size:12px">图1-3: 产生分割线</span></p>
 </div>
 <div style="text-align:center" id="img1-4">
-<p style="margin-bottom: 5px"><img style="margin-bottom: 0px" src="/image/opengl/problem_cause2.png" alt="图片加载失败"></p>
+<p style="margin-bottom: 5px"><img style="margin-bottom: 0px" src="/mynote/image/opengl/problem_cause2.png" alt="图片加载失败"></p>
 <p style="margin-bottom: 20px; line-height:1.5"><span style="font-size:12px">图1-4: 上图问题引发原因</span></p>
 </div>
 <p>漫反射用的是光线反方向向量与平面法线相乘，故不会出现上述两种问题。</p>
 <h2 id="blinn-phong">blinn-phong</h2>
 <p>blinn-phong 则采用半程向量（沿视点-顶点-光点组成的角的角平分线方向上的向量）与平面法线的点积来计算镜面分量，这可以有效解决上面提到的第二个问题。</p>
 <div style="text-align:center" id="img1-5">
-<p style="margin-bottom: 5px"><img style="margin-bottom: 0px" src="/image/opengl/advanced_lighting_halfway_vector.png" alt="图片加载失败"></p>
+<p style="margin-bottom: 5px"><img style="margin-bottom: 0px" src="/mynote/image/opengl/advanced_lighting_halfway_vector.png" alt="图片加载失败"></p>
 <p style="margin-bottom: 20px; line-height:1.5"><span style="font-size:12px">图1-5: 半程向量</span></p>
 </div>
 <p>半程方向向量计算方式很简单即可得到如下：</p>
@@ -144,14 +144,14 @@ c-16-25.333-24-45-24-59z"/></svg></span></span></span></span></span></span></spa
 <p><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><msub><mi>f</mi><mrow><mi>e</mi><mi>y</mi><mi>e</mi></mrow></msub><mo stretchy="false">(</mo><msub><mi>f</mi><mrow><mi>c</mi><mi>r</mi><mi>t</mi></mrow></msub><mo stretchy="false">(</mo><mfrac><mrow><mi>b</mi><mo>∗</mo><mi>x</mi></mrow><mi>a</mi></mfrac><mo stretchy="false">)</mo><mo stretchy="false">)</mo><mo>=</mo><mfrac><mrow><mi>b</mi><mo>∗</mo><msub><mi>f</mi><mrow><mi>e</mi><mi>y</mi><mi>e</mi></mrow></msub><mo stretchy="false">(</mo><msub><mi>f</mi><mrow><mi>c</mi><mi>r</mi><mi>t</mi></mrow></msub><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mo stretchy="false">)</mo></mrow><mi>a</mi></mfrac></mrow><annotation encoding="application/x-tex">f_{eye}(f_{crt}(\frac{b * x}{a})) = \frac{b * f_{eye}(f_{crt}(x))}{a}
 </annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:2.05744em;vertical-align:-0.686em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.10764em;">f</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.15139200000000003em;"><span style="top:-2.5500000000000003em;margin-left:-0.10764em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">e</span><span class="mord mathnormal mtight" style="margin-right:0.03588em;">y</span><span class="mord mathnormal mtight">e</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.286108em;"><span></span></span></span></span></span></span><span class="mopen">(</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.10764em;">f</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.2805559999999999em;"><span style="top:-2.5500000000000003em;margin-left:-0.10764em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">c</span><span class="mord mathnormal mtight" style="margin-right:0.02778em;">r</span><span class="mord mathnormal mtight">t</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mopen">(</span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.37144em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathnormal">a</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathnormal">b</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">∗</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mord mathnormal">x</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.686em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mclose">)</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:2.113em;vertical-align:-0.686em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.427em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathnormal">a</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathnormal">b</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">∗</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.10764em;">f</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.15139200000000003em;"><span style="top:-2.5500000000000003em;margin-left:-0.10764em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">e</span><span class="mord mathnormal mtight" style="margin-right:0.03588em;">y</span><span class="mord mathnormal mtight">e</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.286108em;"><span></span></span></span></span></span></span><span class="mopen">(</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.10764em;">f</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.2805559999999999em;"><span style="top:-2.5500000000000003em;margin-left:-0.10764em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">c</span><span class="mord mathnormal mtight" style="margin-right:0.02778em;">r</span><span class="mord mathnormal mtight">t</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mopen">(</span><span class="mord mathnormal">x</span><span class="mclose">)</span><span class="mclose">)</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.686em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span></span></p>
 <div style="text-align:center" id="img2-1">
-<p style="margin-bottom: 5px"><img style="margin-bottom: 0px" src="/image/opengl/gamma_correction_brightness.png" alt="图片加载失败"></p>
+<p style="margin-bottom: 5px"><img style="margin-bottom: 0px" src="/mynote/image/opengl/gamma_correction_brightness.png" alt="图片加载失败"></p>
 <p style="margin-bottom: 20px; line-height:1.5"><span style="font-size:12px">图2-1: 感知亮度和物理亮度</span></p>
 </div>
 <p>上图中，对人眼而言似乎第一行是正确的亮度值变化，两倍的亮度值确实对应着（相对一倍亮度值的亮度）两倍亮度。然而，如果讨论物理亮度（例如光源发射的光子数），第二行才是实际的物理意义上亮度与亮度值的对应关系。在第二行中，两倍的亮度值对应两倍的物理亮度，但是由于人眼的感知亮度是不同的，导致第二行看起来有点奇怪。</p>
 <p>由于人眼感知亮度的方式更倾向于上图第一行，显示器至今仍在使用上文提到的输出功率与显示颜色的转化关系，以将亮度数值映射到上图第一行的亮度。</p>
 <p>显示器的这种非线性映射确实输出了肉眼看起来更加满意的颜色（这个满意是指照着屏幕调整颜色时，把颜色的亮度值减半，你眼睛里感觉到亮度变化也是减半的，即亮度的数值配置变化导致的视觉变化符合预期），但是对于渲染图象而言，若要把设置的颜色按照物理规律进行运算，就会得到不正确的结果。</p>
 <div style="text-align:center" id="img2-2">
-<p style="margin-bottom: 5px"><img style="margin-bottom: 0px" src="/image/opengl/gamma_correction_gamma_curves.png" alt="图片加载失败"></p>
+<p style="margin-bottom: 5px"><img style="margin-bottom: 0px" src="/mynote/image/opengl/gamma_correction_gamma_curves.png" alt="图片加载失败"></p>
 <p style="margin-bottom: 20px; line-height:1.5"><span style="font-size:12px">图2-2: 三条线分别代表：gamma校正的输入输出映射关系、理想的输入输出映射关系、显示器显像管的输入电压和输出亮度的映射关系</span></p>
 </div>
 <p>如上图，仅观察红色凹曲线，横坐标可理解为输入电压强度<sup><a href="#comment1">[1]</a></sup>或者颜色数值，纵坐标理解为输出光线实际物理亮度。</p>
@@ -159,7 +159,7 @@ c-16-25.333-24-45-24-59z"/></svg></span></span></span></span></span></span></spa
 <p>到目前为止我们都以为我们在线性的空间<sup><a href="#comment3">[3]</a></sup>中工作，但实际上，我们是在屏幕输出空间中工作，因此我们配置的所有光照变量，在物理上都是不正确的，只不过在屏幕上看起来不错。<sup><a href="#comment3">[4]</a></sup></p>
 <p>由于我们设置的颜色对照了屏幕输出来决定，因此当使用这些颜色进行线性空间计算的时候得到的结果在物理上都是不正确的。使用越复杂的算法这一问题就变得越明显。<sup><a href="#comment5">[5]</a></sup></p>
 <div style="text-align:center" id="img2-3">
-<p style="margin-bottom: 5px"><img style="margin-bottom: 0px" src="/image/opengl/gamma_correction_example.png" alt="图片加载失败"></p>
+<p style="margin-bottom: 5px"><img style="margin-bottom: 0px" src="/mynote/image/opengl/gamma_correction_example.png" alt="图片加载失败"></p>
 <p style="margin-bottom: 20px; line-height:1.5"><span style="font-size:12px">图2-3: 有无gamma校正对比</span></p>
 </div>
 <h2 id="校正">校正</h2>
@@ -192,7 +192,7 @@ feel_{corrected} = f_{eye}(f_{crt}(f_{correction}(x))) = x^{-2.2}
 <p>用电脑绘图编辑颜色等，所取的颜色都是根据你在显示器上看到的颜色决定的。这意味着你在电脑上创建或编辑的图片颜色（对显示器输出的颜色而言）不是线性空间中的颜色，而是 sRGB 空间中的颜色<sup><a href="#comment4">[4]</a></sup> 。（这时的颜色值就是需要显示在显示器上的颜色值，而不用再进行 gamma 校正）</p>
 <p>在引入 gamma 校正前这不是问题，因为 sRGB 空间的纹理颜色不进行 gamma 校正才是对的。然而引入 gamma 校正后，对 sRGB 空间的纹理进行 gamma，会导致其看起来不合适。</p>
 <div style="text-align:center" id="img2-4">
-<p style="margin-bottom: 5px"><img style="margin-bottom: 0px" src="/image/opengl/gamma_correction_srgbtextures.png" alt="图片加载失败"></p>
+<p style="margin-bottom: 5px"><img style="margin-bottom: 0px" src="/mynote/image/opengl/gamma_correction_srgbtextures.png" alt="图片加载失败"></p>
 <p style="margin-bottom: 20px; line-height:1.5"><span style="font-size:12px">图2-4: 有无gamma校正对比</span></p>
 </div>
 <p>一个解决办法是在纹理颜色计算前，将其转化成非 sRGB 空间的颜色。</p>
@@ -273,11 +273,11 @@ feel_{corrected} = f_{eye}(f_{crt}(f_{correction}(x))) = x^{-2.2}
 <h3 id="阴影失真">阴影失真</h3>
 <p>第一个问题是阴影失真。如下图</p>
 <div style="text-align:center" id="img3-1">
-<p style="margin-bottom: 5px"><img style="margin-bottom: 0px" src="/image/opengl/shadow_acne.png" alt="图片加载失败"></p>
+<p style="margin-bottom: 5px"><img style="margin-bottom: 0px" src="/mynote/image/opengl/shadow_acne.png" alt="图片加载失败"></p>
 <p style="margin-bottom: 20px; line-height:1.5"><span style="font-size:12px">图3-1: 阴影失真，纹理过滤设为GL_NEAREST时</span></p>
 </div>
 <div style="text-align:center" id="img3-2">
-<p style="margin-bottom: 5px"><img style="margin-bottom: 0px" src="/image/opengl/shadow_acne_linear.png" alt="图片加载失败"></p>
+<p style="margin-bottom: 5px"><img style="margin-bottom: 0px" src="/mynote/image/opengl/shadow_acne_linear.png" alt="图片加载失败"></p>
 <p style="margin-bottom: 20px; line-height:1.5"><span style="font-size:12px">图3-2: 阴影失真，纹理过滤为GL_LINEAR时</span></p>
 </div>
 <p>产生这个问题的原因是阴影贴图是一个个像素组成的，并不能准确取到某一坐标处的离光源最近点的准确深度，而只能取邻近点的值。</p>
@@ -291,7 +291,7 @@ feel_{corrected} = f_{eye}(f_{crt}(f_{correction}(x))) = x^{-2.2}
 <h3 id="悬浮">悬浮</h3>
 <p>引入bias后又会存在第二个问题，悬浮</p>
 <div style="text-align:center" id="img3-3">
-<p style="margin-bottom: 5px"><img style="margin-bottom: 0px" src="/image/opengl/peter_panning.png" alt="图片加载失败"></p>
+<p style="margin-bottom: 5px"><img style="margin-bottom: 0px" src="/mynote/image/opengl/peter_panning.png" alt="图片加载失败"></p>
 <p style="margin-bottom: 20px; line-height:1.5"><span style="font-size:12px">图3-3: bias设为0.1时产生的悬浮问题</span></p>
 </div>
 <p>这个引发原因也好理解，由于我们设置了bias。对于同一光线路径上的两个点A，B，A为更靠近光源的顶点，B为被A遮挡应当存在阴影的点，A点深度为<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>d</mi><mi>A</mi></msub></mrow><annotation encoding="application/x-tex">d_A</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.84444em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal">d</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.32833099999999993em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">A</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span>，b点深度为<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>d</mi><mi>B</mi></msub></mrow><annotation encoding="application/x-tex">d_B</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.84444em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal">d</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.32833099999999993em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.05017em;">B</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span>，在将B点深度与最小深度比较时，若<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>d</mi><mi>B</mi></msub><mo>−</mo><msub><mi>d</mi><mi>A</mi></msub><mo>&lt;</mo><mi>b</mi><mi>i</mi><mi>a</mi><mi>s</mi></mrow><annotation encoding="application/x-tex">d_B - d_A &lt; bias</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.84444em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal">d</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.32833099999999993em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.05017em;">B</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:0.84444em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal">d</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.32833099999999993em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">A</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">&lt;</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.69444em;vertical-align:0em;"></span><span class="mord mathnormal">b</span><span class="mord mathnormal">i</span><span class="mord mathnormal">a</span><span class="mord mathnormal">s</span></span></span></span>，就可能照成<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>d</mi><mi>e</mi><mi>p</mi><mi>t</mi><mi>h</mi><mo>&gt;</mo><msub><mi>d</mi><mi>B</mi></msub><mo>−</mo><mi>b</mi><mi>i</mi><mi>a</mi><mi>s</mi></mrow><annotation encoding="application/x-tex">depth &gt; d_B - bias</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8888799999999999em;vertical-align:-0.19444em;"></span><span class="mord mathnormal">d</span><span class="mord mathnormal">e</span><span class="mord mathnormal">p</span><span class="mord mathnormal">t</span><span class="mord mathnormal">h</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">&gt;</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.84444em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal">d</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.32833099999999993em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.05017em;">B</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:0.69444em;vertical-align:0em;"></span><span class="mord mathnormal">b</span><span class="mord mathnormal">i</span><span class="mord mathnormal">a</span><span class="mord mathnormal">s</span></span></span></span></p>
@@ -299,7 +299,7 @@ feel_{corrected} = f_{eye}(f_{crt}(f_{correction}(x))) = x^{-2.2}
 <p>具体方法是生成阴影贴图时剔除物体的正面。由于实心物体面向光的一面与背光一面深度有一定距离，阴影贴图取的是背面深度，因此些许的depth取值偏差不会影响深度比较，也就不会产生条纹。而对于地板这样的平面，若其前方没有遮挡物，而正面又被剔除了，此时深度缓冲取值为最小值1，因此地板上也不会产生条纹。（不过这种方法有限制）</p>
 <p>另外这个方法会引发的一个问题是，blinn光照有个问题是背光面在特定情况下会有一定光照，使用正面剔除后可能导致背面阴影失真</p>
 <div style="text-align:center" id="img3-4">
-<p style="margin-bottom: 5px"><img style="margin-bottom: 0px" src="/image/opengl/shadow_acne_back.png" alt="图片加载失败"></p>
+<p style="margin-bottom: 5px"><img style="margin-bottom: 0px" src="/mynote/image/opengl/shadow_acne_back.png" alt="图片加载失败"></p>
 <p style="margin-bottom: 20px; line-height:1.5"><span style="font-size:12px">图3-4: 背面的阴影失真</span></p>
 </div>
 <h3 id="超出采样范围">超出采样范围</h3>
@@ -309,7 +309,7 @@ feel_{corrected} = f_{eye}(f_{crt}(f_{correction}(x))) = x^{-2.2}
 <p>修改着色器</p>
 <figure class="highlight glsl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">float</span> ShadowCalculation(<span class="type">vec4</span> fragPosLightSpace)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">// ...</span></span><br><span class="line">    <span class="keyword">if</span>(currentDepth &lt; <span class="number">0</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="comment">// 深度小于0加亮</span></span><br><span class="line">        <span class="keyword">return</span> <span class="number">10</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 事实上这一处判断不需要，因为最后一行的返回语句也会导致currentDepth大于1时直接显示阴影</span></span><br><span class="line">    <span class="keyword">else</span> <span class="keyword">if</span>(currentDepth &gt; <span class="number">1</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="comment">// 深度大于1直接取阴影</span></span><br><span class="line">        <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> closestDepth &lt; currentDepth - bias ? <span class="number">0.0</span>f : <span class="number">1.0</span>f;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <div style="text-align:center" id="img3-5">
-<p style="margin-bottom: 5px"><img style="margin-bottom: 0px" src="/image/opengl/depth_value.png" alt="图片加载失败"></p>
+<p style="margin-bottom: 5px"><img style="margin-bottom: 0px" src="/mynote/image/opengl/depth_value.png" alt="图片加载失败"></p>
 <p style="margin-bottom: 20px; line-height:1.5"><span style="font-size:12px">图3-5: 超出采样范围会产生的情况</span></p>
 </div>
 <p>由于阴影贴图中最大深度值为1，因此即使不做上述修改，比远平面还远的点也总是会显示阴影，如果不想这样，我们就要做些修改。</p>
@@ -343,15 +343,15 @@ feel_{corrected} = f_{eye}(f_{crt}(f_{correction}(x))) = x^{-2.2}
 </section>
       <section class="share">
     <h4>Share this post</h4>
-    <a class="icon-twitter" href="http://twitter.com/share?url=https://github.flyingfishman.io/2021/03/30/opengl9/"
+    <a class="icon-twitter" href="http://twitter.com/share?url=https://github.flyingfishman.io/mynote/2021/03/30/opengl9/"
        onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
         <span class="hidden">Twitter</span>
     </a>
-    <a class="icon-facebook" href="https://www.facebook.com/sharer/sharer.php?u=https://github.flyingfishman.io/2021/03/30/opengl9/"
+    <a class="icon-facebook" href="https://www.facebook.com/sharer/sharer.php?u=https://github.flyingfishman.io/mynote/2021/03/30/opengl9/"
        onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
         <span class="hidden">Facebook</span>
     </a>
-    <a class="icon-google-plus" href="https://plus.google.com/share?url=https://github.flyingfishman.io/2021/03/30/opengl9/"
+    <a class="icon-google-plus" href="https://plus.google.com/share?url=https://github.flyingfishman.io/mynote/2021/03/30/opengl9/"
        onclick="window.open(this.href, 'google-plus-share', 'width=490,height=530');return false;">
         <span class="hidden">Google+</span>
     </a>
@@ -360,13 +360,13 @@ feel_{corrected} = f_{eye}(f_{crt}(f_{correction}(x))) = x^{-2.2}
   </article>
   <nav class="pagination" role="pagination">
     
-    <a class="newer-posts" href="/2021/04/10/opengl10/">
+    <a class="newer-posts" href="/mynote/2021/04/10/opengl10/">
         ← opengl(10):万向光阴影，CSM，法线贴图
     </a>
     
     <span class="page-number">•</span>
     
-    <a class="older-posts" href="/2021/02/25/opengl8/">
+    <a class="older-posts" href="/mynote/2021/02/25/opengl8/">
         opengl(8):高级数据、高级glsl、几何着色器、实例化、抗锯齿 →
     </a>
     
@@ -385,15 +385,15 @@ feel_{corrected} = f_{eye}(f_{crt}(f_{correction}(x))) = x^{-2.2}
   <a class="subscribe icon-feed" href="/rss.xml"><span class="tooltip">Subscribe!</span></a>
   
   <div class="inner">
-     <section class="copyright">All content copyright <a href="/">日常点滴</a> &copy; 2014 &bull; All rights reserved.</section>
+     <section class="copyright">All content copyright <a href="/mynote/">日常点滴</a> &copy; 2014 &bull; All rights reserved.</section>
      <section class="poweredby">Proudly published with <a class="icon-ghost" href="http://zespia.tw/hexo/">Hexo</a></section>
   </div>
 </footer>
 
   <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
 
-<script type="text/javascript" src="/js/jquery.fitvids.js"></script>
-<script type="text/javascript" src="/js/index.js"></script>
+<script type="text/javascript" src="/mynote/js/jquery.fitvids.js"></script>
+<script type="text/javascript" src="/mynote/js/index.js"></script>
 
 
 

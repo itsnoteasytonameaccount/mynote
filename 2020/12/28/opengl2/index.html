@@ -10,7 +10,7 @@
   <meta name="MobileOptimized" content="320" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <link rel="stylesheet" type="text/css" href="/css/screen.css" />
+  <link rel="stylesheet" type="text/css" href="/mynote/css/screen.css" />
   <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Noto+Serif:400,700,400italic|Open+Sans:700,400" />
 
   <meta name="generator" content="日常点滴">
@@ -32,7 +32,7 @@
   <header class="site-head"  style="background-image: url(/hexo/image/cover.jpg)" >
     <div class="vertical">
         <div class="site-head-content inner">
-             <a class="blog-logo" href="/"><img src="https://avatars.githubusercontent.com/u/26755276" alt="Blog Logo"/></a> 
+             <a class="blog-logo" href="/mynote/"><img src="https://avatars.githubusercontent.com/u/26755276" alt="Blog Logo"/></a> 
             <h1 class="blog-title">日常点滴</h1>
             <h2 class="blog-description"></h2>
         </div>
@@ -49,9 +49,9 @@
     
     
     | 
-    <a href='/tags/opengl/'>opengl</a>,
+    <a href='/mynote/tags/opengl/'>opengl</a>,
     
-    <a href='/tags/c/'>c++</a>
+    <a href='/mynote/tags/c/'>c++</a>
     
     
 </span>
@@ -62,7 +62,7 @@
 <a id="more"></a>
 <h1>着色器</h1>
 <p>GPU 中运行着色器程序的顺序如下(蓝色的为可由用户定义的)</p>
-<p><img src="/image/opengl/pipeline.png" alt="图片无法显示"></p>
+<p><img src="/mynote/image/opengl/pipeline.png" alt="图片无法显示"></p>
 <p>图形渲染管线的第一个部分是顶点着色器(Vertex Shader)，它把一个单独的顶点作为输入。顶点着色器主要的目的是把 3D 坐标转为另一种 3D 坐标（后面会解释），同时顶点着色器允许我们对顶点属性进行一些基本处理。</p>
 <p>图元装配(Primitive Assembly)阶段将顶点着色器输出的所有顶点作为输入（如果是 GL_POINTS，那么就是一个顶点），并所有的点装配成指定图元的形状；本节例子中是一个三角形。</p>
 <p>图元装配阶段的输出会传递给几何着色器(Geometry Shader)。几何着色器把图元形式的一系列顶点的集合作为输入，它可以通过产生新顶点构造出新的（或是其它的）图元来生成其他形状。例子中，它生成了另一个三角形。</p>
@@ -199,7 +199,7 @@
 </tbody>
 </table>
 <p><strong>表现</strong></p>
-<p><img src="/image/opengl/texture_wrapping.png" alt="图片无法显示"></p>
+<p><img src="/mynote/image/opengl/texture_wrapping.png" alt="图片无法显示"></p>
 <h2 id="纹理过滤">纹理过滤</h2>
 <p>决定将纹理放大或缩小时像素如何映射</p>
 <p>通过<code>glTexParameteri</code>设置<code>GL_TEXTURE_MIN_FILTER</code>,<code>GL_TEXTURE_MAG_FILTER</code>的值来设置</p>
@@ -226,10 +226,10 @@
 </tbody>
 </table>
 <p>效果</p>
-<p><img src="/image/opengl/texture_filtering.png" alt="图片无法显示"></p>
+<p><img src="/mynote/image/opengl/texture_filtering.png" alt="图片无法显示"></p>
 <h3 id="多级渐远纹理">多级渐远纹理</h3>
 <p>配置<code>GL_TEXTURE_MIN_FILTER</code>时还可以取多级渐远纹理，多级渐远纹理是一组按 50%逐级等比缩小的纹理，如下</p>
-<p><img src="/image/opengl/mipmaps.png" alt="图片无法显示"></p>
+<p><img src="/mynote/image/opengl/mipmaps.png" alt="图片无法显示"></p>
 <p>可在创建完纹理后使用<code>glGenerateMipmaps</code>生成</p>
 <table>
 <thead>
@@ -342,15 +342,15 @@
 </section>
       <section class="share">
     <h4>Share this post</h4>
-    <a class="icon-twitter" href="http://twitter.com/share?url=https://github.flyingfishman.io/2020/12/28/opengl2/"
+    <a class="icon-twitter" href="http://twitter.com/share?url=https://github.flyingfishman.io/mynote/2020/12/28/opengl2/"
        onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
         <span class="hidden">Twitter</span>
     </a>
-    <a class="icon-facebook" href="https://www.facebook.com/sharer/sharer.php?u=https://github.flyingfishman.io/2020/12/28/opengl2/"
+    <a class="icon-facebook" href="https://www.facebook.com/sharer/sharer.php?u=https://github.flyingfishman.io/mynote/2020/12/28/opengl2/"
        onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
         <span class="hidden">Facebook</span>
     </a>
-    <a class="icon-google-plus" href="https://plus.google.com/share?url=https://github.flyingfishman.io/2020/12/28/opengl2/"
+    <a class="icon-google-plus" href="https://plus.google.com/share?url=https://github.flyingfishman.io/mynote/2020/12/28/opengl2/"
        onclick="window.open(this.href, 'google-plus-share', 'width=490,height=530');return false;">
         <span class="hidden">Google+</span>
     </a>
@@ -359,13 +359,13 @@
   </article>
   <nav class="pagination" role="pagination">
     
-    <a class="newer-posts" href="/2021/01/06/opengl3/">
+    <a class="newer-posts" href="/mynote/2021/01/06/opengl3/">
         ← opengl(3):变换、坐标系统、摄像机
     </a>
     
     <span class="page-number">•</span>
     
-    <a class="older-posts" href="/2020/12/18/opengl/">
+    <a class="older-posts" href="/mynote/2020/12/18/opengl/">
         opengl(1)：库、窗口 →
     </a>
     
@@ -384,15 +384,15 @@
   <a class="subscribe icon-feed" href="/rss.xml"><span class="tooltip">Subscribe!</span></a>
   
   <div class="inner">
-     <section class="copyright">All content copyright <a href="/">日常点滴</a> &copy; 2014 &bull; All rights reserved.</section>
+     <section class="copyright">All content copyright <a href="/mynote/">日常点滴</a> &copy; 2014 &bull; All rights reserved.</section>
      <section class="poweredby">Proudly published with <a class="icon-ghost" href="http://zespia.tw/hexo/">Hexo</a></section>
   </div>
 </footer>
 
   <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
 
-<script type="text/javascript" src="/js/jquery.fitvids.js"></script>
-<script type="text/javascript" src="/js/index.js"></script>
+<script type="text/javascript" src="/mynote/js/jquery.fitvids.js"></script>
+<script type="text/javascript" src="/mynote/js/index.js"></script>
 
 
 

@@ -10,7 +10,7 @@
   <meta name="MobileOptimized" content="320" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <link rel="stylesheet" type="text/css" href="/css/screen.css" />
+  <link rel="stylesheet" type="text/css" href="/mynote/css/screen.css" />
   <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Noto+Serif:400,700,400italic|Open+Sans:700,400" />
 
   <meta name="generator" content="日常点滴">
@@ -32,7 +32,7 @@
   <header class="site-head"  style="background-image: url(/hexo/image/cover.jpg)" >
     <div class="vertical">
         <div class="site-head-content inner">
-             <a class="blog-logo" href="/"><img src="https://avatars.githubusercontent.com/u/26755276" alt="Blog Logo"/></a> 
+             <a class="blog-logo" href="/mynote/"><img src="https://avatars.githubusercontent.com/u/26755276" alt="Blog Logo"/></a> 
             <h1 class="blog-title">日常点滴</h1>
             <h2 class="blog-description"></h2>
         </div>
@@ -49,7 +49,7 @@
     
     
     | 
-    <a href='/tags/opengl/'>opengl</a>
+    <a href='/mynote/tags/opengl/'>opengl</a>
     
     
 </span>
@@ -88,17 +88,17 @@ cmake 有图形界面 cmake-gui.exe<br>
 需要本地有 Mingw，似乎较老版本的 mingw 不行，我一开始用 codeblocks 自带的 mingw 编译失败了因此重下了一个 mingw64</p>
 <ol>
 <li>需要先配置 mingw 的环境变量，否则 Configure 时会无论是否指定编译器位置都会报错<br>
-<img src="/image/opengl/Configure%E5%A4%B1%E8%B4%A5.png" alt="图片无法显示">
+<img src="/mynote/image/opengl/Configure%E5%A4%B1%E8%B4%A5.png" alt="图片无法显示">
 <blockquote>
 <p>配置错环境变量也会报错，比如我环境变量配置的是新下载的 mingw64 的 bin 文件夹位置，但我指定的 mingw 编译器是 codeblocks 自带的 mingw 的，也会报错<br>
-<img src="/image/opengl/%E9%85%8D%E7%BD%AE%E9%94%99%E8%AF%AF.png" alt="图片无法显示"></p>
+<img src="/mynote/image/opengl/%E9%85%8D%E7%BD%AE%E9%94%99%E8%AF%AF.png" alt="图片无法显示"></p>
 </blockquote>
 </li>
 <li>配置环境变量，源码位置和输出路径后，第一次点击 Configure 指定生成器,配置如图,之后产生一些编译选项供选择。<br>
-<img src="/image/opengl/%E6%8C%87%E5%AE%9A%E7%94%9F%E6%88%90%E5%99%A8.png" alt="图片无法显示"></li>
+<img src="/mynote/image/opengl/%E6%8C%87%E5%AE%9A%E7%94%9F%E6%88%90%E5%99%A8.png" alt="图片无法显示"></li>
 <li>再次点击 Configure 应用选项后,点击 generate 就会生成 makefile 文件</li>
 <li>之后 cd 到生成路径下执行 mingw32-make,大功告成<br>
-<img src="/image/opengl/%E5%A4%A7%E5%8A%9F%E5%91%8A%E6%88%90.png" alt="图片无法显示"></li>
+<img src="/mynote/image/opengl/%E5%A4%A7%E5%8A%9F%E5%91%8A%E6%88%90.png" alt="图片无法显示"></li>
 <li>然后会在 src 路径下产生一个 libglfw3.a 文件，就是所需的静态库，同时 examples 里还会有一些示例程序</li>
 </ol>
 <h1>编译自己的 opengl 程序测试</h1>
@@ -111,18 +111,18 @@ cmake 有图形界面 cmake-gui.exe<br>
 <ol>
 <li>
 <p>头文件顺序错误，需要将 glad.h 放在最前面</p>
-<p><img src="/image/opengl/%E5%A4%B4%E6%96%87%E4%BB%B6%E9%A1%BA%E5%BA%8F.png" alt="图片无法显示"></p>
+<p><img src="/mynote/image/opengl/%E5%A4%B4%E6%96%87%E4%BB%B6%E9%A1%BA%E5%BA%8F.png" alt="图片无法显示"></p>
 </li>
 <li>
 <p>缺少依赖，需要引用 gdi32</p>
-<p><img src="/image/opengl/%E7%BC%BA%E5%B0%91gdi32.png" alt="图片无法显示"></p>
+<p><img src="/mynote/image/opengl/%E7%BC%BA%E5%B0%91gdi32.png" alt="图片无法显示"></p>
 </li>
 </ol>
 <p>用 everything 搜索 gdi32 发现，mingw 路径下有一个 libgdi32，但是链接后还是缺少依赖，最后找到一个系统的 gdi32.dll,编译成功</p>
 <h2 id="最终改成如下">最终改成如下</h2>
 <figure class="highlight makefile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">INCLUDE_PATH = <span class="variable">$(CUSTOM_LIBS_PATH)</span>/<span class="keyword">include</span></span><br><span class="line">REQUIRED_LIBS = -Llib -lglfw3 -LC:/Windows/WinSxS/amd64_microsoft-windows-gdi32_31bf3856ad364e35_10.0.18362.1_none_2bdc19f7c689fa4b -lgdi32</span><br><span class="line">TARGET = dist/main.exe</span><br><span class="line"></span><br><span class="line"><span class="section">main: gltest.o</span></span><br><span class="line">    <span class="variable">$(CXX)</span> gltest.o -o <span class="variable">$(TARGET)</span></span><br><span class="line"></span><br><span class="line"><span class="section">gltest.o: glad.o c/gltest.cpp</span></span><br><span class="line">	<span class="variable">$(CXX)</span> -c c/gltest.cpp glad.o <span class="variable">$(REQUIRED_LIBS)</span> -I <span class="variable">$(INCLUDE_PATH)</span></span><br><span class="line"></span><br><span class="line"><span class="section">glad.o: <span class="variable">$(CUSTOM_LIBS_PATH)</span>/src/glad.c</span></span><br><span class="line">	<span class="variable">$(CXX)</span> -c <span class="variable">$(CUSTOM_LIBS_PATH)</span>/src/glad.c -I <span class="variable">$(INCLUDE_PATH)</span></span><br><span class="line"></span><br><span class="line"><span class="section">clean:</span></span><br><span class="line">	del glad.o gltest.o dist\main.exe</span><br></pre></td></tr></table></figure>
 <p>编译，启动，大功告成</p>
-<p><img src="/image/opengl/%E5%90%AF%E5%8A%A8%E6%88%90%E5%8A%9F.png" alt="图片无法显示"></p>
+<p><img src="/mynote/image/opengl/%E5%90%AF%E5%8A%A8%E6%88%90%E5%8A%9F.png" alt="图片无法显示"></p>
 <h1>hello world</h1>
 <p>万物之始</p>
 <p>创建一个窗口</p>
@@ -576,15 +576,15 @@ VAO(vertex array object) 顶点数组对象，记录 EBO 和 VBO 的绑定状态
 </section>
       <section class="share">
     <h4>Share this post</h4>
-    <a class="icon-twitter" href="http://twitter.com/share?url=https://github.flyingfishman.io/2020/12/18/opengl/"
+    <a class="icon-twitter" href="http://twitter.com/share?url=https://github.flyingfishman.io/mynote/2020/12/18/opengl/"
        onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
         <span class="hidden">Twitter</span>
     </a>
-    <a class="icon-facebook" href="https://www.facebook.com/sharer/sharer.php?u=https://github.flyingfishman.io/2020/12/18/opengl/"
+    <a class="icon-facebook" href="https://www.facebook.com/sharer/sharer.php?u=https://github.flyingfishman.io/mynote/2020/12/18/opengl/"
        onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
         <span class="hidden">Facebook</span>
     </a>
-    <a class="icon-google-plus" href="https://plus.google.com/share?url=https://github.flyingfishman.io/2020/12/18/opengl/"
+    <a class="icon-google-plus" href="https://plus.google.com/share?url=https://github.flyingfishman.io/mynote/2020/12/18/opengl/"
        onclick="window.open(this.href, 'google-plus-share', 'width=490,height=530');return false;">
         <span class="hidden">Google+</span>
     </a>
@@ -593,13 +593,13 @@ VAO(vertex array object) 顶点数组对象，记录 EBO 和 VBO 的绑定状态
   </article>
   <nav class="pagination" role="pagination">
     
-    <a class="newer-posts" href="/2020/12/28/opengl2/">
+    <a class="newer-posts" href="/mynote/2020/12/28/opengl2/">
         ← opengl(2):着色器和纹理
     </a>
     
     <span class="page-number">•</span>
     
-    <a class="older-posts" href="/2020/12/15/emcc/">
+    <a class="older-posts" href="/mynote/2020/12/15/emcc/">
         windows上安装Emscripten →
     </a>
     
@@ -618,15 +618,15 @@ VAO(vertex array object) 顶点数组对象，记录 EBO 和 VBO 的绑定状态
   <a class="subscribe icon-feed" href="/rss.xml"><span class="tooltip">Subscribe!</span></a>
   
   <div class="inner">
-     <section class="copyright">All content copyright <a href="/">日常点滴</a> &copy; 2014 &bull; All rights reserved.</section>
+     <section class="copyright">All content copyright <a href="/mynote/">日常点滴</a> &copy; 2014 &bull; All rights reserved.</section>
      <section class="poweredby">Proudly published with <a class="icon-ghost" href="http://zespia.tw/hexo/">Hexo</a></section>
   </div>
 </footer>
 
   <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
 
-<script type="text/javascript" src="/js/jquery.fitvids.js"></script>
-<script type="text/javascript" src="/js/index.js"></script>
+<script type="text/javascript" src="/mynote/js/jquery.fitvids.js"></script>
+<script type="text/javascript" src="/mynote/js/index.js"></script>
 
 
 

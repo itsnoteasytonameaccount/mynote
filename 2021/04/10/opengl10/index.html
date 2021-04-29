@@ -10,7 +10,7 @@
   <meta name="MobileOptimized" content="320" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <link rel="stylesheet" type="text/css" href="/css/screen.css" />
+  <link rel="stylesheet" type="text/css" href="/mynote/css/screen.css" />
   <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Noto+Serif:400,700,400italic|Open+Sans:700,400" />
 
   <meta name="generator" content="日常点滴">
@@ -32,7 +32,7 @@
   <header class="site-head"  style="background-image: url(/hexo/image/cover.jpg)" >
     <div class="vertical">
         <div class="site-head-content inner">
-             <a class="blog-logo" href="/"><img src="https://avatars.githubusercontent.com/u/26755276" alt="Blog Logo"/></a> 
+             <a class="blog-logo" href="/mynote/"><img src="https://avatars.githubusercontent.com/u/26755276" alt="Blog Logo"/></a> 
             <h1 class="blog-title">日常点滴</h1>
             <h2 class="blog-description"></h2>
         </div>
@@ -49,7 +49,7 @@
     
     
     | 
-    <a href='/tags/opengl/'>opengl</a>
+    <a href='/mynote/tags/opengl/'>opengl</a>
     
     
 </span>
@@ -95,7 +95,7 @@
 <figure class="highlight glsl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">vec3</span> sampleOffsetDirections[<span class="number">20</span>] = <span class="type">vec3</span>[]</span><br><span class="line">(</span><br><span class="line">   <span class="type">vec3</span>( <span class="number">1</span>,  <span class="number">1</span>,  <span class="number">1</span>), <span class="type">vec3</span>( <span class="number">1</span>, <span class="number">-1</span>,  <span class="number">1</span>), <span class="type">vec3</span>(<span class="number">-1</span>, <span class="number">-1</span>,  <span class="number">1</span>), <span class="type">vec3</span>(<span class="number">-1</span>,  <span class="number">1</span>,  <span class="number">1</span>),</span><br><span class="line">   <span class="type">vec3</span>( <span class="number">1</span>,  <span class="number">1</span>, <span class="number">-1</span>), <span class="type">vec3</span>( <span class="number">1</span>, <span class="number">-1</span>, <span class="number">-1</span>), <span class="type">vec3</span>(<span class="number">-1</span>, <span class="number">-1</span>, <span class="number">-1</span>), <span class="type">vec3</span>(<span class="number">-1</span>,  <span class="number">1</span>, <span class="number">-1</span>),</span><br><span class="line">   <span class="type">vec3</span>( <span class="number">1</span>,  <span class="number">1</span>,  <span class="number">0</span>), <span class="type">vec3</span>( <span class="number">1</span>, <span class="number">-1</span>,  <span class="number">0</span>), <span class="type">vec3</span>(<span class="number">-1</span>, <span class="number">-1</span>,  <span class="number">0</span>), <span class="type">vec3</span>(<span class="number">-1</span>,  <span class="number">1</span>,  <span class="number">0</span>),</span><br><span class="line">   <span class="type">vec3</span>( <span class="number">1</span>,  <span class="number">0</span>,  <span class="number">1</span>), <span class="type">vec3</span>(<span class="number">-1</span>,  <span class="number">0</span>,  <span class="number">1</span>), <span class="type">vec3</span>( <span class="number">1</span>,  <span class="number">0</span>, <span class="number">-1</span>), <span class="type">vec3</span>(<span class="number">-1</span>,  <span class="number">0</span>, <span class="number">-1</span>),</span><br><span class="line">   <span class="type">vec3</span>( <span class="number">0</span>,  <span class="number">1</span>,  <span class="number">1</span>), <span class="type">vec3</span>( <span class="number">0</span>, <span class="number">-1</span>,  <span class="number">1</span>), <span class="type">vec3</span>( <span class="number">0</span>, <span class="number">-1</span>, <span class="number">-1</span>), <span class="type">vec3</span>( <span class="number">0</span>,  <span class="number">1</span>, <span class="number">-1</span>)</span><br><span class="line">);</span><br><span class="line"></span><br><span class="line"><span class="type">float</span> shadow = <span class="number">0.0</span>;</span><br><span class="line"><span class="type">float</span> bias = <span class="number">0.15</span>;</span><br><span class="line"><span class="type">int</span> samples = <span class="number">20</span>;</span><br><span class="line"><span class="type">float</span> viewDistance = <span class="built_in">length</span>(viewPos - fragPos);</span><br><span class="line"><span class="comment">// 偏移半径，决定从附近多远的地方采样</span></span><br><span class="line"><span class="type">float</span> diskRadius = <span class="number">0.05</span>;</span><br><span class="line"><span class="keyword">for</span>(<span class="type">int</span> i = <span class="number">0</span>; i &lt; samples; ++i)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">float</span> closestDepth = <span class="built_in">texture</span>(depthMap, fragToLight + sampleOffsetDirections[i] * diskRadius).r;</span><br><span class="line">    closestDepth *= far_plane;   <span class="comment">// Undo mapping [0;1]</span></span><br><span class="line">    <span class="keyword">if</span>(currentDepth - bias &gt; closestDepth)</span><br><span class="line">        shadow += <span class="number">1.0</span>;</span><br><span class="line">&#125;</span><br><span class="line">shadow /= <span class="type">float</span>(samples);</span><br></pre></td></tr></table></figure>
 <p>最终效果</p>
 <div style="text-align:center" id="img1-1">
-<p style="margin-bottom: 5px"><img style="margin-bottom: 0px" src="/image/opengl/point_shadows.png" alt="图片加载失败"></p>
+<p style="margin-bottom: 5px"><img style="margin-bottom: 0px" src="/mynote/image/opengl/point_shadows.png" alt="图片加载失败"></p>
 <p style="margin-bottom: 20px; line-height:1.5"><span style="font-size:12px">图1-1: 阴影效果</span></p>
 </div>
 <h1>CSM（Cascaded Shadow Maps 级联阴影贴图）</h1>
@@ -110,14 +110,14 @@
 <li>在摄像头视角下渲染场景中的顶点，通过阴影贴图及光线视角下的深度决定是否存在阴影。</li>
 </ol>
 <div style="text-align:center" id="img2-1">
-<p style="margin-bottom: 5px"><img style="margin-bottom: 0px" src="/image/opengl/cascaded_shadow_maps.png" alt="图片加载失败"></p>
+<p style="margin-bottom: 5px"><img style="margin-bottom: 0px" src="/mynote/image/opengl/cascaded_shadow_maps.png" alt="图片加载失败"></p>
 <p style="margin-bottom: 20px; line-height:1.5"><span style="font-size:12px">图2-1: 级联阴影贴图划分示例</span></p>
 </div>
 <p>观看<a href="#img2-1">图 2-1</a>可以注意到，所有的阴影投射物以及摄像头视锥切片被包含在光锥中，光锥外不应该有需要被渲染的物体。换句话说，光锥是摄像头视锥切片的边界盒子（长方体），它的近平面延伸到足够包裹所有可能的遮蔽物。如果在树上方有个遮蔽物 B，这个盒子就需要被适当地延长，否则 B 不会投射出阴影。</p>
 <h2 id="视锥的分割：平行分片阴影贴图">视锥的分割：平行分片阴影贴图</h2>
 <p>CSM 算法的第一步需要计算出视锥的分割位置，下文取法来自<a href="https://dl.acm.org/doi/10.1145/1128923.1128975" target="_blank" rel="noopener">Parallel-Split Shadow Maps for Large-Scale Virtual Environments</a>，不一定要这样取，不讲究的取法是凭直觉取，也可以用别人总结好的取法。</p>
 <div style="text-align:center" id="img2-2">
-<p style="margin-bottom: 5px"><img style="margin-bottom: 0px" src="/image/opengl/pssm.png" alt="图片加载失败"></p>
+<p style="margin-bottom: 5px"><img style="margin-bottom: 0px" src="/mynote/image/opengl/pssm.png" alt="图片加载失败"></p>
 <p style="margin-bottom: 20px; line-height:1.5"><span style="font-size:12px">图2-2: pssm示意图</span></p>
 </div>
 <h3 id="推导过程">推导过程</h3>
@@ -173,7 +173,7 @@
 </annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.2438799999999999em;vertical-align:-0.276864em;"></span><span class="mord"><span class="mord mathnormal">c</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.9670159999999998em;"><span style="top:-2.4231360000000004em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span><span style="top:-3.180908em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.01968em;">l</span><span class="mord mathnormal mtight">o</span><span class="mord mathnormal mtight" style="margin-right:0.03588em;">g</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.276864em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:1.188em;vertical-align:-0.25em;"></span><span class="mord mathnormal">n</span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.10764em;">f</span><span class="mord">/</span><span class="mord mathnormal">n</span><span class="mclose"><span class="mclose">)</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.938em;"><span style="top:-3.113em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">i</span><span class="mord mtight">/</span><span class="mord mathnormal mtight" style="margin-right:0.10903em;">N</span></span></span></span></span></span></span></span></span></span></span></span></span></p>
 <p>对数分割方法的问题在于分割出来的块中，靠近近平面的块的长度会非常小，只能包括非常小一部分对象。这是因为我们之前的公式都是理想情况下的公式，假设了视锥<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false">[</mo><mi>n</mi><mo separator="true">,</mo><mi>f</mi><mo stretchy="false">]</mo></mrow><annotation encoding="application/x-tex">[n, f]</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">[</span><span class="mord mathnormal">n</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord mathnormal" style="margin-right:0.10764em;">f</span><span class="mclose">]</span></span></span></span>范围内的所有内容都可以准确映射到阴影贴图的<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false">[</mo><mn>0</mn><mo separator="true">,</mo><mn>1</mn><mo stretchy="false">]</mo></mrow><annotation encoding="application/x-tex">[0, 1]</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">[</span><span class="mord">0</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord">1</span><span class="mclose">]</span></span></span></span>范围内，阴影贴图既不会漏掉某些内容，也不会包括不可见的内容。这在实践中不可能实现（因为我们仅考虑了深度，其他坐标轴方向的的内容没办法完全贴合的映射到阴影贴图中）。</p>
 <div style="text-align:center" id="img2-3">
-<p style="margin-bottom: 5px"><img style="margin-bottom: 0px" src="/image/opengl/light_frustum_and_view_frustum.png" alt="图片加载失败"></p>
+<p style="margin-bottom: 5px"><img style="margin-bottom: 0px" src="/mynote/image/opengl/light_frustum_and_view_frustum.png" alt="图片加载失败"></p>
 <p style="margin-bottom: 20px; line-height:1.5"><span style="font-size:12px">图2-3: 光线的截体包括不可见区域</span></p>
 </div>
 <p>上述问题会导致过了视锥的分割区后阴影的清晰度剧烈突变，因为较靠近近平面的视锥区域过采样而较远的视锥欠采样。</p>
@@ -258,15 +258,15 @@
 </section>
       <section class="share">
     <h4>Share this post</h4>
-    <a class="icon-twitter" href="http://twitter.com/share?url=https://github.flyingfishman.io/2021/04/10/opengl10/"
+    <a class="icon-twitter" href="http://twitter.com/share?url=https://github.flyingfishman.io/mynote/2021/04/10/opengl10/"
        onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
         <span class="hidden">Twitter</span>
     </a>
-    <a class="icon-facebook" href="https://www.facebook.com/sharer/sharer.php?u=https://github.flyingfishman.io/2021/04/10/opengl10/"
+    <a class="icon-facebook" href="https://www.facebook.com/sharer/sharer.php?u=https://github.flyingfishman.io/mynote/2021/04/10/opengl10/"
        onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
         <span class="hidden">Facebook</span>
     </a>
-    <a class="icon-google-plus" href="https://plus.google.com/share?url=https://github.flyingfishman.io/2021/04/10/opengl10/"
+    <a class="icon-google-plus" href="https://plus.google.com/share?url=https://github.flyingfishman.io/mynote/2021/04/10/opengl10/"
        onclick="window.open(this.href, 'google-plus-share', 'width=490,height=530');return false;">
         <span class="hidden">Google+</span>
     </a>
@@ -277,7 +277,7 @@
     
     <span class="page-number">•</span>
     
-    <a class="older-posts" href="/2021/03/30/opengl9/">
+    <a class="older-posts" href="/mynote/2021/03/30/opengl9/">
         opengl(9):高级光照，gamma校正，阴影 →
     </a>
     
@@ -296,15 +296,15 @@
   <a class="subscribe icon-feed" href="/rss.xml"><span class="tooltip">Subscribe!</span></a>
   
   <div class="inner">
-     <section class="copyright">All content copyright <a href="/">日常点滴</a> &copy; 2014 &bull; All rights reserved.</section>
+     <section class="copyright">All content copyright <a href="/mynote/">日常点滴</a> &copy; 2014 &bull; All rights reserved.</section>
      <section class="poweredby">Proudly published with <a class="icon-ghost" href="http://zespia.tw/hexo/">Hexo</a></section>
   </div>
 </footer>
 
   <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
 
-<script type="text/javascript" src="/js/jquery.fitvids.js"></script>
-<script type="text/javascript" src="/js/index.js"></script>
+<script type="text/javascript" src="/mynote/js/jquery.fitvids.js"></script>
+<script type="text/javascript" src="/mynote/js/index.js"></script>
 
 
 
