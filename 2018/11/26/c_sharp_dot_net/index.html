@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html" charset="UTF-8" >
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+  <title>c#点net笔记 | 日常点滴</title>
+  <meta name="description" content="" />
+  <meta name="HandheldFriendly" content="True" />
+  <meta name="MobileOptimized" content="320" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <link rel="stylesheet" type="text/css" href="/hexo/css/screen.css" />
+  <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Noto+Serif:400,700,400italic|Open+Sans:700,400" />
+
+  <meta name="generator" content="日常点滴">
+
+  
+  <link rel="alternate" type="application/rss+xml" title="RSS" href="/rss.xml">
+  
+  
+  <link rel="alternate" type="application/atom+xml" title="Atom 0.3" href="rss.xml">
+  
+  
+
+  
+</head>
+
+
+<body class="post-template">
+
+  <header class="site-head"  style="background-image: url(/image/cover.png)" >
+    <div class="vertical">
+        <div class="site-head-content inner">
+             <a class="blog-logo" href="/hexo/"><img src="https://avatars.githubusercontent.com/u/26755276" alt="Blog Logo"/></a> 
+            <h1 class="blog-title">日常点滴</h1>
+            <h2 class="blog-description"></h2>
+        </div>
+    </div>
+</header>
+  
+
+<main class="content" role="main">
+  <article class="post">
+    <span class="post-meta">
+      <time datetime="2018-11-25T16:00:00.000Z" itemprop="datePublished">
+          2018-11-26
+      </time>
+    
+    
+    | 
+    <a href='/hexo/tags/CSharp/'>CSharp</a>
+    
+    
+</span>
+    <h1 class="post-title">c#点net笔记</h1>
+    <section class="post-content">
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.12.0/katex.min.css" /><p>最近学c#的笔记</p>
+<a id="more"></a>
+<h1>iis中部署</h1>
+<p>在启用或关闭Windows功能中</p>
+<p>需要安装了.net支持,版本视情况自定。</p>
+<p>另外需要在以下路径勾选.net相关服务<br>
+internet information server–&gt;万维网服务–&gt;应用程序与开发功能</p>
+<p>在iis中部署后若出现版本错误<br>
+<a href="http://xn--fiq88l7vcu0kya897iwnb9hj3dx7vmlqe9hqre54b92uvl6de77b.net" target="_blank" rel="noopener">在应用程序池中查看是否有需要的版本.net</a><br>
+之后在网站上右击–&gt;高级–&gt;属性</p>
+<h1>sqlserver</h1>
+<p>vs自带简易的sql server服务器,去除了一些管理器等。连接的方法可以在资源管理器右键–&gt;编辑连接–&gt;高级里查看到。<br>
+连接方式为读取mdf文件绑定到sqlserver实例.</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">data <span class="built_in">source</span> = addr;AttachDbFileName = file path;interact link=<span class="literal">true</span>;</span><br><span class="line"><span class="comment"># 实例地址         绑定文件名                   可信连接</span></span><br></pre></td></tr></table></figure>
+<p>注：复原实例要下载数据库管理工具ssms，出现mdf文件版本不匹配时,在vs中，新建连接选择mdf文件，出现提示框点击确定，会自动转化。</p>
+<h1>iis身份认证</h1>
+<p>在iis应用程序中可以设置身份认证方式<br>
+若不存在基本身份认证，则需要在打开或关闭功能中添加基本身份认证<br>
+身份认证的账号密码似乎是服务器电脑的系统用户名密码，不可是别名<br>
+用户名一般是administrator</p>
+<h1><a href="http://asp.net" target="_blank" rel="noopener">asp.net</a> form身份认证</h1>
+<p>form身份认证是需要数据库的.<br>
+当你安了sql server的时候，由于登陆默认采用的是本地sql server实例,，且程序会自动替你创建所需数据库,采用form登陆时即使没有建立合适的数据库来存放用户数据,也不会出现问题。<br>
+但若是没有安装sqlserver而是直接采用了vs自带的小型数据库，应用找不到默认的实例，便会报错。需要在配置文件中手动配置修改记录用户信息要用到的数据库。<br>
+处理方式如下：</p>
+<ol>
+<li>
+<p>找到vs中的实例，记住实例名</p>
+</li>
+<li>
+<p>安装合适的数据库表，用命令如下</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#具体操作参数请自行在命令行查看，以下命令代表安装所有需要的服务</span></span><br><span class="line">aspnet_regsql -S 实例名 -E -A all</span><br></pre></td></tr></table></figure>
+</li>
+<li>
+<p>修改web.config</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">&lt;!-- 添加内容如下 --&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">connectionStrings</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">add</span> <span class="attr">name</span>=<span class="string">"ASPNETDB"</span> <span class="attr">connectionString</span>=<span class="string">"你的连接字符串"</span>   <span class="attr">providerName</span>=<span class="string">"system.data.sqlClient"</span>/&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">connectionStrings</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">membership</span> <span class="attr">defaultProvider</span>=<span class="string">"SqlProvider"</span></span></span><br><span class="line"><span class="tag">  <span class="attr">userIsOnlineTimeWindow</span>=<span class="string">"15"</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">providers</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">add</span></span></span><br><span class="line"><span class="tag">      <span class="attr">name</span>=<span class="string">"SqlProvider"</span></span></span><br><span class="line"><span class="tag">      <span class="attr">type</span>=<span class="string">"System.Web.Security.SqlMembershipProvider"</span></span></span><br><span class="line"><span class="tag">      <span class="attr">connectionStringName</span>=<span class="string">"ASPNETDB"</span></span></span><br><span class="line"><span class="tag">      <span class="attr">applicationName</span>=<span class="string">"MyApplication"</span></span></span><br><span class="line"><span class="tag">      <span class="attr">enablePasswordRetrieval</span>=<span class="string">"false"</span></span></span><br><span class="line"><span class="tag">      <span class="attr">enablePasswordReset</span>=<span class="string">"true"</span></span></span><br><span class="line"><span class="tag">      <span class="attr">requiresQuestionAndAnswer</span>=<span class="string">"true"</span></span></span><br><span class="line"><span class="tag">      <span class="attr">requiresUniqueEmail</span>=<span class="string">"false"</span></span></span><br><span class="line"><span class="tag">      <span class="attr">passwordFormat</span>=<span class="string">"Hashed"</span></span></span><br><span class="line"><span class="tag">      <span class="attr">maxInvalidPasswordAttempts</span>=<span class="string">"5"</span></span></span><br><span class="line"><span class="tag">      <span class="attr">passwordAttemptWindow</span>=<span class="string">"10"</span> /&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">providers</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">membership</span>&gt;</span></span><br></pre></td></tr></table></figure>
+</li>
+<li>
+<p><a href="https://docs.microsoft.com/en-us/dotnet/api/system.web.security.sqlmembershipprovider?view=netframework-4.7.2" target="_blank" rel="noopener">官网说明</a></p>
+</li>
+</ol>
+
+    </section>
+    <footer class="post-footer">
+      <section class="author">
+    <h4>flyingfisherman</h4>
+    <p>前端工程师，热爱技术，坚信知识技术改变生活。最高兴的场合莫过于学到的技术为自己、亲友或他人提供了些许的便利、帮助。</p>
+</section>
+      <section class="share">
+    <h4>Share this post</h4>
+    <a class="icon-twitter" href="http://twitter.com/share?url=https://github.flyingfishman.io/hexo/2018/11/26/c_sharp_dot_net/"
+       onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+        <span class="hidden">Twitter</span>
+    </a>
+    <a class="icon-facebook" href="https://www.facebook.com/sharer/sharer.php?u=https://github.flyingfishman.io/hexo/2018/11/26/c_sharp_dot_net/"
+       onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+        <span class="hidden">Facebook</span>
+    </a>
+    <a class="icon-google-plus" href="https://plus.google.com/share?url=https://github.flyingfishman.io/hexo/2018/11/26/c_sharp_dot_net/"
+       onclick="window.open(this.href, 'google-plus-share', 'width=490,height=530');return false;">
+        <span class="hidden">Google+</span>
+    </a>
+</section>
+    </footer>
+  </article>
+  <nav class="pagination" role="pagination">
+    
+    <a class="newer-posts" href="/hexo/2018/11/30/uart/">
+        ← zigbee接口使用问题
+    </a>
+    
+    <span class="page-number">•</span>
+    
+    <a class="older-posts" href="/hexo/2018/11/24/subversion/">
+        subversion配置 →
+    </a>
+    
+</nav>
+  <div id="comment" class="comments-area">
+    <h1 class="title"><a href="#disqus_comments" name="disqus_comments">Comments</a></h1>
+
+    
+</div>
+</main>
+
+
+  
+<footer class="site-footer">
+  
+  <a class="subscribe icon-feed" href="/rss.xml"><span class="tooltip">Subscribe!</span></a>
+  
+  <div class="inner">
+     <section class="copyright">All content copyright <a href="/hexo/">日常点滴</a> &copy; 2014 &bull; All rights reserved.</section>
+     <section class="poweredby">Proudly published with <a class="icon-ghost" href="http://zespia.tw/hexo/">Hexo</a></section>
+  </div>
+</footer>
+
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+<script type="text/javascript" src="/hexo/js/jquery.fitvids.js"></script>
+<script type="text/javascript" src="/hexo/js/index.js"></script>
+
+
+
+
+
+
+</body>
+</html>

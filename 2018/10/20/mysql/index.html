@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html" charset="UTF-8" >
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+  <title>彻底删除mysql服务 | 日常点滴</title>
+  <meta name="description" content="" />
+  <meta name="HandheldFriendly" content="True" />
+  <meta name="MobileOptimized" content="320" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <link rel="stylesheet" type="text/css" href="/hexo/css/screen.css" />
+  <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Noto+Serif:400,700,400italic|Open+Sans:700,400" />
+
+  <meta name="generator" content="日常点滴">
+
+  
+  <link rel="alternate" type="application/rss+xml" title="RSS" href="/rss.xml">
+  
+  
+  <link rel="alternate" type="application/atom+xml" title="Atom 0.3" href="rss.xml">
+  
+  
+
+  
+</head>
+
+
+<body class="post-template">
+
+  <header class="site-head"  style="background-image: url(/image/cover.png)" >
+    <div class="vertical">
+        <div class="site-head-content inner">
+             <a class="blog-logo" href="/hexo/"><img src="https://avatars.githubusercontent.com/u/26755276" alt="Blog Logo"/></a> 
+            <h1 class="blog-title">日常点滴</h1>
+            <h2 class="blog-description"></h2>
+        </div>
+    </div>
+</header>
+  
+
+<main class="content" role="main">
+  <article class="post">
+    <span class="post-meta">
+      <time datetime="2018-10-19T16:00:00.000Z" itemprop="datePublished">
+          2018-10-20
+      </time>
+    
+    
+    | 
+    <a href='/hexo/tags/mysql/'>mysql</a>
+    
+    
+</span>
+    <h1 class="post-title">彻底删除mysql服务</h1>
+    <section class="post-content">
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.12.0/katex.min.css" /><h1>解决方案</h1>
+<p>不知为何mysql服务花了很长时间才删除，记录办法。</p>
+<p><a href="http://www.cnblogs.com/fanbi/p/6432838.html" target="_blank" rel="noopener">点击这里</a></p>
+<p><strong>补充</strong><br>
+事实上使用<code>sc</code>命令似乎就足够了，在打开<code>services.msc</code>的情况下，使用<code>sc delete</code>命令并不会立刻删除服务的注册表，服务也仍然存在于服务列表中，因此就容易造成服务没被完全删除的假象，此时只要刷新一下servies.msc的窗口即可看到服务被完全删除，</p>
+<h1>其他问题</h1>
+<p>navicat连接不上数据库<br>
+可能是用户名密码加密方式问题，会影响你创建用户时存入数据库的用户密码，查看配置文件设置选项。或直接在创建用户时添加条件<br>
+例如</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ALTER USER <span class="string">'root'</span>@<span class="string">'localhost'</span> IDENTIFIED WITH mysql_native_password BY <span class="string">'9527'</span>;</span><br></pre></td></tr></table></figure>
+<h1>group by选择语句问题</h1>
+<p>可能是sql_mode设置出了问题，<a href="https://www.cnblogs.com/fireporsche/p/8618691.html" target="_blank" rel="noopener">点击这里</a>查看sql_mode问题</p>
+<h1>windows上启动mysql</h1>
+<p>可能的方法</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">net start service_name</span><br><span class="line"><span class="comment"># 此时用net stop停止</span></span><br><span class="line">mysqld</span><br><span class="line"><span class="comment"># 此时直接taskkill</span></span><br></pre></td></tr></table></figure>
+<p>添加服务的方法</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">mysqld --install service_name</span><br><span class="line">mysqld --remove service_name</span><br><span class="line"></span><br><span class="line"><span class="comment"># 还有一种用sc的方法</span></span><br><span class="line">sc start exe_path</span><br><span class="line"><span class="comment"># 删除</span></span><br><span class="line">sc delete service_name</span><br><span class="line"><span class="comment"># 此时只是禁用还需删除注册表</span></span><br></pre></td></tr></table></figure>
+    </section>
+    <footer class="post-footer">
+      <section class="author">
+    <h4>flyingfisherman</h4>
+    <p>前端工程师，热爱技术，坚信知识技术改变生活。最高兴的场合莫过于学到的技术为自己、亲友或他人提供了些许的便利、帮助。</p>
+</section>
+      <section class="share">
+    <h4>Share this post</h4>
+    <a class="icon-twitter" href="http://twitter.com/share?url=https://github.flyingfishman.io/hexo/2018/10/20/mysql/"
+       onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+        <span class="hidden">Twitter</span>
+    </a>
+    <a class="icon-facebook" href="https://www.facebook.com/sharer/sharer.php?u=https://github.flyingfishman.io/hexo/2018/10/20/mysql/"
+       onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+        <span class="hidden">Facebook</span>
+    </a>
+    <a class="icon-google-plus" href="https://plus.google.com/share?url=https://github.flyingfishman.io/hexo/2018/10/20/mysql/"
+       onclick="window.open(this.href, 'google-plus-share', 'width=490,height=530');return false;">
+        <span class="hidden">Google+</span>
+    </a>
+</section>
+    </footer>
+  </article>
+  <nav class="pagination" role="pagination">
+    
+    <a class="newer-posts" href="/hexo/2018/11/24/subversion/">
+        ← subversion配置
+    </a>
+    
+    <span class="page-number">•</span>
+    
+    <a class="older-posts" href="/hexo/2018/10/14/杂项/">
+        杂项笔记 →
+    </a>
+    
+</nav>
+  <div id="comment" class="comments-area">
+    <h1 class="title"><a href="#disqus_comments" name="disqus_comments">Comments</a></h1>
+
+    
+</div>
+</main>
+
+
+  
+<footer class="site-footer">
+  
+  <a class="subscribe icon-feed" href="/rss.xml"><span class="tooltip">Subscribe!</span></a>
+  
+  <div class="inner">
+     <section class="copyright">All content copyright <a href="/hexo/">日常点滴</a> &copy; 2014 &bull; All rights reserved.</section>
+     <section class="poweredby">Proudly published with <a class="icon-ghost" href="http://zespia.tw/hexo/">Hexo</a></section>
+  </div>
+</footer>
+
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+<script type="text/javascript" src="/hexo/js/jquery.fitvids.js"></script>
+<script type="text/javascript" src="/hexo/js/index.js"></script>
+
+
+
+
+
+
+</body>
+</html>

@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html" charset="UTF-8" >
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+  <title>centos下程序作为服务启动 | 日常点滴</title>
+  <meta name="description" content="" />
+  <meta name="HandheldFriendly" content="True" />
+  <meta name="MobileOptimized" content="320" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <link rel="stylesheet" type="text/css" href="/hexo/css/screen.css" />
+  <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Noto+Serif:400,700,400italic|Open+Sans:700,400" />
+
+  <meta name="generator" content="日常点滴">
+
+  
+  <link rel="alternate" type="application/rss+xml" title="RSS" href="/rss.xml">
+  
+  
+  <link rel="alternate" type="application/atom+xml" title="Atom 0.3" href="rss.xml">
+  
+  
+
+  
+</head>
+
+
+<body class="post-template">
+
+  <header class="site-head"  style="background-image: url(/image/cover.png)" >
+    <div class="vertical">
+        <div class="site-head-content inner">
+             <a class="blog-logo" href="/hexo/"><img src="https://avatars.githubusercontent.com/u/26755276" alt="Blog Logo"/></a> 
+            <h1 class="blog-title">日常点滴</h1>
+            <h2 class="blog-description"></h2>
+        </div>
+    </div>
+</header>
+  
+
+<main class="content" role="main">
+  <article class="post">
+    <span class="post-meta">
+      <time datetime="2020-11-23T02:11:00.000Z" itemprop="datePublished">
+          2020-11-23
+      </time>
+    
+    
+    | 
+    <a href='/hexo/tags/linux/'>linux</a>,
+    
+    <a href='/hexo/tags/centos/'>centos</a>
+    
+    
+</span>
+    <h1 class="post-title">centos下程序作为服务启动</h1>
+    <section class="post-content">
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.12.0/katex.min.css" /><h1>前言</h1>
+<p>有一个叫kaillerasrv的简单程序需要在后台跑，用<code>&amp;</code>在后台跑起来，在shell关闭后就会被杀了。<br>
+加<code>nohup</code>也不行，一段时间过后就被杀掉了，还是必须将程序做成服务，记录步骤。</p>
+<a id="more"></a>
+<h1>实现</h1>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 可执行文件名太长，链接一下</span></span><br><span class="line">ln -s /path/to/kaillerasrv /usr/bin/kail</span><br><span class="line"><span class="comment"># 首先在系统里找示例文件，减少工作量</span></span><br><span class="line">find / -name nginx.service</span><br><span class="line"><span class="comment"># 其次复制文件内容，cp或其他什么的都可以</span></span><br><span class="line">cat /usr/lib/systemd/system/nginx.service&gt;/usr/lib/systemd/system/kail.service</span><br></pre></td></tr></table></figure>
+<p>之后打开文件，按照<a href="#%E5%8F%82%E8%80%83">参考</a>中给的链接修改配置</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">[Unit]</span><br><span class="line">Description=kail</span><br><span class="line"><span class="comment"># After=network.target remote-fs.target nss-lookup.target</span></span><br><span class="line"></span><br><span class="line">[Service]</span><br><span class="line"><span class="comment"># Type=forking</span></span><br><span class="line">Type=simple</span><br><span class="line">PIDFile=/run/kail.pid</span><br><span class="line"><span class="comment"># Nginx will fail to start if /run/nginx.pid already exists but has the wrong</span></span><br><span class="line"><span class="comment"># SELinux context. This might happen when running `nginx -t` from the cmdline.</span></span><br><span class="line"><span class="comment"># https://bugzilla.redhat.com/show_bug.cgi?id=1268621</span></span><br><span class="line">ExecStartPre=/usr/bin/rm -f /run/kail.pid</span><br><span class="line"><span class="comment"># ExecStartPre=/usr/sbin/nginx -t</span></span><br><span class="line">ExecStart=/usr/bin/kail</span><br><span class="line">ExecReload=/bin/<span class="built_in">kill</span> -s HUP <span class="variable">$MAINPID</span></span><br><span class="line">KillSignal=SIGQUIT</span><br><span class="line">TimeoutStopSec=5</span><br><span class="line">KillMode=process</span><br><span class="line">PrivateTmp=<span class="literal">true</span></span><br><span class="line"></span><br><span class="line">[Install]</span><br><span class="line"><span class="comment"># WantedBy=multi-user.target</span></span><br></pre></td></tr></table></figure>
+<p>最后执行<code>systemctl start kail</code>即可。</p>
+<h1>参考</h1>
+<ol>
+<li><a href="https://www.cnblogs.com/tq1226112215/p/8550340.html" target="_blank" rel="noopener">《centos7将可执行程序做成服务》</a> authored by <a href="https://home.cnblogs.com/u/tq1226112215/" target="_blank" rel="noopener">唐群</a>@<a href="https://www.cnblogs.com/" target="_blank" rel="noopener">博客园</a></li>
+</ol>
+
+    </section>
+    <footer class="post-footer">
+      <section class="author">
+    <h4>flyingfisherman</h4>
+    <p>前端工程师，热爱技术，坚信知识技术改变生活。最高兴的场合莫过于学到的技术为自己、亲友或他人提供了些许的便利、帮助。</p>
+</section>
+      <section class="share">
+    <h4>Share this post</h4>
+    <a class="icon-twitter" href="http://twitter.com/share?url=https://github.flyingfishman.io/hexo/2020/11/23/程序作为服务启动/"
+       onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+        <span class="hidden">Twitter</span>
+    </a>
+    <a class="icon-facebook" href="https://www.facebook.com/sharer/sharer.php?u=https://github.flyingfishman.io/hexo/2020/11/23/程序作为服务启动/"
+       onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+        <span class="hidden">Facebook</span>
+    </a>
+    <a class="icon-google-plus" href="https://plus.google.com/share?url=https://github.flyingfishman.io/hexo/2020/11/23/程序作为服务启动/"
+       onclick="window.open(this.href, 'google-plus-share', 'width=490,height=530');return false;">
+        <span class="hidden">Google+</span>
+    </a>
+</section>
+    </footer>
+  </article>
+  <nav class="pagination" role="pagination">
+    
+    <a class="newer-posts" href="/hexo/2020/12/15/emcc/">
+        ← windows上安装Emscripten
+    </a>
+    
+    <span class="page-number">•</span>
+    
+    <a class="older-posts" href="/hexo/2020/10/10/runas/">
+        当前目录下打开管理员命令行 →
+    </a>
+    
+</nav>
+  <div id="comment" class="comments-area">
+    <h1 class="title"><a href="#disqus_comments" name="disqus_comments">Comments</a></h1>
+
+    
+</div>
+</main>
+
+
+  
+<footer class="site-footer">
+  
+  <a class="subscribe icon-feed" href="/rss.xml"><span class="tooltip">Subscribe!</span></a>
+  
+  <div class="inner">
+     <section class="copyright">All content copyright <a href="/hexo/">日常点滴</a> &copy; 2014 &bull; All rights reserved.</section>
+     <section class="poweredby">Proudly published with <a class="icon-ghost" href="http://zespia.tw/hexo/">Hexo</a></section>
+  </div>
+</footer>
+
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+<script type="text/javascript" src="/hexo/js/jquery.fitvids.js"></script>
+<script type="text/javascript" src="/hexo/js/index.js"></script>
+
+
+
+
+
+
+</body>
+</html>

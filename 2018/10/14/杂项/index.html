@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html" charset="UTF-8" >
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+  <title>杂项笔记 | 日常点滴</title>
+  <meta name="description" content="" />
+  <meta name="HandheldFriendly" content="True" />
+  <meta name="MobileOptimized" content="320" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <link rel="stylesheet" type="text/css" href="/hexo/css/screen.css" />
+  <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Noto+Serif:400,700,400italic|Open+Sans:700,400" />
+
+  <meta name="generator" content="日常点滴">
+
+  
+  <link rel="alternate" type="application/rss+xml" title="RSS" href="/rss.xml">
+  
+  
+  <link rel="alternate" type="application/atom+xml" title="Atom 0.3" href="rss.xml">
+  
+  
+
+  
+</head>
+
+
+<body class="post-template">
+
+  <header class="site-head"  style="background-image: url(/image/cover.png)" >
+    <div class="vertical">
+        <div class="site-head-content inner">
+             <a class="blog-logo" href="/hexo/"><img src="https://avatars.githubusercontent.com/u/26755276" alt="Blog Logo"/></a> 
+            <h1 class="blog-title">日常点滴</h1>
+            <h2 class="blog-description"></h2>
+        </div>
+    </div>
+</header>
+  
+
+<main class="content" role="main">
+  <article class="post">
+    <span class="post-meta">
+      <time datetime="2018-10-13T16:00:00.000Z" itemprop="datePublished">
+          2018-10-14
+      </time>
+    
+    
+    | 
+    <a href='/hexo/tags/android/'>android</a>,
+    
+    <a href='/hexo/tags/javascript/'>javascript</a>,
+    
+    <a href='/hexo/tags/算法/'>算法</a>,
+    
+    <a href='/hexo/tags/java/'>java</a>
+    
+    
+</span>
+    <h1 class="post-title">杂项笔记</h1>
+    <section class="post-content">
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.12.0/katex.min.css" /><p>各种平时碰到问题的笔记</p>
+<a id="more"></a>
+<h1>eclipse</h1>
+<p>eclipse运行项目时，报java版本错误可能并不是buildpath的问题，还有可能是properties中的project facet出问题</p>
+<h1>chord算法</h1>
+<p>在chord算法中有如下一句，本人十分疑惑</p>
+<blockquote>
+<p>资源被分配到满足NID&gt;=KID的第一个节点上</p>
+</blockquote>
+<p>疑惑的原因是，资源所属的结点难道不是存在各种可能的么，为什么能确定资源一定存在满足如上条件的节点中呢，难道还有规定chord环中的一台电脑里存的文件的KID（文件名字等信息通过chord算法指定的hash处理生成）必须小于他的NID（计算机ip等信息通过通过chord算法指定的hash处理生成）么?那我结点NID小于文件KID的岂不是不能下载该文件？能的话岂不是资源位置不满足上述条件？<br>
+上网查了许久，但由于大多数程序员深刻贯彻着人类的本质（复读机），文章全是copy,paste.我并未找到合适的解答。</p>
+<p>暂定该句意思为资源的相关信息存于满足NID&gt;=KID的第一个节点上，可根据相关信息准确找到资源所属节点</p>
+<h1>android</h1>
+<p>启动avd黑屏，搜索无果,采用删除用户数据命令</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">emulator -avd avd_name -wipe-data</span><br></pre></td></tr></table></figure>
+<p>成功</p>
+<h1>sublime</h1>
+<h2 id="插件">插件</h2>
+<h3 id="all-autocomplete">all autocomplete</h3>
+<p>api提示插件</p>
+<h3 id="trailing-spaces">trailing spaces</h3>
+<p>多余空格显示插件</p>
+<h3 id="IMESurpport">IMESurpport</h3>
+<p>Sublime Text对中文输入法的支持有个小bug，就是在输入中文时，输入法没办法显示在Sublime Text的窗口之上，只能在Sublime Text窗口之外显示，也就是“输入框不跟随”【2】</p>
+<p>安装IMESupport插件，并重启Sublime Text即可。</p>
+<h3 id="tagify">tagify</h3>
+<p>标签匹配插件</p>
+<h3 id="docBlockr">docBlockr</h3>
+<p>代码补齐</p>
+<h3 id="链接">链接</h3>
+<p>参考自<a href="https://www.jianshu.com/p/0703221093b9" target="_blank" rel="noopener">此篇博客</a></p>
+<h2 id="问题">问题</h2>
+<p>用html/css/js pretiffy自动格式化代码出现缩进只有两个空格的情况，可能是editconfig的问题，此时需要修改文件夹根目录的.editconfig文件，将indentsize设为4</p>
+<h1>javaGUI</h1>
+<p>可以有绝对布局<br>
+setLayout(null);<br>
+之后就可以对组件setBounds;<br>
+gridLayout若设置了行参数不为0，则忽略列参数</p>
+<p>以下为一个GUI布局示例</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br></pre></td><td class="code"><pre><span class="line">        JPanel panel = <span class="keyword">new</span> JPanel();</span><br><span class="line">        JPanel btnpanel = <span class="keyword">new</span> JPanel();</span><br><span class="line">        JPanel txtpanel = <span class="keyword">new</span> JPanel();</span><br><span class="line">        JPanel info = <span class="keyword">new</span> JPanel();</span><br><span class="line">        JScrollPane js = <span class="keyword">new</span> JScrollPane();</span><br><span class="line"><span class="comment">//      JButton closebtn = new JButton("测试发送");</span></span><br><span class="line">         JButton closebtn = <span class="keyword">new</span> JButton(<span class="string">"关闭"</span>);</span><br><span class="line">        JLabel Picture = <span class="keyword">new</span> JLabel();</span><br><span class="line">        GridBagLayout gridbag = <span class="keyword">new</span> GridBagLayout();</span><br><span class="line">        GridBagConstraints gbc = <span class="keyword">new</span> GridBagConstraints();</span><br><span class="line"></span><br><span class="line">        picture = <span class="keyword">new</span> ImageIcon();</span><br><span class="line">        tf = <span class="keyword">new</span> JTextArea(<span class="number">8</span>, <span class="number">40</span>);</span><br><span class="line">        name = <span class="keyword">new</span> JLabel(<span class="string">"学生姓名:"</span>);</span><br><span class="line">        sex = <span class="keyword">new</span> JLabel(<span class="string">"学生性别:"</span>);</span><br><span class="line">        id = <span class="keyword">new</span> JLabel(<span class="string">"学生卡号:"</span>);</span><br><span class="line">        namev = <span class="keyword">new</span> JLabel(<span class="string">"无"</span>);</span><br><span class="line">        sexv = <span class="keyword">new</span> JLabel(<span class="string">"无"</span>);</span><br><span class="line">        idv = <span class="keyword">new</span> JLabel(<span class="string">"无"</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">//      tf.setEditable(true);</span></span><br><span class="line">         tf.setEditable(<span class="keyword">false</span>);</span><br><span class="line">        tf.setText(<span class="string">"欢迎使用！"</span>);</span><br><span class="line"></span><br><span class="line">        panel.setLayout(gridbag);</span><br><span class="line">        btnpanel.setLayout(gridbag);</span><br><span class="line">        txtpanel.setLayout(gridbag);</span><br><span class="line">        info.setLayout(gridbag);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// btnpanel.setBorder(BorderFactory.createLoweredBevelBorder());</span></span><br><span class="line">        <span class="comment">// txtpanel.setBorder(BorderFactory.createLoweredBevelBorder());</span></span><br><span class="line"></span><br><span class="line">        panel.add(btnpanel);</span><br><span class="line">        panel.add(txtpanel);</span><br><span class="line">        txtpanel.add(closebtn);</span><br><span class="line">        txtpanel.add(js);</span><br><span class="line">        js.add(tf);</span><br><span class="line">        info.add(name);</span><br><span class="line">        info.add(id);</span><br><span class="line">        info.add(sex);</span><br><span class="line">        info.add(namev);</span><br><span class="line">        info.add(idv);</span><br><span class="line">        info.add(sexv);</span><br><span class="line">        btnpanel.add(Picture);</span><br><span class="line">        btnpanel.add(info);</span><br><span class="line">        Picture.setIcon(picture);</span><br><span class="line">        constriants.add(panel);</span><br><span class="line"></span><br><span class="line">        Picture.setPreferredSize(<span class="keyword">new</span> Dimension(<span class="number">150</span>, <span class="number">200</span>));</span><br><span class="line">        btnpanel.setMinimumSize(<span class="keyword">new</span> Dimension(<span class="number">500</span>, <span class="number">280</span>));</span><br><span class="line">        btnpanel.setPreferredSize(<span class="keyword">new</span> Dimension(<span class="number">500</span>, <span class="number">280</span>));</span><br><span class="line">        <span class="comment">// txtpanel.setMinimumSize(new Dimension(500, 200));</span></span><br><span class="line">        txtpanel.setPreferredSize(<span class="keyword">new</span> Dimension(<span class="number">500</span>, <span class="number">200</span>));</span><br><span class="line">        info.setMaximumSize(<span class="keyword">new</span> Dimension(<span class="number">300</span>, <span class="number">200</span>));</span><br><span class="line">        info.setPreferredSize(<span class="keyword">new</span> Dimension(<span class="number">300</span>, <span class="number">200</span>));</span><br><span class="line">        js.setPreferredSize(<span class="keyword">new</span> Dimension(<span class="number">480</span>, <span class="number">130</span>));</span><br><span class="line">        js.setMinimumSize(<span class="keyword">new</span> Dimension(<span class="number">480</span>, <span class="number">130</span>));</span><br><span class="line">        js.setViewportView(tf);</span><br><span class="line"></span><br><span class="line">        gbc.insets.top = <span class="number">0</span>;</span><br><span class="line">        gbc.insets.bottom = <span class="number">0</span>;</span><br><span class="line">        gbc.insets.right = <span class="number">0</span>;</span><br><span class="line">        gbc.insets.left = <span class="number">0</span>;</span><br><span class="line">        gbc.gridx = <span class="number">0</span>;</span><br><span class="line">        gbc.gridy = <span class="number">0</span>;</span><br><span class="line">        gridbag.setConstraints(btnpanel, gbc);</span><br><span class="line"></span><br><span class="line">        gbc.gridx = <span class="number">0</span>;</span><br><span class="line">        gbc.gridy = <span class="number">1</span>;</span><br><span class="line">        gbc.insets.top = <span class="number">0</span>;</span><br><span class="line">        gbc.insets.bottom = <span class="number">0</span>;</span><br><span class="line">        gbc.insets.right = <span class="number">0</span>;</span><br><span class="line">        gbc.insets.left = <span class="number">0</span>;</span><br><span class="line">        gridbag.setConstraints(txtpanel, gbc);</span><br><span class="line"></span><br><span class="line">        gbc.gridx = <span class="number">0</span>;</span><br><span class="line">        gbc.gridy = <span class="number">0</span>;</span><br><span class="line">        <span class="comment">// gbc.insets.left = 0;</span></span><br><span class="line">        <span class="comment">// gbc.insets.right = 200;</span></span><br><span class="line">        gridbag.setConstraints(Picture, gbc);</span><br><span class="line"></span><br><span class="line">        gbc.gridx = <span class="number">1</span>;</span><br><span class="line">        gbc.gridy = <span class="number">0</span>;</span><br><span class="line">        gridbag.setConstraints(info, gbc);</span><br><span class="line"></span><br><span class="line">        gbc.gridx = <span class="number">0</span>;</span><br><span class="line">        gbc.gridy = <span class="number">0</span>;</span><br><span class="line">        gbc.insets.bottom = <span class="number">20</span>;</span><br><span class="line">        <span class="comment">// gbc.insets.left = 200;</span></span><br><span class="line">        gridbag.setConstraints(closebtn, gbc);</span><br><span class="line"></span><br><span class="line">        gbc.gridx = <span class="number">0</span>;</span><br><span class="line">        gbc.gridy = <span class="number">1</span>;</span><br><span class="line">        gbc.insets.bottom = <span class="number">0</span>;</span><br><span class="line">        gridbag.setConstraints(js, gbc);</span><br><span class="line"></span><br><span class="line">        gbc.gridx = <span class="number">0</span>;</span><br><span class="line">        gbc.gridy = <span class="number">0</span>;</span><br><span class="line">        gbc.insets.bottom = <span class="number">25</span>;</span><br><span class="line">        gbc.insets.top = <span class="number">25</span>;</span><br><span class="line">        gbc.insets.left = <span class="number">0</span>;</span><br><span class="line">        gridbag.setConstraints(name, gbc);</span><br><span class="line"></span><br><span class="line">        gbc.gridx = <span class="number">0</span>;</span><br><span class="line">        gbc.gridy = <span class="number">1</span>;</span><br><span class="line">        gridbag.setConstraints(sex, gbc);</span><br><span class="line"></span><br><span class="line">        gbc.gridx = <span class="number">0</span>;</span><br><span class="line">        gbc.gridy = <span class="number">2</span>;</span><br><span class="line">        gridbag.setConstraints(id, gbc);</span><br><span class="line"></span><br><span class="line">        gbc.gridx = <span class="number">1</span>;</span><br><span class="line">        gbc.gridy = <span class="number">0</span>;</span><br><span class="line">        gbc.insets.bottom = <span class="number">25</span>;</span><br><span class="line">        gbc.insets.top = <span class="number">25</span>;</span><br><span class="line">        gbc.insets.right = <span class="number">150</span>;</span><br><span class="line">        gbc.insets.left = <span class="number">20</span>;</span><br><span class="line">        gridbag.setConstraints(namev, gbc);</span><br><span class="line"></span><br><span class="line">        gbc.gridx = <span class="number">1</span>;</span><br><span class="line">        gbc.gridy = <span class="number">1</span>;</span><br><span class="line">        gridbag.setConstraints(sexv, gbc);</span><br><span class="line"></span><br><span class="line">        gbc.gridx = <span class="number">1</span>;</span><br><span class="line">        gbc.gridy = <span class="number">2</span>;</span><br><span class="line">        gridbag.setConstraints(idv, gbc);</span><br><span class="line"></span><br><span class="line">        constriants.setVisible(<span class="keyword">true</span>);</span><br></pre></td></tr></table></figure>
+<h1>NodeJs Express</h1>
+<p>可获取get参数,若要获取其他参数需要相应组件</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//示例程序</span></span><br><span class="line"><span class="keyword">const</span> express = <span class="built_in">require</span>(<span class="string">'express'</span>);</span><br><span class="line"><span class="keyword">const</span> bodyParser = <span class="built_in">require</span>(<span class="string">'body-parser'</span>);</span><br><span class="line"><span class="comment">//返回一个函数</span></span><br><span class="line"><span class="keyword">const</span> multipart = <span class="built_in">require</span>(<span class="string">'connect-multiparty'</span>);</span><br><span class="line"><span class="keyword">const</span> applicationServer = <span class="built_in">require</span>(<span class="string">"./server.js"</span>);</span><br><span class="line"><span class="built_in">module</span>.exports = <span class="function"><span class="keyword">function</span>(<span class="params">application</span>) </span>&#123;</span><br><span class="line">    <span class="comment">//监听http请求</span></span><br><span class="line">    <span class="keyword">var</span> app = application || express();</span><br><span class="line">    <span class="keyword">var</span> bodyParser = <span class="built_in">require</span>(<span class="string">'body-parser'</span>);</span><br><span class="line">    <span class="keyword">var</span> multipartMiddleware = multipart(); <span class="comment">//允许参数使用form-data格式,即contentType="mutipart/form-data"</span></span><br><span class="line">    <span class="keyword">var</span> server;</span><br><span class="line">    app.use(bodyParser.json(&#123; <span class="attr">limit</span>: <span class="string">'1mb'</span> &#125;)); <span class="comment">//这里指定允许参数使用 json 格式,即contentType="application/json"</span></span><br><span class="line">    app.use(bodyParser.urlencoded(&#123;</span><br><span class="line">        extended: <span class="literal">true</span></span><br><span class="line">    &#125;)); <span class="comment">//这里指定允许www-form-urlencoded格式,即contentType="application/x-www-form-urlencoded"</span></span><br><span class="line"></span><br><span class="line">    applicationServer(app, multipartMiddleware);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (!application) &#123;</span><br><span class="line">        server = <span class="built_in">require</span>(<span class="string">"http"</span>).createServer(app);</span><br><span class="line">        server.listen(<span class="number">7070</span>);</span><br><span class="line">        <span class="built_in">console</span>.log(<span class="string">"server start at loacalhost:7070"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//get参数通过reqest.query获取,post参数通过request.body获取</span></span><br></pre></td></tr></table></figure>
+<h1>eclipse很多项目相干配置需要在properties中改,web app libraries需要close project才能更新</h1>
+<h1>onbeforeunload事件</h1>
+<p>刷新，跳转，退出时执行</p>
+<p>mdn上的说法</p>
+<blockquote>
+<p>当该事件返回的字符串（事前设置好的event.returnValue的值）不为null或者undefined时，弹出确认窗口让用户自行选择是否关闭当前页面。一些浏览器将该事件返回的字符串显示在弹出窗上。从Firefox 4、 Chrome 51、Opera 38 和Safari 9.1开始，通用确认信息代替事件返回的字符串。比如，火狐上会显示“本页面要求您确认您要离开 - 您输入的数据可能不会被保存”，请查阅bug 588292和Chrome Platform Status。<br>
+从2011年5月25日起,  HTML5 规范 声明:在该事件的处理函数中调用下列弹窗相关的方法时,可以忽略不执行,window.showModalDialog(), window.alert(), window.confirm() window.prompt().<br>
+上一条对于onunload同样适用<br>
+需要指出的是，许多浏览器会忽略该事件并自动关闭页面无需用户的确认。火狐浏览器在配置页面about:config设有一个dom.disable_beforeunload的开关变量用于开启这个功能。</p>
+</blockquote>
+<p>另外百度上搜索到的，经测试属实（火狐中）</p>
+<blockquote>
+<p>当用户没和页面进行互动过，window.onbeforeunload不会弹出提示窗口,但会执行其他代码</p>
+</blockquote>
+<p>其他还有,经自己测试出的（火狐中）</p>
+<blockquote>
+<p>用addEventListener给window添加该触发器时,设置返回值也不会弹出提示窗口，而必须设置event.returnValue<br>
+用addEventListener给body添加该触发器时,无论怎样都不触发(注意，是不触发，而不是仅仅不弹出窗口)<br>
+-总而言之这是个不实用的方法。</p>
+</blockquote>
+<h1>mark</h1>
+<p><a href="https://www.cnblogs.com/Dreamer-1/p/5523046.html" target="_blank" rel="noopener">串口通信</a><br>
+<a href="https://www.cnblogs.com/wangmeijian/p/7072053.html" target="_blank" rel="noopener">npm源管理</a><br>
+边框的那个问题<br>
+matrix的问题<br>
+<a href="http://tieba.baidu.com/p/2004216123" target="_blank" rel="noopener">javaGUI</a><br>
+js Infinity<br>
+<a href="https://www.zhangxinxu.com/wordpress/2015/03/css3-object-position-object-fit/" target="_blank" rel="noopener">img object-fit</a><br>
+是否有一个数有十种不同方式写成四个不同正整数的立方和</p>
+<h1>js</h1>
+<p>js有个utc时间和本地时间,不要弄错<br>
+取整避免用parseInt参见https://stackoverflow.com/questions/27650459/function-parseint-1-10000000-returns-1-why<br>
+<a href="https://www.cnblogs.com/breezeljm/p/6138763.html" target="_blank" rel="noopener">https://www.cnblogs.com/breezeljm/p/6138763.html</a></p>
+<h1>springboot几个参数</h1>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">server.addr <span class="comment">//地址</span></span><br><span class="line">server.port <span class="comment">//端口</span></span><br><span class="line">spring.resources.static-locations <span class="comment">//静态文件位置</span></span><br><span class="line">spring.jpa.show-sql=<span class="literal">true</span><span class="comment">//显示sql</span></span><br></pre></td></tr></table></figure>
+<p>配置文件可放在jar包外<br>
+配置加载优先顺序由jar包外向内<br>
+加载优先顺序如下</p>
+<ul>
+<li>runpath/config/</li>
+<li>runpath/</li>
+<li>classpath/config/</li>
+<li>classpath/</li>
+</ul>
+<h1>tomcat400错误</h1>
+<h1>java泛型</h1>
+<p>定义的时候使用T,E等任意字母,可在类上或函数上使用，使用时可用通配符?来声明变量,声明和使用时可通过extends,super来取上界和下界，注意用泛型时程序并不知道如何转化类型为你定义的泛型（泛型的类型是不固定的），用通配声明一个泛型变量时，通配符代表的变量是只读的，因为并不知道如何将你写入的某一变量转化为？类型。</p>
+<h1>javascript</h1>
+<p>我刚开始以为是vue的原因，后来才发现是因为querySelector选择器不识别开头为数字的选择器，解决方案如下：在绑定id时前面加一个字母或者字符串就行了，获取的时候也注意加上这个就可以了</p>
+<h1>webpack</h1>
+<p>extract-text-webpack-plugin组件报错Tapable.plugin is deprecated. Use new API on <code>.hooks</code> instead<br>
+原因是该组件不被webpack4支持,解决办法，下载beta版本，npm i -s extract-text-webpack-plugin@next<br>
+之后又报错text.forEach is not a function<br>
+解决办法 跳转到源码 在text.forEach前面加一句text = text.default<br>
+有误，加了上述一句也解决不了问题，分离出的css是空的，改用别的插件mini-css-extract-plugin</p>
+<h1>webpack4执行webpack init时报错</h1>
+<p><a href="https://github.com/webpack/webpack-cli/issues/1127" target="_blank" rel="noopener">解决方案</a></p>
+<blockquote>
+<p>This error seems to be due to error in the configuration. Refer following steps:<br>
+If you are using webpack v5, refer Migration Guide to update the scaffolded configuration.<br>
+If you are using webpack v4, use webpack-cli v3, @webpack-cli/init v0.2.2.</p>
+</blockquote>
+
+    </section>
+    <footer class="post-footer">
+      <section class="author">
+    <h4>flyingfisherman</h4>
+    <p>前端工程师，热爱技术，坚信知识技术改变生活。最高兴的场合莫过于学到的技术为自己、亲友或他人提供了些许的便利、帮助。</p>
+</section>
+      <section class="share">
+    <h4>Share this post</h4>
+    <a class="icon-twitter" href="http://twitter.com/share?url=https://github.flyingfishman.io/hexo/2018/10/14/杂项/"
+       onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+        <span class="hidden">Twitter</span>
+    </a>
+    <a class="icon-facebook" href="https://www.facebook.com/sharer/sharer.php?u=https://github.flyingfishman.io/hexo/2018/10/14/杂项/"
+       onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+        <span class="hidden">Facebook</span>
+    </a>
+    <a class="icon-google-plus" href="https://plus.google.com/share?url=https://github.flyingfishman.io/hexo/2018/10/14/杂项/"
+       onclick="window.open(this.href, 'google-plus-share', 'width=490,height=530');return false;">
+        <span class="hidden">Google+</span>
+    </a>
+</section>
+    </footer>
+  </article>
+  <nav class="pagination" role="pagination">
+    
+    <a class="newer-posts" href="/hexo/2018/10/20/mysql/">
+        ← 彻底删除mysql服务
+    </a>
+    
+    <span class="page-number">•</span>
+    
+    <a class="older-posts" href="/hexo/2018/10/03/springMVC/">
+        关于springBoot →
+    </a>
+    
+</nav>
+  <div id="comment" class="comments-area">
+    <h1 class="title"><a href="#disqus_comments" name="disqus_comments">Comments</a></h1>
+
+    
+</div>
+</main>
+
+
+  
+<footer class="site-footer">
+  
+  <a class="subscribe icon-feed" href="/rss.xml"><span class="tooltip">Subscribe!</span></a>
+  
+  <div class="inner">
+     <section class="copyright">All content copyright <a href="/hexo/">日常点滴</a> &copy; 2014 &bull; All rights reserved.</section>
+     <section class="poweredby">Proudly published with <a class="icon-ghost" href="http://zespia.tw/hexo/">Hexo</a></section>
+  </div>
+</footer>
+
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+<script type="text/javascript" src="/hexo/js/jquery.fitvids.js"></script>
+<script type="text/javascript" src="/hexo/js/index.js"></script>
+
+
+
+
+
+
+</body>
+</html>

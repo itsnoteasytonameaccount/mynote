@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html" charset="UTF-8" >
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+  <title>hexo的使用技巧 | 日常点滴</title>
+  <meta name="description" content="" />
+  <meta name="HandheldFriendly" content="True" />
+  <meta name="MobileOptimized" content="320" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <link rel="stylesheet" type="text/css" href="/hexo/css/screen.css" />
+  <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Noto+Serif:400,700,400italic|Open+Sans:700,400" />
+
+  <meta name="generator" content="日常点滴">
+
+  
+  <link rel="alternate" type="application/rss+xml" title="RSS" href="/rss.xml">
+  
+  
+  <link rel="alternate" type="application/atom+xml" title="Atom 0.3" href="rss.xml">
+  
+  
+
+  
+</head>
+
+
+<body class="post-template">
+
+  <header class="site-head"  style="background-image: url(/image/cover.png)" >
+    <div class="vertical">
+        <div class="site-head-content inner">
+             <a class="blog-logo" href="/hexo/"><img src="https://avatars.githubusercontent.com/u/26755276" alt="Blog Logo"/></a> 
+            <h1 class="blog-title">日常点滴</h1>
+            <h2 class="blog-description"></h2>
+        </div>
+    </div>
+</header>
+  
+
+<main class="content" role="main">
+  <article class="post">
+    <span class="post-meta">
+      <time datetime="2018-04-02T03:06:19.000Z" itemprop="datePublished">
+          2018-04-02
+      </time>
+    
+    
+    | 
+    <a href='/hexo/tags/hexo/'>hexo</a>
+    
+    
+</span>
+    <h1 class="post-title">hexo的使用技巧</h1>
+    <section class="post-content">
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.12.0/katex.min.css" /><h1>hexo 博客使用（一）</h1>
+<h2 id="前言">前言</h2>
+<p>首先是官方中文文档，不管什么情况，应该养成首先看官方文档的习惯，官方文档解决不了再合理利用搜索引擎<br>
+<a href="https://hexo.io/zh-cn/docs/" target="_blank" rel="noopener">官方文档点击这里</a></p>
+<a id="more"></a>
+<h2 id="基础知识">基础知识</h2>
+<ol>
+<li>
+<p>文章位置<br>
+写文章用的是 markdown，文章路径默认为 source 文件夹中的_posts,<a href="http://xn--siqsrz21bhjga372bl84b.md" target="_blank" rel="noopener">文章文件格式为.md</a> 后缀,至于 markdown 语法<a href="http://wowubuntu.com/markdown/index.html" target="_blank" rel="noopener">点这里查看</a>，当你在控制台执行<em>hexo generate</em>后，默认会在 public 目录下生成 html 文件，最终你的博客页面显示的就是这些 html 文件。</p>
+</li>
+<li>
+<p>主题<br>
+hexo 有着大量的主题，你可以在<a href="https://hexo.io/themes/" target="_blank" rel="noopener">官方的主题页面</a>寻找适合自己的主题,主题的位置默认在 themes 文件夹里，<br>
+主题的安装只需要将包下载在主题文件夹即可，切换主题只需要在_config.yml 配置文件中，更改主题配置。切换主题后，需要重新 generate</p>
+</li>
+<li>
+<p>配置文件<br>
+hexo 配置文件为_config.yml，重要的几个参数有：</p>
+<blockquote>
+<p>title:主页的标题<br>
+author:文章作者<br>
+root:网页的根路径,比如：若你将页面部署在<em><a href="http://www.yoursite.com/root/" target="_blank" rel="noopener">www.yoursite.com/root/</a><em>下，且</em><a href="http://www.yousite.com" target="_blank" rel="noopener">www.yousite.com</a></em>是你网站的根路径，你的 root 就应该设为/root/<br>
+url:网站路径<br>
+public_dir:文件生成的目录<br>
+source_dir:文章目录<br>
+theme:选择主题</p>
+</blockquote>
+<p>当然，还有许多参数，另外，当你安装了某些插件时，也需要在_config.yml 中为其配置参数<br>
+有些主题也需要为其配置参数,另外，一些主题还有自己独立的配置文件</p>
+</li>
+<li>
+<p>第三方服务<br>
+由于 hexo 博客完全没有后台服务，因而有一些需要数据记录和操作的服务是无法做到的，例如记录文章信息供用户检索，或者评论功能，这时就需要第三方服务，网上有许多免费的第三方数据服务，我用过或了解过的有，<a href="https://www.algolia.com/" target="_blank" rel="noopener">algolia</a>(提供数据存储以及检索接口),<a href="http://www.uyan.cc/" target="_blank" rel="noopener">友言</a>(提供社会化分享，评论服务,但似乎所有接口都不支持 https 协议)，<a href="https://changyan.kuaizhan.com/" target="_blank" rel="noopener">畅言</a>(也是评论服务，看过许多网站使用这一服务),<a href="https://livere.com/" target="_blank" rel="noopener">livere</a>(同样是评论服务，支持 https 协议，因而我当前采用的是这一评论服务),另外还有百度 api 等——我的分享功能用的是百度 api</p>
+<p>有许多主题自身接入了第三方服务，要使用只需要在相应配置文件中添加相应配置即可</p>
+</li>
+</ol>
+<h2 id="进阶">进阶</h2>
+<h3 id="修改主题">修改主题</h3>
+<p>他人的主题或许满足不了自身的所有需求，但是自己写主题的时间成本又不小，因而可以采取一种折衷的办法，修改现成的主题，将不满意的地方改为自己喜欢的样子，或为主题添加第三方服务</p>
+<p>主题由各部分的模板文件组成，模板文件有两种类型，一种是类似于 jsp 的，通过<code>&lt;%标签开头%&gt;&lt;%标签结尾%&gt;</code>来嵌入预执行代码的模板语句，后缀为 ejs。</p>
+<p>另一种类似<code>AngularJs</code>的将代码放在两对花括号之间，本人只进行过第一种主题模板的修改。两种模板需要不同的插件生成 html 文件的。除了少许的差异外，两种模板的语法是基本一致的。</p>
+<p>详见官方文档，不作赘述。</p>
+<h3 id="插件">插件</h3>
+<p>npm 上有许多关于 hexo 的插件，用以丰富其功能，如果这些插件满足不了你，可以尝试自己写需要的功能插件。</p>
+<p>hexo 为所有插件提供 hexo 全局变量<br>
+hexo 插件要采用注册器拓展自身功能，举例如下</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">hexo.extend.generator.register(<span class="string">"name"</span>, functionName);</span><br><span class="line"><span class="comment">//generator注册的函数必须返回一个对象，否则generate时可能会报错，具体返回格式参看官方文档</span></span><br><span class="line">hexo.extend.console.register(<span class="string">"name"</span>, <span class="string">"describe"</span>, name);</span><br></pre></td></tr></table></figure>
+<p>hexo 可拓展的部分有</p>
+<blockquote>
+<p>控制台(console)，此部分的扩展会添加在控制台 hexo 指令的可选参数中</p>
+</blockquote>
+<blockquote>
+<p>生成器(generator),此部分的扩展会在你执行控制台的 hexo generate 指令时自动执行</p>
+</blockquote>
+<blockquote>
+<p>过滤器(filter),某些特定时段对文件内容修改</p>
+</blockquote>
+<p>更多可参看<a href="https://hexo.bootcss.com/api/filter.html" target="_blank" rel="noopener">官方中文 api 文档</a>，另外我尝试写过一个 <a href="https://github.com/flyingfishman/hexo-algolia-helper" target="_blank" rel="noopener">hexo-algolia-helper</a> 插件，虽然代码难看，功能也不好，但应该可作为示例</p>
+<p>要写插件，如果是是一些小功能的话可以直接写在 scripts 文件夹中，如果 hexo 博客目录没有 scripts 文件夹，自己添加，scripts 文件夹里的代码文件，会在每次调用控制台时自动执行。</p>
+<p><strong>script 示例：使用相对路径的图片</strong></p>
+<p>文件结构如下</p>
+<p><img src="/hexo/image/struct.png" alt="图片无法显示"></p>
+<p>则可以在 markdown 文件中使用相对路径</p>
+<figure class="highlight markdown"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">![<span class="string">图片无法显示</span>](<span class="link">../image/你的图片路径</span>)</span><br></pre></td></tr></table></figure>
+<p><code>hexo generate</code>时 image 文件夹会被复制到 public 文件夹下</p>
+<p>因此需要写路径函数用来改写路径，在 filter 中注册</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">postImages</span>(<span class="params">post</span>) </span>&#123;</span><br><span class="line">  post.content = post.content.replace(<span class="regexp">/&lt;img[^&gt;]*src="[^"]*"[^&gt;]*&gt;/g</span>, <span class="function"><span class="keyword">function</span> (<span class="params">dir, index</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> dir.replace(<span class="regexp">/\.\.\//</span>, hexo.config.root);</span><br><span class="line">  &#125;);</span><br><span class="line">  <span class="keyword">return</span> post;</span><br><span class="line">&#125;</span><br><span class="line">hexo.extend.filter.register(<span class="string">"after_post_render"</span>, postImages);</span><br></pre></td></tr></table></figure>
+<p>如果是大型插件，可以写一个独立插件发布至 npm 上，在通过 npm 安装至 hexo 博客目录下，插件名必须是 hexo-*****的格式，否则 hexo 不会自动执行该插件</p>
+<blockquote>
+<p>要想写好插件，也是最好多看文档，不要盲目信百度，说不定有很多人就是像我一样，学了点三脚猫功夫就出来摆弄。</p>
+</blockquote>
+
+    </section>
+    <footer class="post-footer">
+      <section class="author">
+    <h4>flyingfisherman</h4>
+    <p>前端工程师，热爱技术，坚信知识技术改变生活。最高兴的场合莫过于学到的技术为自己、亲友或他人提供了些许的便利、帮助。</p>
+</section>
+      <section class="share">
+    <h4>Share this post</h4>
+    <a class="icon-twitter" href="http://twitter.com/share?url=https://github.flyingfishman.io/hexo/2018/04/02/use/"
+       onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+        <span class="hidden">Twitter</span>
+    </a>
+    <a class="icon-facebook" href="https://www.facebook.com/sharer/sharer.php?u=https://github.flyingfishman.io/hexo/2018/04/02/use/"
+       onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+        <span class="hidden">Facebook</span>
+    </a>
+    <a class="icon-google-plus" href="https://plus.google.com/share?url=https://github.flyingfishman.io/hexo/2018/04/02/use/"
+       onclick="window.open(this.href, 'google-plus-share', 'width=490,height=530');return false;">
+        <span class="hidden">Google+</span>
+    </a>
+</section>
+    </footer>
+  </article>
+  <nav class="pagination" role="pagination">
+    
+    <a class="newer-posts" href="/hexo/2018/04/05/es6/">
+        ← 用法笔记
+    </a>
+    
+    <span class="page-number">•</span>
+    
+    <a class="older-posts" href="/hexo/2018/01/14/first/">
+        注册表 →
+    </a>
+    
+</nav>
+  <div id="comment" class="comments-area">
+    <h1 class="title"><a href="#disqus_comments" name="disqus_comments">Comments</a></h1>
+
+    
+</div>
+</main>
+
+
+  
+<footer class="site-footer">
+  
+  <a class="subscribe icon-feed" href="/rss.xml"><span class="tooltip">Subscribe!</span></a>
+  
+  <div class="inner">
+     <section class="copyright">All content copyright <a href="/hexo/">日常点滴</a> &copy; 2014 &bull; All rights reserved.</section>
+     <section class="poweredby">Proudly published with <a class="icon-ghost" href="http://zespia.tw/hexo/">Hexo</a></section>
+  </div>
+</footer>
+
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+<script type="text/javascript" src="/hexo/js/jquery.fitvids.js"></script>
+<script type="text/javascript" src="/hexo/js/index.js"></script>
+
+
+
+
+
+
+</body>
+</html>

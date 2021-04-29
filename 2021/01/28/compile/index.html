@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html" charset="UTF-8" >
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+  <title>程序编译 | 日常点滴</title>
+  <meta name="description" content="" />
+  <meta name="HandheldFriendly" content="True" />
+  <meta name="MobileOptimized" content="320" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <link rel="stylesheet" type="text/css" href="/hexo/css/screen.css" />
+  <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Noto+Serif:400,700,400italic|Open+Sans:700,400" />
+
+  <meta name="generator" content="日常点滴">
+
+  
+  <link rel="alternate" type="application/rss+xml" title="RSS" href="/rss.xml">
+  
+  
+  <link rel="alternate" type="application/atom+xml" title="Atom 0.3" href="rss.xml">
+  
+  
+
+  
+</head>
+
+
+<body class="post-template">
+
+  <header class="site-head"  style="background-image: url(/image/cover.png)" >
+    <div class="vertical">
+        <div class="site-head-content inner">
+             <a class="blog-logo" href="/hexo/"><img src="https://avatars.githubusercontent.com/u/26755276" alt="Blog Logo"/></a> 
+            <h1 class="blog-title">日常点滴</h1>
+            <h2 class="blog-description"></h2>
+        </div>
+    </div>
+</header>
+  
+
+<main class="content" role="main">
+  <article class="post">
+    <span class="post-meta">
+      <time datetime="2021-01-27T16:00:00.000Z" itemprop="datePublished">
+          2021-01-28
+      </time>
+    
+    
+    | 
+    <a href='/hexo/tags/c/'>c</a>,
+    
+    <a href='/hexo/tags/makefile/'>makefile</a>
+    
+    
+</span>
+    <h1 class="post-title">程序编译</h1>
+    <section class="post-content">
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.12.0/katex.min.css" /><p>每次都是这样，要用东西，以前用过，但是现在忘了，又得找半天，才想起要记笔记</p>
+<p>不做深入，简单了解一下</p>
+<a id="more"></a>
+<h1>gcc</h1>
+<p>编译参数</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">参数</th>
+<th style="text-align:left">作用</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">-<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>o</mi></mrow><annotation encoding="application/x-tex">o</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.43056em;vertical-align:0em;"></span><span class="mord mathnormal">o</span></span></span></span></td>
+<td style="text-align:left">输出文件名</td>
+</tr>
+<tr>
+<td style="text-align:left">-<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>O</mi></mrow><annotation encoding="application/x-tex">O</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathnormal" style="margin-right:0.02778em;">O</span></span></span></span></td>
+<td style="text-align:left">优化选项</td>
+</tr>
+<tr>
+<td style="text-align:left">-<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>l</mi></mrow><annotation encoding="application/x-tex">l</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.69444em;vertical-align:0em;"></span><span class="mord mathnormal" style="margin-right:0.01968em;">l</span></span></span></span></td>
+<td style="text-align:left">链接库</td>
+</tr>
+<tr>
+<td style="text-align:left">-<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>L</mi></mrow><annotation encoding="application/x-tex">L</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathnormal">L</span></span></span></span></td>
+<td style="text-align:left">链接库位置</td>
+</tr>
+<tr>
+<td style="text-align:left">-<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>I</mi></mrow><annotation encoding="application/x-tex">I</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathnormal" style="margin-right:0.07847em;">I</span></span></span></span></td>
+<td style="text-align:left">头文件搜索路径，可以重复设置多个</td>
+</tr>
+<tr>
+<td style="text-align:left">-<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>g</mi></mrow><annotation encoding="application/x-tex">g</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.625em;vertical-align:-0.19444em;"></span><span class="mord mathnormal" style="margin-right:0.03588em;">g</span></span></span></span></td>
+<td style="text-align:left">生成调试信息</td>
+</tr>
+<tr>
+<td style="text-align:left">-<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>g</mi><mi>g</mi><mi>d</mi><mi>b</mi></mrow><annotation encoding="application/x-tex">ggdb</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8888799999999999em;vertical-align:-0.19444em;"></span><span class="mord mathnormal" style="margin-right:0.03588em;">g</span><span class="mord mathnormal" style="margin-right:0.03588em;">g</span><span class="mord mathnormal">d</span><span class="mord mathnormal">b</span></span></span></span></td>
+<td style="text-align:left">尽量生成gdb可用的调试信息</td>
+</tr>
+<tr>
+<td style="text-align:left">-<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>W</mi><mi>a</mi><mi>l</mi><mi>l</mi></mrow><annotation encoding="application/x-tex">Wall</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.69444em;vertical-align:0em;"></span><span class="mord mathnormal" style="margin-right:0.13889em;">W</span><span class="mord mathnormal">a</span><span class="mord mathnormal" style="margin-right:0.01968em;">l</span><span class="mord mathnormal" style="margin-right:0.01968em;">l</span></span></span></span></td>
+<td style="text-align:left">生成所有警告</td>
+</tr>
+<tr>
+<td style="text-align:left">-<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>w</mi></mrow><annotation encoding="application/x-tex">w</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.43056em;vertical-align:0em;"></span><span class="mord mathnormal" style="margin-right:0.02691em;">w</span></span></span></span></td>
+<td style="text-align:left">不生成警告</td>
+</tr>
+<tr>
+<td style="text-align:left">-<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>s</mi><mi>h</mi><mi>a</mi><mi>r</mi><mi>e</mi></mrow><annotation encoding="application/x-tex">share</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.69444em;vertical-align:0em;"></span><span class="mord mathnormal">s</span><span class="mord mathnormal">h</span><span class="mord mathnormal">a</span><span class="mord mathnormal" style="margin-right:0.02778em;">r</span><span class="mord mathnormal">e</span></span></span></span></td>
+<td style="text-align:left">尽量使用动态库</td>
+</tr>
+<tr>
+<td style="text-align:left">-<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>s</mi><mi>t</mi><mi>a</mi><mi>t</mi><mi>i</mi><mi>c</mi></mrow><annotation encoding="application/x-tex">static</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.65952em;vertical-align:0em;"></span><span class="mord mathnormal">s</span><span class="mord mathnormal">t</span><span class="mord mathnormal">a</span><span class="mord mathnormal">t</span><span class="mord mathnormal">i</span><span class="mord mathnormal">c</span></span></span></span></td>
+<td style="text-align:left">不使用动态库</td>
+</tr>
+<tr>
+<td style="text-align:left">-<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>W</mi><mi>l</mi></mrow><annotation encoding="application/x-tex">Wl</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.69444em;vertical-align:0em;"></span><span class="mord mathnormal" style="margin-right:0.13889em;">W</span><span class="mord mathnormal" style="margin-right:0.01968em;">l</span></span></span></span></td>
+<td style="text-align:left">发送参数到链接器</td>
+</tr>
+<tr>
+<td style="text-align:left">-<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>W</mi><mi>a</mi></mrow><annotation encoding="application/x-tex">Wa</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathnormal" style="margin-right:0.13889em;">W</span><span class="mord mathnormal">a</span></span></span></span></td>
+<td style="text-align:left">发送参数到汇编器</td>
+</tr>
+<tr>
+<td style="text-align:left">-<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>W</mi><mi>p</mi></mrow><annotation encoding="application/x-tex">Wp</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8777699999999999em;vertical-align:-0.19444em;"></span><span class="mord mathnormal" style="margin-right:0.13889em;">W</span><span class="mord mathnormal">p</span></span></span></span></td>
+<td style="text-align:left">发送参数到预处理器</td>
+</tr>
+</tbody>
+</table>
+<h2 id="优化级别">优化级别</h2>
+<p>以下内容复制自<a href="https://zhuanlan.zhihu.com/p/196785332" target="_blank" rel="noopener">GCC 优化级别</a></p>
+<ul>
+<li>-O0不做任何优化，可以用于调试代码</li>
+<li>-O或-O1、-O2、-O3优化程度逐级提高，牺牲了编译时间和可调试性</li>
+<li>-Og在O1的基础上，去掉了那些影响调试的优化，所以如果最终是为了调试程序，可以使用这个参数。</li>
+<li>-Os 是在 -O2 的基础上，去掉了那些会导致最终可执行程序增大的优化，如果想要更小的可执行程序，可选择这个参数。</li>
+<li>-Ofast 是在 -O3 的基础上，添加了一些非常规优化，这些优化是通过打破一些国际标准（比如一些数学函数的实现标准）来实现的，所以一般不推荐使用该参数。</li>
+<li>如果想知道上面的优化参数具体做了哪些优化，可以使用 gcc -Q --help=optimizers 命令来查询，比如下面是查询 -O3 参数开启了哪些优化</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gcc -Q --<span class="built_in">help</span>=optimizers -O3</span><br></pre></td></tr></table></figure>
+<h2 id="编译过程">编译过程</h2>
+<p>以c语言为例</p>
+<ul>
+<li><code>gcc -E</code>: 预处理，处理符号、宏、头文件包含、条件编译等，用到的是预处理器cpp</li>
+<li><code>gcc -S</code>: 仅编译成汇编文件，不进行汇编或组装，用到的是编译器cc</li>
+<li><code>gcc -c</code>: 汇编成二进制文件，用到的是汇编器ar</li>
+<li><code>gcc</code>: 链接成可执行文件，用到的是链接器ld</li>
+</ul>
+<h1>动态库和静态库</h1>
+<p>动态库和静态库的所处阶段不同，静态库本质上是汇编后的代码，动态库是链接后的代码</p>
+<h2 id="动态库">动态库</h2>
+<p>不编译入程序，程序运行时加载，多个运行中程序共用同一个动态库时只需在内存中载入一份动态库</p>
+<p>编译选项<code>-shared</code></p>
+<h3 id="fPIC">-fPIC</h3>
+<p>详见<a href="https://blog.csdn.net/derkampf/article/details/69660050" target="_blank" rel="noopener">gcc编译参数-fPIC的一些问题</a></p>
+<blockquote>
+<p>-fPIC 作用于编译阶段，告诉编译器产生与位置无关代码(Position-Independent Code)，则产生的代码中，没有绝对地址，全部使用相对地址，故而代码可以被加载器加载到内存的任意位置，都可以正确的执行。这正是共享库所要求的，共享库被加载时，在内存的位置不是固定的。</p>
+</blockquote>
+<blockquote>
+<p>如果不加-fPIC,则加载.so文件的代码段时,代码段引用的数据对象需要重定位, 重定位会修改代码段的内容,这就造成每个使用这个.so文件代码段的进程在内核里都会生成这个.so文件代码段的copy</p>
+</blockquote>
+<h3 id="动态库搜索路径">动态库搜索路径</h3>
+<h4 id="windows">windows</h4>
+<p>windows下搜索路径:可执行文件目录=&gt;执行目录=&gt;windows目录=&gt;system目录=&gt;path包含的目录<br>
+经测试，似乎不可以通过<code>-Wl,-rpath</code>指定，也不可通过设置<code>LD_LIBRARY_PATH</code>来指定</p>
+<h4 id="linux">linux</h4>
+<p>linux下搜索路径：/lib,/usr/lib</p>
+<p>可以自行指定，方法如下</p>
+<p><strong>通过设置<code>LD_LIBRARY_PATH</code>来指定</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 当前路径</span></span><br><span class="line"><span class="built_in">export</span> LD_LIBRARY_PATH=.</span><br><span class="line"><span class="comment"># 其他路径,多个路径用冒号分隔</span></span><br><span class="line"><span class="built_in">export</span> LD_LIBRARY_PATH=/root/mylib:/root/mylib</span><br></pre></td></tr></table></figure>
+<p><strong>通过`-Wl,-rpath在编译时指定</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">g++ hello.cpp -L. -lmy -o hello -Wl,-rpath,.</span><br></pre></td></tr></table></figure>
+<h2 id="静态库">静态库</h2>
+<p>编译入程序</p>
+<p>编译静态库的方法</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ar -rc xxx.lib xxx1.o xxx2.o</span><br></pre></td></tr></table></figure>
+<h1>makefile</h1>
+<p><a href="https://www.gnu.org/software/make/manual/" target="_blank" rel="noopener">make手册(英文)</a></p>
+<h2 id="前置条件和目标等概念">前置条件和目标等概念</h2>
+<p>目标指的是编译的目标文件，前置条件指的是编译该目标之前需要编译的目标或者依赖的文件</p>
+<p>一般格式</p>
+<figure class="highlight makefile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="section">目标: 前置条件</span></span><br><span class="line">    命令列表</span><br></pre></td></tr></table></figure>
+<p>使用makefile编译时，编译器会自动检查目标文件是否存在、前置条件对应的文件内容相较上一次是否改变，以确定是否需要编译</p>
+<p><strong>伪目标</strong></p>
+<p>类似clean以及其他自定义的标签，不产生真正的同名文件的目标，称为伪目标，若在文件夹存在伪目标的同名文件，会导致伪目标不执行，提示<code>xxx is up to date</code>，可以用<code>.PHONY</code>告诉编译器哪个是伪目标</p>
+<p>例</p>
+<figure class="highlight makefile"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta"><span class="meta-keyword">.PHONY</span>: clean</span></span><br></pre></td></tr></table></figure>
+<h2 id="隐含规则">隐含规则</h2>
+<p>不提供命令列表的话，会使用隐含规则，推测命令</p>
+<p>比如我用mingw测试的隐含规则</p>
+<figure class="highlight makefile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 会检查同一目录下的文件</span></span><br><span class="line"><span class="comment"># 若存在main.c，命令是$(CC) -c -o main.o main.c &amp;&amp; $(CC) -o main main.o</span></span><br><span class="line"><span class="comment"># 若存在main.o文件，命令是$(CC) main.o -o main</span></span><br><span class="line"><span class="comment"># 若存在main.cpp文件，命令时$(CXX) main.cpp -o main</span></span><br><span class="line"><span class="section">main:</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 若不存在main.o，命令是$(CXX) main.cpp -o main</span></span><br><span class="line"><span class="comment"># 但若存在main.o，命令会变为$(CC) main.o main.cpp -o main</span></span><br><span class="line"><span class="section">main: main.cpp</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 其他后缀无隐含规则且不是main这样的特殊目标名只会提示Nothing to do for xxx</span></span><br><span class="line"><span class="section">anytarget.unknownExt:</span></span><br></pre></td></tr></table></figure>
+<h2 id="执行编译">执行编译</h2>
+<p>用make命令执行，默认执行第一个目标的编译</p>
+<h2 id="简单语法">简单语法</h2>
+<p><strong>传入参数</strong></p>
+<p>命令行中直接<code>make PARAM_NAME=PARAM_VALUE</code><br>
+makefile中使用参数<code>$(PARAM_NAME)</code></p>
+<p><strong>条件</strong></p>
+<p><code>ifeq</code>,<code>ifneq</code>,<code>ifdef</code></p>
+<p>例</p>
+<figure class="highlight makefile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">ifeq</span>(<span class="variable">$(CC)</span>,gcc)</span><br><span class="line">    libs=<span class="variable">$(libs_for_gcc)</span></span><br><span class="line"><span class="keyword">else</span></span><br><span class="line">    libs=<span class="variable">$(normal_libs)</span></span><br><span class="line"><span class="keyword">endif</span></span><br><span class="line"></span><br><span class="line">bar =</span><br><span class="line">foo = <span class="variable">$(bar)</span></span><br><span class="line"><span class="section">all:</span></span><br><span class="line"><span class="keyword">ifdef</span> foo</span><br><span class="line">    @echo yes</span><br><span class="line"><span class="keyword">else</span></span><br><span class="line">    @echo  no</span><br><span class="line"><span class="keyword">endif</span></span><br></pre></td></tr></table></figure>
+<p><strong>示例</strong></p>
+<figure class="highlight makefile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">FILES_TO_COMPILE = a.o b.o</span><br><span class="line"></span><br><span class="line"><span class="section">main: <span class="variable">$(FILES_TO_COMPILE)</span> other_cmd</span></span><br><span class="line">    <span class="variable">$(CC)</span> <span class="variable">$(FILES_TO_COMPILE)</span> other_file.c -o <span class="variable">$(TARGET_NAME)</span> -I <span class="variable">$(INCLUDE_PATH)</span> <span class="variable">$(LIBS)</span></span><br><span class="line"><span class="comment"># 不常修改的依赖可以单独生成目标，这样下次修改程序代码再次编译时，省去了这些文件的编译时间</span></span><br><span class="line"><span class="section">a.o: file1.c</span></span><br><span class="line">	<span class="variable">$(CC)</span> -c file1.c</span><br><span class="line"><span class="section">b.o: file2.c</span></span><br><span class="line">	<span class="variable">$(CC)</span> -c file2.c</span><br><span class="line"><span class="comment"># 多个目标</span></span><br><span class="line">c.o d.o: file3.c</span><br><span class="line">    <span class="variable">$(CC)</span> -c file3.c</span><br><span class="line"><span class="section">other_cmd:</span></span><br><span class="line">	<span class="comment"># dosomething</span></span><br><span class="line"><span class="section">clean:</span></span><br><span class="line">	rm -f a.o b.o</span><br></pre></td></tr></table></figure>
+<p><strong>赋值</strong></p>
+<figure class="highlight makefile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">VARIABLE = value</span><br><span class="line"><span class="comment"># makefile开始执行时就扩展。</span></span><br><span class="line"></span><br><span class="line">VARIABLE := value</span><br><span class="line"><span class="comment"># 执行到这一句再扩展</span></span><br><span class="line"></span><br><span class="line">VARIABLE ?= value</span><br><span class="line"><span class="comment"># 只有在该变量为空时才设置值。</span></span><br><span class="line"></span><br><span class="line">VARIABLE += value</span><br><span class="line"><span class="comment"># 将值追加到变量的尾端。</span></span><br></pre></td></tr></table></figure>
+<p><code>:=</code>和<code>=</code>区别举例</p>
+<figure class="highlight makefile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">A = a</span><br><span class="line"><span class="comment"># 相当于'B = '因为makefile执行时A还没有值</span></span><br><span class="line">B = <span class="variable">$(A)</span></span><br><span class="line"><span class="comment"># 相当于'B = a'因为执行到赋值语句时A已经有值</span></span><br><span class="line">B := <span class="variable">$(A)</span></span><br></pre></td></tr></table></figure>
+<h2 id="通配符">通配符</h2>
+<p>支持<code>*</code>任意个任意字符，<code>?</code>一个任意字符，<code>[a-z]</code>一个字母通配模式</p>
+<p>示例</p>
+<figure class="highlight makefile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="section">clean:</span></span><br><span class="line">    rm -f *.o</span><br></pre></td></tr></table></figure>
+<h2 id="模式匹配">模式匹配</h2>
+<p>只有在作为其他目标的依赖的时候才有用，匹配依赖的模式</p>
+<figure class="highlight makefile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="section">main: f1.o f2.o</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 需要作为依赖</span></span><br><span class="line"><span class="section">%.o: %.c</span></span><br><span class="line"><span class="comment"># 等同于</span></span><br><span class="line"><span class="section">f1.o: f1.c</span></span><br><span class="line"><span class="section">f2.o: f2.c</span></span><br></pre></td></tr></table></figure>
+<h2 id="自动变量">自动变量</h2>
+<p><code>$@</code>指代当前编译目标<br>
+<code>$*</code>匹配<code>%</code>模式匹配到的目标<br>
+<code>$&lt;</code>匹配第一个前置条件</p>
+<h2 id="内置变量">内置变量</h2>
+<p><code>$(CC)</code>当前c编译器，<code>$(MAKE)</code>当前make工具，<code>$(CXX)</code>c++编译器</p>
+<h2 id="路径">路径</h2>
+<p>makefile中执行的命令环境路径是make程序执行时的路径，而不是makefile所在的路径</p>
+<figure class="highlight makefile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># parent makefile</span></span><br><span class="line"><span class="comment"># PWD = /root</span></span><br><span class="line"><span class="section">main: makechild</span></span><br><span class="line"><span class="section">makechild:</span></span><br><span class="line">    @<span class="variable">$(MAKE)</span> -s -f child/makefile</span><br><span class="line">    <span class="comment"># 可以改成</span></span><br><span class="line">    cd child &amp;&amp; @<span class="variable">$(MAKE)</span> -s</span><br><span class="line"></span><br><span class="line"><span class="comment"># child makefile</span></span><br><span class="line"><span class="section">main:</span></span><br><span class="line">    @echo $$PWD</span><br><span class="line"></span><br><span class="line"><span class="comment"># /root下执行make结果是/root而不是/root/child</span></span><br></pre></td></tr></table></figure>
+<h2 id="函数">函数</h2>
+<p>wildcard和patsubst需要着重了解一下，非常有用</p>
+<p>wildcard用来列举通配符匹配的文件，patsubst用来模式替换</p>
+<p>作用举例：无法cd到child文件夹的情况下（比如-I设置了相对路径），在parent文件夹列举child的.cpp文件，并执行命令生成对应的child/.o文件</p>
+<p>这个目的在windows下用shell不知道能否达到，但用上述两个函数就很简单</p>
+<figure class="highlight makefile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">CPP_LIST := <span class="variable">$(<span class="built_in">wildcard</span> child/*.cpp)</span></span><br><span class="line">OBJECT_LIST := <span class="variable">$(<span class="built_in">patsubst</span> %.cpp,%.o,<span class="variable">$(CPP_LIST)</span>)</span></span><br><span class="line"></span><br><span class="line"><span class="section">main: <span class="variable">$(OBJECT_LIST)</span></span></span><br><span class="line">    <span class="variable">$(CXX)</span> <span class="variable">$(OBJECT_LIST)</span> -o main.exe</span><br><span class="line"></span><br><span class="line"><span class="section">child/%.o: child/%.cpp</span></span><br><span class="line">    <span class="variable">$(CXX)</span> <span class="variable">$&lt;</span> <span class="variable">$(INCLUDE_PATH)</span> <span class="variable">$(LIBRARY)</span> -o <span class="variable">$@</span></span><br></pre></td></tr></table></figure>
+<h2 id="引入其他文件">引入其他文件</h2>
+<p>相当于用对应文件内容替换include部分</p>
+<figure class="highlight makefile"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">include</span> path/to/file</span><br></pre></td></tr></table></figure>
+<h1>参考</h1>
+<ol>
+<li><a href="https://zhuanlan.zhihu.com/p/196785332" target="_blank" rel="noopener">GCC 优化级别</a></li>
+<li><a href="https://www.cnblogs.com/king-lps/p/7757919.html" target="_blank" rel="noopener">《GCC编译过程与动态链接库和静态链接库》</a> authored by <a href="https://home.cnblogs.com/u/king-lps/" target="_blank" rel="noopener">三年一梦</a>@<a href="https://www.cnblogs.com/" target="_blank" rel="noopener">博客园</a></li>
+<li><a href="https://blog.csdn.net/derkampf/article/details/69660050" target="_blank" rel="noopener">《gcc编译参数-fPIC的一些问题》</a> authored by <a href="https://blog.csdn.net/derkampf" target="_blank" rel="noopener">逐鹿之城</a>@<a href="https://www.csdn.net/" target="_blank" rel="noopener">csdn</a></li>
+<li><a href="https://blog.csdn.net/u012662731/article/details/78520349" target="_blank" rel="noopener">《C/C++程序编译过程详解》</a> authored by <a href="https://blog.csdn.net/u012662731" target="_blank" rel="noopener">壮二宝</a>@<a href="https://www.csdn.net/" target="_blank" rel="noopener">csdn</a></li>
+<li><a href="http://c.biancheng.net/view/7068.html" target="_blank" rel="noopener">Makefile ifeq、ifneq、ifdef和ifndef（条件判断）</a></li>
+<li><a href="https://blog.csdn.net/pkueecser/article/details/7432168?utm_medium=distribute.pc_relevant_bbs_down.none-task-blog-baidujs-2.nonecase&amp;depth_1-utm_source=distribute.pc_relevant_bbs_down.none-task-blog-baidujs-2.nonecase" target="_blank" rel="noopener">《关于DLL搜索路径的顺序问题》</a> authored by <a href="https://blog.csdn.net/scut1135" target="_blank" rel="noopener">三少GG</a>@<a href="https://www.csdn.net/" target="_blank" rel="noopener">csdn</a></li>
+</ol>
+
+    </section>
+    <footer class="post-footer">
+      <section class="author">
+    <h4>flyingfisherman</h4>
+    <p>前端工程师，热爱技术，坚信知识技术改变生活。最高兴的场合莫过于学到的技术为自己、亲友或他人提供了些许的便利、帮助。</p>
+</section>
+      <section class="share">
+    <h4>Share this post</h4>
+    <a class="icon-twitter" href="http://twitter.com/share?url=https://github.flyingfishman.io/hexo/2021/01/28/compile/"
+       onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+        <span class="hidden">Twitter</span>
+    </a>
+    <a class="icon-facebook" href="https://www.facebook.com/sharer/sharer.php?u=https://github.flyingfishman.io/hexo/2021/01/28/compile/"
+       onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+        <span class="hidden">Facebook</span>
+    </a>
+    <a class="icon-google-plus" href="https://plus.google.com/share?url=https://github.flyingfishman.io/hexo/2021/01/28/compile/"
+       onclick="window.open(this.href, 'google-plus-share', 'width=490,height=530');return false;">
+        <span class="hidden">Google+</span>
+    </a>
+</section>
+    </footer>
+  </article>
+  <nav class="pagination" role="pagination">
+    
+    <a class="newer-posts" href="/hexo/2021/01/29/opengl4/">
+        ← opengl(4):颜色、基础光照、材质
+    </a>
+    
+    <span class="page-number">•</span>
+    
+    <a class="older-posts" href="/hexo/2021/01/06/opengl3/">
+        opengl(3):变换、坐标系统、摄像机 →
+    </a>
+    
+</nav>
+  <div id="comment" class="comments-area">
+    <h1 class="title"><a href="#disqus_comments" name="disqus_comments">Comments</a></h1>
+
+    
+</div>
+</main>
+
+
+  
+<footer class="site-footer">
+  
+  <a class="subscribe icon-feed" href="/rss.xml"><span class="tooltip">Subscribe!</span></a>
+  
+  <div class="inner">
+     <section class="copyright">All content copyright <a href="/hexo/">日常点滴</a> &copy; 2014 &bull; All rights reserved.</section>
+     <section class="poweredby">Proudly published with <a class="icon-ghost" href="http://zespia.tw/hexo/">Hexo</a></section>
+  </div>
+</footer>
+
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+<script type="text/javascript" src="/hexo/js/jquery.fitvids.js"></script>
+<script type="text/javascript" src="/hexo/js/index.js"></script>
+
+
+
+
+
+
+</body>
+</html>

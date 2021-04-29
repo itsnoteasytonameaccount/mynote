@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html" charset="UTF-8" >
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+  <title>Archives | 日常点滴</title>
+  <meta name="description" content="" />
+  <meta name="HandheldFriendly" content="True" />
+  <meta name="MobileOptimized" content="320" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <link rel="stylesheet" type="text/css" href="/hexo/css/screen.css" />
+  <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Noto+Serif:400,700,400italic|Open+Sans:700,400" />
+
+  <meta name="generator" content="日常点滴">
+
+  
+  <link rel="alternate" type="application/rss+xml" title="RSS" href="/rss.xml">
+  
+  
+  <link rel="alternate" type="application/atom+xml" title="Atom 0.3" href="rss.xml">
+  
+  
+
+  
+</head>
+
+
+<body class="home-template">
+
+  <header class="site-head"  style="background-image: url(/image/cover.png)" >
+    <div class="vertical">
+        <div class="site-head-content inner">
+             <a class="blog-logo" href="/hexo/"><img src="https://avatars.githubusercontent.com/u/26755276" alt="Blog Logo"/></a> 
+            <h1 class="blog-title">日常点滴</h1>
+            <h2 class="blog-description"></h2>
+        </div>
+    </div>
+</header>
+  
+<main class="content" role="main">
+  
+  <article class="post">
+    <header class="post-header">
+      <span class="post-meta">
+      <time datetime="2020-12-17T16:00:00.000Z" itemprop="datePublished">
+          2020-12-18
+      </time>
+    
+    
+    | 
+    <a href='/hexo/tags/opengl/'>opengl</a>
+    
+    
+</span>
+      <h2 class="post-title"><a href="/hexo/2020/12/18/opengl/">opengl(1)：库、窗口</a></h2>
+    </header>
+    <section class="post-excerpt">
+      <p>
+      
+        <p>以下内容主要来自<a href="https://learnopengl-cn.github.io/" target="_blank" rel="noopener">LearnOpenGL CN</a>文档，另外<a href="https://learnopengl-cn.github.io/" target="_blank" rel="noopener">LearnOpenGL CN</a>每一节都是有讨论区的，用的 disqus，disqus 很早就被墙了，想要在评论区寻求帮助需要翻墙，不要像我，学到模型加载才看到讨论区</p>
+<p>你也可以在<a href="https://www.khronos.org/opengl/wiki/Getting_Started" target="_blank" rel="noopener">此处</a>找到其他opengl官方推荐的资料、教程网站，推荐先用<a href="https://learnopengl-cn.github.io/" target="_blank" rel="noopener">LearnOpenGL CN</a>入门，再去看其他的</p>
+<h1>前言</h1>
+<p>本来是想学 webgl，但是把 mdn 上的 webgl 示例学完之后，还是没办法做到绘制想要的图形，因此想看看能不能直接在 opengl 里找到答案</p>
+      
+      </p>
+      
+      <p>
+          <a href="/hexo/2020/12/18/opengl/" class="excerpt-link">Read More...</a>
+      </p>
+      
+    </section>
+  </article>
+  
+  <article class="post">
+    <header class="post-header">
+      <span class="post-meta">
+      <time datetime="2020-12-15T12:56:00.000Z" itemprop="datePublished">
+          2020-12-15
+      </time>
+    
+</span>
+      <h2 class="post-title"><a href="/hexo/2020/12/15/emcc/">windows上安装Emscripten</a></h2>
+    </header>
+    <section class="post-excerpt">
+      <p>
+      
+        前言
+因为想试试 webassembly ，需要安装 Emscripten，但是安装出了蛮多问题的
+步骤
+先用 git 下载 EmscriptSDK，这步比较简单
+1git clone https://github.com/emscripten-core/emsdk.git
+然后通过 emsdk 安装 Emscripten
+1emsdk install latest
+问题
+
+node一直下载失败导致安装步骤退出
+
+这个问题令我很疑惑，我
+      
+      </p>
+      
+      <p>
+          <a href="/hexo/2020/12/15/emcc/" class="excerpt-link">Read More...</a>
+      </p>
+      
+    </section>
+  </article>
+  
+  <article class="post">
+    <header class="post-header">
+      <span class="post-meta">
+      <time datetime="2020-11-23T02:11:00.000Z" itemprop="datePublished">
+          2020-11-23
+      </time>
+    
+    
+    | 
+    <a href='/hexo/tags/linux/'>linux</a>,
+    
+    <a href='/hexo/tags/centos/'>centos</a>
+    
+    
+</span>
+      <h2 class="post-title"><a href="/hexo/2020/11/23/程序作为服务启动/">centos下程序作为服务启动</a></h2>
+    </header>
+    <section class="post-excerpt">
+      <p>
+      
+        <h1>前言</h1>
+<p>有一个叫kaillerasrv的简单程序需要在后台跑，用<code>&amp;</code>在后台跑起来，在shell关闭后就会被杀了。<br>
+加<code>nohup</code>也不行，一段时间过后就被杀掉了，还是必须将程序做成服务，记录步骤。</p>
+      
+      </p>
+      
+      <p>
+          <a href="/hexo/2020/11/23/程序作为服务启动/" class="excerpt-link">Read More...</a>
+      </p>
+      
+    </section>
+  </article>
+  
+  <article class="post">
+    <header class="post-header">
+      <span class="post-meta">
+      <time datetime="2020-10-10T06:51:16.098Z" itemprop="datePublished">
+          2020-10-10
+      </time>
+    
+    
+    | 
+    <a href='/hexo/tags/windows/'>windows</a>,
+    
+    <a href='/hexo/tags/命令行/'>命令行</a>
+    
+    
+</span>
+      <h2 class="post-title"><a href="/hexo/2020/10/10/runas/">当前目录下打开管理员命令行</a></h2>
+    </header>
+    <section class="post-excerpt">
+      <p>
+      
+        <h1>前言</h1>
+<p>win10 当前目录下打开管理员命令行比较麻烦。一种是<code>win+R</code>然后输入<code>cmd</code>接着按住<code>ctrl+shift</code>回车，或直接找到<code>cmd.exe</code>右键以管理员身份运行，再在弹出的窗口里<code>cd /d path</code>到当前路径</p>
+<p><code>win+x</code>现在只能打开<code>powershell</code>，虽然很多说<code>powershell</code>比<code>cmd</code>好用的，但还是更习惯<code>cmd.exe</code>。</p>
+<p>打开<code>cmd</code>后如果需要转到一个比较长的路径的话，不管是复制粘贴还是**手输+<code>Tab键</code>**都挺麻烦的，因此想要一个更简单的最好鼠标点击两下就完成的操作。</p>
+      
+      </p>
+      
+      <p>
+          <a href="/hexo/2020/10/10/runas/" class="excerpt-link">Read More...</a>
+      </p>
+      
+    </section>
+  </article>
+  
+  <article class="post">
+    <header class="post-header">
+      <span class="post-meta">
+      <time datetime="2020-08-08T11:59:06.842Z" itemprop="datePublished">
+          2020-08-08
+      </time>
+    
+    
+    | 
+    <a href='/hexo/tags/javascript/'>javascript</a>,
+    
+    <a href='/hexo/tags/rainmeter/'>rainmeter</a>,
+    
+    <a href='/hexo/tags/python/'>python</a>
+    
+    
+</span>
+      <h2 class="post-title"><a href="/hexo/2020/08/08/record/">rainmeter皮肤google翻译工具编写</a></h2>
+    </header>
+    <section class="post-excerpt">
+      <p>
+      
+        <h1>前言</h1>
+<p>由于写代码起变量名有时需要查翻译，但每次都要打开关闭一个 google 翻译页面非常不方便，因此想做一个一直处于屏幕顶部的随时可用的 google 翻译工具栏。</p>
+<p>以下为经验记录</p>
+      
+      </p>
+      
+      <p>
+          <a href="/hexo/2020/08/08/record/" class="excerpt-link">Read More...</a>
+      </p>
+      
+    </section>
+  </article>
+  
+  <article class="post">
+    <header class="post-header">
+      <span class="post-meta">
+      <time datetime="2020-07-11T16:00:00.000Z" itemprop="datePublished">
+          2020-07-12
+      </time>
+    
+    
+    | 
+    <a href='/hexo/tags/vscode/'>vscode</a>
+    
+    
+</span>
+      <h2 class="post-title"><a href="/hexo/2020/07/12/vscode/">vscode使用</a></h2>
+    </header>
+    <section class="post-excerpt">
+      <p>
+      
+        <h1>前言</h1>
+<p>工具在手却不会用，或发挥不了其优点是一件很值得惭愧的事.<br>
+因此决定看文档学习一下 vscode 的使用方法,弥补一下。</p>
+      
+      </p>
+      
+      <p>
+          <a href="/hexo/2020/07/12/vscode/" class="excerpt-link">Read More...</a>
+      </p>
+      
+    </section>
+  </article>
+  
+  <article class="post">
+    <header class="post-header">
+      <span class="post-meta">
+      <time datetime="2020-05-01T16:00:00.000Z" itemprop="datePublished">
+          2020-05-02
+      </time>
+    
+    
+    | 
+    <a href='/hexo/tags/c/'>c</a>,
+    
+    <a href='/hexo/tags/算法/'>算法</a>
+    
+    
+</span>
+      <h2 class="post-title"><a href="/hexo/2020/05/02/lock/">互斥锁</a></h2>
+    </header>
+    <section class="post-excerpt">
+      <p>
+      
+        <h1>前言</h1>
+<p>互斥锁方面算法，因为毕设有要用到的地方，所以复习了一下，记录成果</p>
+      
+      </p>
+      
+      <p>
+          <a href="/hexo/2020/05/02/lock/" class="excerpt-link">Read More...</a>
+      </p>
+      
+    </section>
+  </article>
+  
+  <article class="post">
+    <header class="post-header">
+      <span class="post-meta">
+      <time datetime="2020-03-27T16:00:00.000Z" itemprop="datePublished">
+          2020-03-28
+      </time>
+    
+    
+    | 
+    <a href='/hexo/tags/linux/'>linux</a>,
+    
+    <a href='/hexo/tags/centos/'>centos</a>,
+    
+    <a href='/hexo/tags/nginx/'>nginx</a>
+    
+    
+</span>
+      <h2 class="post-title"><a href="/hexo/2020/03/28/centos/">centos各环境安装</a></h2>
+    </header>
+    <section class="post-excerpt">
+      <p>
+      
+        <h1>前言</h1>
+<p>装虚拟机，租服务器，帮同学朋友弄东西,每次都要重复一些步骤，每次都觉得有经验了，但每次都一堆问题，令人沮丧，总结记一记或许能好些<br>
+<a href="https://cloud.tencent.com/document/product/213/38056" target="_blank" rel="noopener">这里有一份腾讯云的文档</a></p>
+      
+      </p>
+      
+      <p>
+          <a href="/hexo/2020/03/28/centos/" class="excerpt-link">Read More...</a>
+      </p>
+      
+    </section>
+  </article>
+  
+  <article class="post">
+    <header class="post-header">
+      <span class="post-meta">
+      <time datetime="2020-03-19T16:00:00.000Z" itemprop="datePublished">
+          2020-03-20
+      </time>
+    
+    
+    | 
+    <a href='/hexo/tags/eslint/'>eslint</a>,
+    
+    <a href='/hexo/tags/prettier/'>prettier</a>,
+    
+    <a href='/hexo/tags/jest/'>jest</a>
+    
+    
+</span>
+      <h2 class="post-title"><a href="/hexo/2020/03/20/eslint/">esint、prettier、jest</a></h2>
+    </header>
+    <section class="post-excerpt">
+      <p>
+      
+        <h1>eslint</h1>
+<p>代码规范工具，本文使用版本 6，其他版本可能表现不同</p>
+      
+      </p>
+      
+      <p>
+          <a href="/hexo/2020/03/20/eslint/" class="excerpt-link">Read More...</a>
+      </p>
+      
+    </section>
+  </article>
+  
+  <article class="post">
+    <header class="post-header">
+      <span class="post-meta">
+      <time datetime="2020-01-04T16:00:00.000Z" itemprop="datePublished">
+          2020-01-05
+      </time>
+    
+    
+    | 
+    <a href='/hexo/tags/babel/'>babel</a>
+    
+    
+</span>
+      <h2 class="post-title"><a href="/hexo/2020/01/05/babel/">babel学习笔记</a></h2>
+    </header>
+    <section class="post-excerpt">
+      <p>
+      
+        <h1>概述</h1>
+<p><a href="https://www.babeljs.cn/docs/" target="_blank" rel="noopener">官方文档</a><br>
+之前没系统地学习过，现在补回，本笔记基于的版本是 babel7，重点为了在 webpack 中使用，故而略去文档中涉及其他打包工具的部分，以及一些命令行使用方法的部分</p>
+      
+      </p>
+      
+      <p>
+          <a href="/hexo/2020/01/05/babel/" class="excerpt-link">Read More...</a>
+      </p>
+      
+    </section>
+  </article>
+  
+  <nav class="pagination" role="pagination">
+    <a class="newer-posts" href="/hexo/archives/">← Newer Posts</a>
+    <span class="page-number">Page 2 of 5</span>
+    <a class="older-posts" href="/hexo/archives/page/3/">Older Posts →</a>
+  </nav>
+</main>
+
+
+  
+<footer class="site-footer">
+  
+  <a class="subscribe icon-feed" href="/rss.xml"><span class="tooltip">Subscribe!</span></a>
+  
+  <div class="inner">
+     <section class="copyright">All content copyright <a href="/hexo/">日常点滴</a> &copy; 2014 &bull; All rights reserved.</section>
+     <section class="poweredby">Proudly published with <a class="icon-ghost" href="http://zespia.tw/hexo/">Hexo</a></section>
+  </div>
+</footer>
+
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+<script type="text/javascript" src="/hexo/js/jquery.fitvids.js"></script>
+<script type="text/javascript" src="/hexo/js/index.js"></script>
+
+
+
+
+
+
+</body>
+</html>

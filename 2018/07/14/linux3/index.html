@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html" charset="UTF-8" >
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+  <title>centos安装配置mysql | 日常点滴</title>
+  <meta name="description" content="" />
+  <meta name="HandheldFriendly" content="True" />
+  <meta name="MobileOptimized" content="320" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <link rel="stylesheet" type="text/css" href="/hexo/css/screen.css" />
+  <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Noto+Serif:400,700,400italic|Open+Sans:700,400" />
+
+  <meta name="generator" content="日常点滴">
+
+  
+  <link rel="alternate" type="application/rss+xml" title="RSS" href="/rss.xml">
+  
+  
+  <link rel="alternate" type="application/atom+xml" title="Atom 0.3" href="rss.xml">
+  
+  
+
+  
+</head>
+
+
+<body class="post-template">
+
+  <header class="site-head"  style="background-image: url(/image/cover.png)" >
+    <div class="vertical">
+        <div class="site-head-content inner">
+             <a class="blog-logo" href="/hexo/"><img src="https://avatars.githubusercontent.com/u/26755276" alt="Blog Logo"/></a> 
+            <h1 class="blog-title">日常点滴</h1>
+            <h2 class="blog-description"></h2>
+        </div>
+    </div>
+</header>
+  
+
+<main class="content" role="main">
+  <article class="post">
+    <span class="post-meta">
+      <time datetime="2018-07-13T16:00:00.000Z" itemprop="datePublished">
+          2018-07-14
+      </time>
+    
+    
+    | 
+    <a href='/hexo/tags/linux/'>linux</a>,
+    
+    <a href='/hexo/tags/mysql/'>mysql</a>
+    
+    
+</span>
+    <h1 class="post-title">centos安装配置mysql</h1>
+    <section class="post-content">
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.12.0/katex.min.css" /><p>临时新租了服务器，但安mysql时出了些错，做个记录</p>
+<a id="more"></a>
+<h1>内容</h1>
+<h2 id="安装工具简介">安装工具简介</h2>
+<p>yum：centos中类似apt-get的命令，依赖python环境<br>
+yum用法(以下为复制粘贴，不保证正确性)</p>
+<blockquote>
+<p>1.使用YUM查找软件包 命令：yum search<br>
+2.列出所有可安装的软件包 命令：yum list<br>
+3.列出所有可更新的软件包 命令：yum list updates<br>
+4.列出所有已安装的软件包 命令：yum list installed<br>
+5.列出所有已安装但不在 Yum Repository 内的软件包  命令：yum list extras<br>
+6.列出所指定的软件包 命令：yum list<br>
+7.使用YUM获取软件包信息 命令：yum info<br>
+8.列出所有软件包的信息 命令：yum info<br>
+9.列出所有可更新的软件包信息 命令：yum info updates<br>
+10.列出所有已安装的软件包信息 命令：yum info installed<br>
+11.列出所有已安装但不在 Yum Repository 内的软件包信息  命令：yum info extras<br>
+12.列出软件包提供哪些文件 命令：yum provides</p>
+</blockquote>
+<p>两个常用的命令<br>
+yum install package<br>
+yum uninstall package</p>
+<p>rpm为另一个安装工具，需要先下载rpm的安装包<br>
+常用命令<br>
+``bash<br>
+rpm -qa<br>
+//查找<br>
+rpm -ivh<br>
+//-i install,-v 似乎是列出输出文件，-h hash什么的，不明确</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">## mysql安装配置</span><br><span class="line">mysql需要安装3项</span><br><span class="line">devel,client,server分别用于支持开发，连接，提供服务</span><br><span class="line">我的安装方法是</span><br><span class="line"></span><br><span class="line">### 1.安装yum的mysql仓库(下载源)</span><br><span class="line">&gt;这一步不知道是否必要，你可以先用yum install mysql-devel*试试看是否存在安装包</span><br><span class="line">mysql仓库rpm安装包[在这下](https://dev.mysql.com/downloads/repo/yum/)</span><br><span class="line">获取下载连接后可用wegt命令直接获取安装包</span><br><span class="line">若无wget</span><br><span class="line">```bash</span><br><span class="line">yum install wget</span><br></pre></td></tr></table></figure>
+<p>获取安装包后<br>
+<strong>rpm -ivh 包名</strong>来安装<br>
+之后就可以用</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">yum install mysql-community-client mysql-community-server mysql-community-devel</span><br></pre></td></tr></table></figure>
+<p>来安装mysql了</p>
+<p>安装好后mysql的配置文件路径为/etc/my.cnf<br>
+一般采取默认设置就行。</p>
+<h3 id="配置步骤">配置步骤</h3>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#会在默认配置的datadir初始化</span></span><br><span class="line"><span class="comment">#若datadir中已存在文件会报错</span></span><br><span class="line"><span class="comment">#可在log-error路径中查看报错输出，默认是/var/log/mysqld.log</span></span><br><span class="line"><span class="comment">#error-log设置查看配置文件(如果配了)</span></span><br><span class="line">mysqld --initialize</span><br><span class="line"><span class="comment">#--initialize步骤还会生成默认密码，可在log-error路径中查看</span></span><br><span class="line"><span class="comment">#windows上初始密码在datadir的"***.err"文件中</span></span><br><span class="line"><span class="comment">#安装服务(windows上才需要)</span></span><br><span class="line">mysqld --install</span><br><span class="line"><span class="comment">#后台启动</span></span><br><span class="line"><span class="comment">#最好确认配置文件中有usr=mysql，避免以root用户运行</span></span><br><span class="line">mysqld &amp;</span><br><span class="line"><span class="comment">#用initial的密码登陆</span></span><br><span class="line">mysql -uroot -p你的密码</span><br><span class="line"><span class="comment">#登录后要用命令修改用户密码，否则会报错</span></span><br><span class="line">alter user <span class="string">'root'</span>@<span class="string">'localhost'</span> identified by <span class="string">'你的密码'</span>;</span><br><span class="line"><span class="comment">#mysql以前的password()函数和password字段都没了，只能用上诉命令修改密码</span></span><br></pre></td></tr></table></figure>
+<p>若忘记密码则可重启mysqld并一跳过验证（管理员），方式如下</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mysqld --skip-grant-tables</span><br></pre></td></tr></table></figure>
+<p>跳过验证后不可用idetified方式修改密码</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">alter user <span class="string">'root'</span>@<span class="string">'localhost'</span> identified by <span class="string">'你的密码'</span>;<span class="comment">#报错</span></span><br></pre></td></tr></table></figure>
+<p>其他方案<br>
+先将密码置空</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">update user <span class="built_in">set</span> authentication_string=<span class="string">''</span> <span class="built_in">where</span> user=<span class="string">'root'</span>;</span><br></pre></td></tr></table></figure>
+<p>重启mysqld,再验证登陆修改密码</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">mysql -uroot -p</span><br><span class="line">alter user <span class="string">'root'</span>@<span class="string">'localhost'</span> identified by <span class="string">'你的密码'</span>；</span><br></pre></td></tr></table></figure>
+
+    </section>
+    <footer class="post-footer">
+      <section class="author">
+    <h4>flyingfisherman</h4>
+    <p>前端工程师，热爱技术，坚信知识技术改变生活。最高兴的场合莫过于学到的技术为自己、亲友或他人提供了些许的便利、帮助。</p>
+</section>
+      <section class="share">
+    <h4>Share this post</h4>
+    <a class="icon-twitter" href="http://twitter.com/share?url=https://github.flyingfishman.io/hexo/2018/07/14/linux3/"
+       onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+        <span class="hidden">Twitter</span>
+    </a>
+    <a class="icon-facebook" href="https://www.facebook.com/sharer/sharer.php?u=https://github.flyingfishman.io/hexo/2018/07/14/linux3/"
+       onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+        <span class="hidden">Facebook</span>
+    </a>
+    <a class="icon-google-plus" href="https://plus.google.com/share?url=https://github.flyingfishman.io/hexo/2018/07/14/linux3/"
+       onclick="window.open(this.href, 'google-plus-share', 'width=490,height=530');return false;">
+        <span class="hidden">Google+</span>
+    </a>
+</section>
+    </footer>
+  </article>
+  <nav class="pagination" role="pagination">
+    
+    <a class="newer-posts" href="/hexo/2018/10/03/springMVC/">
+        ← 关于springBoot
+    </a>
+    
+    <span class="page-number">•</span>
+    
+    <a class="older-posts" href="/hexo/2018/06/12/asm/">
+        x8086汇编语言基础 →
+    </a>
+    
+</nav>
+  <div id="comment" class="comments-area">
+    <h1 class="title"><a href="#disqus_comments" name="disqus_comments">Comments</a></h1>
+
+    
+</div>
+</main>
+
+
+  
+<footer class="site-footer">
+  
+  <a class="subscribe icon-feed" href="/rss.xml"><span class="tooltip">Subscribe!</span></a>
+  
+  <div class="inner">
+     <section class="copyright">All content copyright <a href="/hexo/">日常点滴</a> &copy; 2014 &bull; All rights reserved.</section>
+     <section class="poweredby">Proudly published with <a class="icon-ghost" href="http://zespia.tw/hexo/">Hexo</a></section>
+  </div>
+</footer>
+
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+<script type="text/javascript" src="/hexo/js/jquery.fitvids.js"></script>
+<script type="text/javascript" src="/hexo/js/index.js"></script>
+
+
+
+
+
+
+</body>
+</html>

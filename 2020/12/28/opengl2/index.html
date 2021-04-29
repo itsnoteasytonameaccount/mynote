@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html" charset="UTF-8" >
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+  <title>opengl(2):着色器和纹理 | 日常点滴</title>
+  <meta name="description" content="" />
+  <meta name="HandheldFriendly" content="True" />
+  <meta name="MobileOptimized" content="320" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <link rel="stylesheet" type="text/css" href="/hexo/css/screen.css" />
+  <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Noto+Serif:400,700,400italic|Open+Sans:700,400" />
+
+  <meta name="generator" content="日常点滴">
+
+  
+  <link rel="alternate" type="application/rss+xml" title="RSS" href="/rss.xml">
+  
+  
+  <link rel="alternate" type="application/atom+xml" title="Atom 0.3" href="rss.xml">
+  
+  
+
+  
+</head>
+
+
+<body class="post-template">
+
+  <header class="site-head"  style="background-image: url(/image/cover.png)" >
+    <div class="vertical">
+        <div class="site-head-content inner">
+             <a class="blog-logo" href="/hexo/"><img src="https://avatars.githubusercontent.com/u/26755276" alt="Blog Logo"/></a> 
+            <h1 class="blog-title">日常点滴</h1>
+            <h2 class="blog-description"></h2>
+        </div>
+    </div>
+</header>
+  
+
+<main class="content" role="main">
+  <article class="post">
+    <span class="post-meta">
+      <time datetime="2020-12-27T16:00:00.000Z" itemprop="datePublished">
+          2020-12-28
+      </time>
+    
+    
+    | 
+    <a href='/hexo/tags/opengl/'>opengl</a>,
+    
+    <a href='/hexo/tags/c/'>c++</a>
+    
+    
+</span>
+    <h1 class="post-title">opengl(2):着色器和纹理</h1>
+    <section class="post-content">
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.12.0/katex.min.css" /><p>以下内容主要来自<a href="https://learnopengl-cn.github.io/" target="_blank" rel="noopener">LearnOpenGL CN</a>文档，另外<a href="https://learnopengl-cn.github.io/" target="_blank" rel="noopener">LearnOpenGL CN</a>每一节都是有讨论区的，用的disqus，disqus很早就被墙了，想要在评论区寻求帮助需要翻墙</p>
+<p>你也可以在<a href="https://www.khronos.org/opengl/wiki/Getting_Started" target="_blank" rel="noopener">此处</a>找到其他opengl官方推荐的资料、教程网站，推荐先用<a href="https://learnopengl-cn.github.io/" target="_blank" rel="noopener">LearnOpenGL CN</a>入门，再去看其他的</p>
+<a id="more"></a>
+<h1>着色器</h1>
+<p>GPU 中运行着色器程序的顺序如下(蓝色的为可由用户定义的)</p>
+<p><img src="/hexo/image/opengl/pipeline.png" alt="图片无法显示"></p>
+<p>图形渲染管线的第一个部分是顶点着色器(Vertex Shader)，它把一个单独的顶点作为输入。顶点着色器主要的目的是把 3D 坐标转为另一种 3D 坐标（后面会解释），同时顶点着色器允许我们对顶点属性进行一些基本处理。</p>
+<p>图元装配(Primitive Assembly)阶段将顶点着色器输出的所有顶点作为输入（如果是 GL_POINTS，那么就是一个顶点），并所有的点装配成指定图元的形状；本节例子中是一个三角形。</p>
+<p>图元装配阶段的输出会传递给几何着色器(Geometry Shader)。几何着色器把图元形式的一系列顶点的集合作为输入，它可以通过产生新顶点构造出新的（或是其它的）图元来生成其他形状。例子中，它生成了另一个三角形。</p>
+<p>几何着色器的输出会被传入光栅化阶段(Rasterization Stage)，这里它会把图元映射为最终屏幕上相应的像素，生成供片段着色器(Fragment Shader)使用的片段(Fragment)。在片段着色器运行之前会执行裁切(Clipping)。裁切会丢弃超出你的视图以外的所有像素，用来提升执行效率。</p>
+<p>OpenGL 中的一个片段是 OpenGL 渲染一个像素所需的所有数据。</p>
+<p>片段着色器的主要目的是计算一个像素的最终颜色，这也是所有 OpenGL 高级效果产生的地方。通常，片段着色器包含 3D 场景的数据（比如光照、阴影、光的颜色等等），这些数据可以被用来计算最终像素的颜色。</p>
+<p>在所有对应颜色值确定以后，最终的对象将会被传到最后一个阶段，我们叫做 Alpha 测试和混合(Blending)阶段。这个阶段检测片段的对应的深度（和模板(Stencil)）值（后面会讲），用它们来判断这个像素是其它物体的前面还是后面，决定是否应该丢弃。这个阶段也会检查 alpha 值（alpha 值定义了一个物体的透明度）并对物体进行混合(Blend)。所以，即使在片段着色器中计算出来了一个像素输出的颜色，在渲染多个三角形的时候最后的像素颜色也可能完全不同。</p>
+<h2 id="in、out、uniform修饰符"><code>in</code>、<code>out</code>、<code>uniform</code>修饰符</h2>
+<p><code>in</code>和<code>out</code>在较早版本为<code>attribute</code>和<code>varying</code></p>
+<p><code>in</code>声明的属性值会继承管线之前阶段用<code>out</code>声明的同名属性的值。</p>
+<p>顶点着色器中的<code>in</code>的数据则是由程序决定</p>
+<p><strong>uniform</strong></p>
+<blockquote>
+<p>首先，uniform 是全局的(Global)，全局意味着 uniform 变量必须在每个着色器程序对象中都是独一无二的，而且它可以被着色器程序的任意着色器在任意阶段访问，然后，无论你把 uniform 值设置成什么，uniform 会一直保存它们的数据，直到它们被重置或更新</p>
+</blockquote>
+<blockquote>
+<p>如果你声明了一个 uniform 却在 GLSL 代码中没用过，编译器会静默移除这个变量，导致最后编译出的版本中并不会包含它，这可能导致几个非常麻烦的错误</p>
+</blockquote>
+<p>可以通过通过<code>glGetUniformLocation</code>查询<code>uniform</code>的值，通过<code>glUniform*</code>设置<code>uniform</code>的值</p>
+<p><strong>glUniform 的后缀规则如下</strong></p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">后缀</th>
+<th style="text-align:left">含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">f</td>
+<td style="text-align:left">函数需要一个 float 作为它的值</td>
+</tr>
+<tr>
+<td style="text-align:left">i</td>
+<td style="text-align:left">函数需要一个 int 作为它的值</td>
+</tr>
+<tr>
+<td style="text-align:left">ui</td>
+<td style="text-align:left">函数需要一个 unsigned int 作为它的值</td>
+</tr>
+<tr>
+<td style="text-align:left">3f</td>
+<td style="text-align:left">函数需要 3 个 float 作为它的值</td>
+</tr>
+<tr>
+<td style="text-align:left">fv</td>
+<td style="text-align:left">函数需要一个 float 向量/数组作为它的值</td>
+</tr>
+</tbody>
+</table>
+<p>具体模式和作用参见下文<a href="#%E5%87%BD%E6%95%B0">函数</a>部分</p>
+<h2 id="数据类型">数据类型</h2>
+<p>包含 c 的大部分基础类型<code>int</code>、<code>float</code>、<code>double</code>、<code>uint</code>和<code>bool</code></p>
+<h3 id="向量">向量</h3>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">类型</th>
+<th style="text-align:left">含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">vecn</td>
+<td style="text-align:left">包含 n 个 float 分量的默认向量</td>
+</tr>
+<tr>
+<td style="text-align:left">bvecn</td>
+<td style="text-align:left">包含 n 个 bool 分量的向量</td>
+</tr>
+<tr>
+<td style="text-align:left">ivecn</td>
+<td style="text-align:left">包含 n 个 int 分量的向量</td>
+</tr>
+<tr>
+<td style="text-align:left">uvecn</td>
+<td style="text-align:left">包含 n 个 unsigned int 分量的向量</td>
+</tr>
+<tr>
+<td style="text-align:left">dvecn</td>
+<td style="text-align:left">包含 n 个 double 分量的向量</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>一个向量的分量可以通过<code>vec.x</code>这种方式获取，这里<code>x</code>是指这个向量的第一个分量。你可以分别使用<code>.x</code>、<code>.y</code>、<code>.z</code>和<code>.w</code>来获取它们的第 1、2、3、4 个分量。GLSL 也允许你对颜色使用<code>rgba</code>，或是对纹理坐标使用<code>stpq</code>访问相同的分量。</p>
+</blockquote>
+<p><strong>示例</strong></p>
+<figure class="highlight glsl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">vec2</span> someVec;</span><br><span class="line"><span class="type">vec4</span> differentVec = someVec.xyxx;</span><br><span class="line"><span class="type">vec3</span> anotherVec = differentVec.zyw;</span><br><span class="line"><span class="type">vec4</span> otherVec = someVec.xxxx + anotherVec.yxzy;</span><br></pre></td></tr></table></figure>
+<h2 id="预设变量">预设变量</h2>
+<p><code>gl_Position</code>：顶点着色器中设置此变量来决定顶点位置</p>
+<h2 id="内建类型">内建类型</h2>
+<p><code>sampler2D</code>：采样器，默认为<code>GL_TEXTURE0</code>的采样，可以设置，具体见<a href="#%E7%BA%B9%E7%90%86%E5%8F%A0%E5%8A%A0">下文</a>描述</p>
+<figure class="highlight glsl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 声明一个采样器变量</span></span><br><span class="line"><span class="keyword">uniform</span> <span class="type">sampler2D</span> ourTexture;</span><br></pre></td></tr></table></figure>
+<h1>纹理</h1>
+<h2 id="glTexParameter">glTexParameter*</h2>
+<p>设置纹理参数</p>
+<p>定义如下</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">typedef</span> <span class="title">void</span> <span class="params">(APIENTRYP PFNGLTEXPARAMETERFPROC)</span><span class="params">(GLenum target, GLenum pname, GLfloat param)</span></span>;</span><br><span class="line">GLAPI PFNGLTEXPARAMETERFPROC glad_glTexParameterf;</span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> glTexParameterf glad_glTexParameterf</span></span><br><span class="line"><span class="function"><span class="keyword">typedef</span> <span class="title">void</span> <span class="params">(APIENTRYP PFNGLTEXPARAMETERFVPROC)</span><span class="params">(GLenum target, GLenum pname, <span class="keyword">const</span> GLfloat *params)</span></span>;</span><br><span class="line">GLAPI PFNGLTEXPARAMETERFVPROC glad_glTexParameterfv;</span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> glTexParameterfv glad_glTexParameterfv</span></span><br><span class="line"><span class="function"><span class="keyword">typedef</span> <span class="title">void</span> <span class="params">(APIENTRYP PFNGLTEXPARAMETERIPROC)</span><span class="params">(GLenum target, GLenum pname, GLint param)</span></span>;</span><br><span class="line">GLAPI PFNGLTEXPARAMETERIPROC glad_glTexParameteri;</span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> glTexParameteri glad_glTexParameteri</span></span><br><span class="line"><span class="function"><span class="keyword">typedef</span> <span class="title">void</span> <span class="params">(APIENTRYP PFNGLTEXPARAMETERIVPROC)</span><span class="params">(GLenum target, GLenum pname, <span class="keyword">const</span> GLint *params)</span></span>;</span><br><span class="line">GLAPI PFNGLTEXPARAMETERIVPROC glad_glTexParameteriv;</span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> glTexParameteriv glad_glTexParameteriv</span></span><br></pre></td></tr></table></figure>
+<p>以上函数命名后缀规则同<code>glUniform</code></p>
+<p>参数含义</p>
+<ul>
+<li>target： 指定目标纹理，它只能取值<code>GL_TEXTURE_1D</code>或者<code>GL_TEXTURE_2D</code>；</li>
+<li>pname：指定单值纹理参数的符号名称，可以选择的符号常数如下:<code>GL_TEXTURE_MIN_FILTER</code>、<code>GL_TEXTURE_MAG_FILTER</code>、<code>GL_TEXTURE_WRAP_S</code>、 <code>GL_TEXTURE_WRAP_T</code>, 后缀为<code>fv</code>和<code>iv</code>的的函数第还可传<code>GL_TEXTURE_BORDER_COLOR</code>和<code>GL_TEXTURE_PRIORITY</code>;</li>
+<li>param|*params：指定 pname 的值</li>
+</ul>
+<h2 id="纹理环绕方式">纹理环绕方式</h2>
+<p>决定设置的纹理坐标在(0,0)到(1,1)区间外时如何绘制<br>
+通过<code>glTexParameteri</code>设置<code>GL_TEXTURE_WRAP_T</code>,<code>GL_TEXTURE_WRAP_S</code>的值来设置</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">环绕方式</th>
+<th style="text-align:left">描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">GL_REPEAT</td>
+<td style="text-align:left">对纹理的默认行为。重复纹理图，默认像。</td>
+</tr>
+<tr>
+<td style="text-align:left">GL_MIRRORED_REPEAT</td>
+<td style="text-align:left">和 GL_REPEAT 一样，但每次重复图片是镜像放置的。</td>
+</tr>
+<tr>
+<td style="text-align:left">GL_CLAMP_TO_EDGE</td>
+<td style="text-align:left">纹理坐标会被约束在 0 到 1 之间，超出的部分会重复纹理坐标的边缘，产生一种边缘被拉伸的效果。</td>
+</tr>
+<tr>
+<td style="text-align:left">GL_CLAMP_TO_BORDER</td>
+<td style="text-align:left">超出的坐标为用户指定的边缘颜色。</td>
+</tr>
+</tbody>
+</table>
+<p><strong>表现</strong></p>
+<p><img src="/hexo/image/opengl/texture_wrapping.png" alt="图片无法显示"></p>
+<h2 id="纹理过滤">纹理过滤</h2>
+<p>决定将纹理放大或缩小时像素如何映射</p>
+<p>通过<code>glTexParameteri</code>设置<code>GL_TEXTURE_MIN_FILTER</code>,<code>GL_TEXTURE_MAG_FILTER</code>的值来设置</p>
+<p>对于<code>GL_TEXTURE_MIN_FILTER</code>，<code>GL_TEXTURE_MAG_FILTER</code>可设置</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">值</th>
+<th style="text-align:left">效果</th>
+<th style="text-align:left">举例</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><code>GL_NEAREST</code></td>
+<td style="text-align:left">就近取值</td>
+<td style="text-align:left">例如:将 a[10] 映射到 b[100] ,b[51]取 a[5]</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>GL_LINEAR</code></td>
+<td style="text-align:left">线性插值</td>
+<td style="text-align:left">将 a[10]映射到 b[100],b[51]取 a[5]*0.9+a[6]*0.1</td>
+</tr>
+</tbody>
+</table>
+<p>效果</p>
+<p><img src="/hexo/image/opengl/texture_filtering.png" alt="图片无法显示"></p>
+<h3 id="多级渐远纹理">多级渐远纹理</h3>
+<p>配置<code>GL_TEXTURE_MIN_FILTER</code>时还可以取多级渐远纹理，多级渐远纹理是一组按 50%逐级等比缩小的纹理，如下</p>
+<p><img src="/hexo/image/opengl/mipmaps.png" alt="图片无法显示"></p>
+<p>可在创建完纹理后使用<code>glGenerateMipmaps</code>生成</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">过滤方式</th>
+<th style="text-align:left">描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">GL_NEAREST_MIPMAP_NEAREST</td>
+<td style="text-align:left">使用最邻近的多级渐远纹理来匹配像素大小，并使用邻近插值进行纹理采样</td>
+</tr>
+<tr>
+<td style="text-align:left">GL_LINEAR_MIPMAP_NEAREST</td>
+<td style="text-align:left">使用最邻近的多级渐远纹理级别，并使用线性插值进行采样</td>
+</tr>
+<tr>
+<td style="text-align:left">GL_NEAREST_MIPMAP_LINEAR</td>
+<td style="text-align:left">在两个最匹配像素大小的多级渐远纹理之间进行线性插值，使用邻近插值进行采样</td>
+</tr>
+<tr>
+<td style="text-align:left">GL_LINEAR_MIPMAP_LINEAR</td>
+<td style="text-align:left">在两个邻近的多级渐远纹理之间使用线性插值，并使用线性插值进行采样</td>
+</tr>
+</tbody>
+</table>
+<p><strong>举例</strong></p>
+<p>假设有一张原始尺寸为 128*128 的图片，载入成了纹理并且设置了多级渐远纹理<code>glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_NEAREST);</code>，<br>
+然后用<code>glGenerateMipmaps</code>生成了尺寸分别为 128*128、64*64、32*32、16*16、8*8、4*4、2*2、1*1的多级纹理。<br>
+那么将纹理绘制到某个 60*60 的表面上时，会采用64*64的纹理，对表面某点的颜色取值时，会采用线性线性插值的方式。</p>
+<h2 id="纹理使用步骤">纹理使用步骤</h2>
+<h3 id="创建纹理并设置参数">创建纹理并设置参数</h3>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">unsigned</span> <span class="keyword">int</span> texture;</span><br><span class="line">glGenTextures(id, texture);</span><br><span class="line"><span class="comment">// 默认活跃的是GL_TEXTURE0</span></span><br><span class="line"><span class="comment">// glActiveTexture(GL_TEXTURE0);</span></span><br><span class="line">glBindTexture(GL_TEXTURE_2D, texture);</span><br><span class="line"></span><br><span class="line">glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MINMAP_NEAREST);</span><br><span class="line">glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINREA);</span><br><span class="line">glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);</span><br><span class="line">glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);</span><br></pre></td></tr></table></figure>
+<h3 id="纹理中填入图片数据并生成多级纹理渐变">纹理中填入图片数据并生成多级纹理渐变</h3>
+<p>读取图片数据使用的是 <a href="https://github.com/nothings/stb/blob/master/stb_image.h" target="_blank" rel="noopener">stb_image.h</a></p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">glTexImage2D(GL_TEXTURE_2D, <span class="number">0</span>, GL_RBG, width, height, <span class="number">0</span>, GL_RBG, GL_UNSIGNED_INT, data);</span><br><span class="line">glGenerateMinmap(GL_TEXTURE_2D);</span><br></pre></td></tr></table></figure>
+<p>处理完后修改片段着色器中的代码如下即可</p>
+<figure class="highlight glsl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#version 330 core</span></span><br><span class="line"><span class="keyword">out</span> <span class="type">vec4</span> FragColor;</span><br><span class="line"></span><br><span class="line"><span class="keyword">in</span> <span class="type">vec3</span> ourColor;</span><br><span class="line"><span class="keyword">in</span> <span class="type">vec2</span> TexCoord;</span><br><span class="line"></span><br><span class="line"><span class="keyword">uniform</span> <span class="type">sampler2D</span> ourTexture;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span> main()</span><br><span class="line">&#123;</span><br><span class="line">    FragColor = <span class="built_in">texture</span>(ourTexture, TexCoord);</span><br><span class="line">    <span class="comment">// 颜色叠加</span></span><br><span class="line">    FragColor = <span class="built_in">texture</span>(ourTexture, TexCoord) * <span class="type">vec4</span>(ourColor, <span class="number">1.0</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="纹理叠加">纹理叠加</h2>
+<p>通过修改当前活跃的纹理 GL_TEXTURE(0-15+)，可以同时绑定多个纹理，如下</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">GL_TEXTURE0 + n == GL_TEXTUREn; <span class="comment">// true</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 假设已创建两个纹理texture和texture1</span></span><br><span class="line"><span class="comment">// texture绑定到GL_TEXTURE0</span></span><br><span class="line">glActiveTexture(GL_TEXTURE0);</span><br><span class="line">glBindTexture(GL_TEXTURE_2D, texture);</span><br><span class="line"><span class="comment">// texture1绑定到GL_TEXTURE1</span></span><br><span class="line">glActiveTexture(GL_TEXTURE1);</span><br><span class="line">glBindTexture(GL_TEXTURE_2D, texture1);</span><br></pre></td></tr></table></figure>
+<p>然后可以通过修改片段着色器来叠加纹理。</p>
+<figure class="highlight glsl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#version 330 core</span></span><br><span class="line">...</span><br><span class="line"></span><br><span class="line"><span class="keyword">uniform</span> <span class="type">sampler2D</span> texture1;</span><br><span class="line"><span class="keyword">uniform</span> <span class="type">sampler2D</span> texture2;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span> main()</span><br><span class="line">&#123;</span><br><span class="line">    FragColor = <span class="built_in">mix</span>(<span class="built_in">texture</span>(texture1, TexCoord), <span class="built_in">texture</span>(texture2, TexCoord), <span class="number">0.2</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>还需要指定两个采样器属于哪个纹理单元</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 只需要在程序编译成功，纹理绑定后指定1次，不需要在渲染循环中指定</span></span><br><span class="line">glUniform1i(glGetUniformLocation(ourShader.ID, <span class="string">"texture1"</span>), <span class="number">0</span>);</span><br><span class="line">glUniform1i(glGetUniformLocation(ourShader.ID, <span class="string">"texture2"</span>), <span class="number">1</span>);</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>最终输出颜色现在是两个纹理的结合。GLSL 内建的 mix 函数需要接受两个值作为参数，并对它们根据第三个参数进行线性插值。如果第三个值是 0.0，它会返回第一个输入；如果是 1.0，会返回第二个输入值。0.2 会返回 80%的第一个输入颜色和 20%的第二个输入颜色，即返回两个纹理的混合色。</p>
+</blockquote>
+<h1>函數</h1>
+<h2 id="glUniform-1-2-3-4-i-f">glUniform{1|2|3|4}{i|f}</h2>
+<p>向 uniform 中填入{1|2|3|4}个{浮点型|整型}数据</p>
+<p>例如<code>glUniform3f</code></p>
+<p><strong>定义</strong></p>
+<p><code>typedef void (APIENTRYP PFNGLUNIFORM3FPROC)(GLint location, GLfloat v0, GLfloat v1, GLfloat v2);</code></p>
+<p><strong>参数列表</strong></p>
+<ul>
+<li>location: uniform 在程序中的位置，可以用<code>glGetUniformLocation</code>获取</li>
+<li>v0: 第一个浮点数</li>
+<li>v1: 第二个浮点数</li>
+<li>v2: 第三个浮点数</li>
+</ul>
+<h2 id="glUniform-1-2-3-4-i-f-v">glUniform{1|2|3|4}{i|f}v</h2>
+<p>修改一个 uniform 或一个 uniform 数组的值，向每个 uniform 中填入长度为{1|2|3|4}的{浮点型|整型}数据</p>
+<p><strong>参数列表</strong></p>
+<ul>
+<li>location: uniform 在程序中的位置，可以用<code>glGetUniformLocation</code>获取</li>
+<li>count: 要修改几个 uniform</li>
+<li>values: 数据数组的首地址指针</li>
+</ul>
+<h2 id="glUniformMatrix-2-3-4-fv">glUniformMatrix{2|3|4}fv</h2>
+<p>修改一个或多个矩阵类型的 uniform 变量</p>
+<p><code>typedef void (APIENTRYP PFNGLUNIFORMMATRIX4FVPROC)(GLint location, GLsizei count, GLboolean transpose, const GLfloat *value)</code></p>
+<p>参数列表</p>
+<ul>
+<li>location: uniform 变量在着色器程序中的位置</li>
+<li>count: uniform 数量</li>
+<li>transpose:是否转置</li>
+<li>value:矩阵数据数组首地址指针</li>
+</ul>
+<h2 id="glTexImage2D">glTexImage2D</h2>
+<p><code>void glTexImage2D(GLenum target, GLint level, GLint internalformat, GLsizei width, GLint border, GLenum format, GLenum type, const void *pixels)</code></p>
+<ul>
+<li>target: 目标纹理</li>
+<li>level: 用来指定多级渐远纹理的级别，0为基本级别即原纹理。如果想手动设置每级多级渐远纹理的数据，可以指定这个参数。
+<blockquote>
+<p>Mipmaps are defined using <code>glTexImage1D</code> or <code>glTexImage2D</code> with the <strong>level-of-detail</strong> argument indicating the order of the mipmaps. <strong>Level</strong> 0 is the original texture; <strong>level</strong> bold max(n, m) is the final 1x1 mipmap.</p>
+</blockquote>
+</li>
+<li>internalformat: 纹理格式，如<code>GL_RGB</code></li>
+<li>width,height: 宽高</li>
+<li>border: 边长必须为0或1</li>
+<li>format: 据说必须和inernalformat一致</li>
+<li>type: 图像数据的数据类型<code>GL_UNSIGNED_BYTE, GL_BYTE, GL_BITMAP, GL_UNSIGNED_SHORT, GL_SHORT, GL_UNSIGNED_INT, GL_INT, and GL_FLOAT</code></li>
+<li>pixels: 图像数据</li>
+</ul>
+<h1>参考</h1>
+<ol>
+<li><a href="https://learnopengl-cn.github.io/01%20Getting%20started/04%20Hello%20Triangle/" target="_blank" rel="noopener">learnopengl CN:着色器</a></li>
+<li><a href="https://learnopengl-cn.github.io/01%20Getting%20started/06%20Textures/" target="_blank" rel="noopener">learnopengl CN:纹理</a></li>
+<li><a href="https://docs.microsoft.com/en-us/windows/win32/opengl/gltexparameter-functions" target="_blank" rel="noopener">glTexParameter Functions</a></li>
+</ol>
+
+    </section>
+    <footer class="post-footer">
+      <section class="author">
+    <h4>flyingfisherman</h4>
+    <p>前端工程师，热爱技术，坚信知识技术改变生活。最高兴的场合莫过于学到的技术为自己、亲友或他人提供了些许的便利、帮助。</p>
+</section>
+      <section class="share">
+    <h4>Share this post</h4>
+    <a class="icon-twitter" href="http://twitter.com/share?url=https://github.flyingfishman.io/hexo/2020/12/28/opengl2/"
+       onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+        <span class="hidden">Twitter</span>
+    </a>
+    <a class="icon-facebook" href="https://www.facebook.com/sharer/sharer.php?u=https://github.flyingfishman.io/hexo/2020/12/28/opengl2/"
+       onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+        <span class="hidden">Facebook</span>
+    </a>
+    <a class="icon-google-plus" href="https://plus.google.com/share?url=https://github.flyingfishman.io/hexo/2020/12/28/opengl2/"
+       onclick="window.open(this.href, 'google-plus-share', 'width=490,height=530');return false;">
+        <span class="hidden">Google+</span>
+    </a>
+</section>
+    </footer>
+  </article>
+  <nav class="pagination" role="pagination">
+    
+    <a class="newer-posts" href="/hexo/2021/01/06/opengl3/">
+        ← opengl(3):变换、坐标系统、摄像机
+    </a>
+    
+    <span class="page-number">•</span>
+    
+    <a class="older-posts" href="/hexo/2020/12/18/opengl/">
+        opengl(1)：库、窗口 →
+    </a>
+    
+</nav>
+  <div id="comment" class="comments-area">
+    <h1 class="title"><a href="#disqus_comments" name="disqus_comments">Comments</a></h1>
+
+    
+</div>
+</main>
+
+
+  
+<footer class="site-footer">
+  
+  <a class="subscribe icon-feed" href="/rss.xml"><span class="tooltip">Subscribe!</span></a>
+  
+  <div class="inner">
+     <section class="copyright">All content copyright <a href="/hexo/">日常点滴</a> &copy; 2014 &bull; All rights reserved.</section>
+     <section class="poweredby">Proudly published with <a class="icon-ghost" href="http://zespia.tw/hexo/">Hexo</a></section>
+  </div>
+</footer>
+
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+<script type="text/javascript" src="/hexo/js/jquery.fitvids.js"></script>
+<script type="text/javascript" src="/hexo/js/index.js"></script>
+
+
+
+
+
+
+</body>
+</html>

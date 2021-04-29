@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html" charset="UTF-8" >
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+  <title>当前目录下打开管理员命令行 | 日常点滴</title>
+  <meta name="description" content="" />
+  <meta name="HandheldFriendly" content="True" />
+  <meta name="MobileOptimized" content="320" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <link rel="stylesheet" type="text/css" href="/hexo/css/screen.css" />
+  <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Noto+Serif:400,700,400italic|Open+Sans:700,400" />
+
+  <meta name="generator" content="日常点滴">
+
+  
+  <link rel="alternate" type="application/rss+xml" title="RSS" href="/rss.xml">
+  
+  
+  <link rel="alternate" type="application/atom+xml" title="Atom 0.3" href="rss.xml">
+  
+  
+
+  
+</head>
+
+
+<body class="post-template">
+
+  <header class="site-head"  style="background-image: url(/image/cover.png)" >
+    <div class="vertical">
+        <div class="site-head-content inner">
+             <a class="blog-logo" href="/hexo/"><img src="https://avatars.githubusercontent.com/u/26755276" alt="Blog Logo"/></a> 
+            <h1 class="blog-title">日常点滴</h1>
+            <h2 class="blog-description"></h2>
+        </div>
+    </div>
+</header>
+  
+
+<main class="content" role="main">
+  <article class="post">
+    <span class="post-meta">
+      <time datetime="2020-10-10T06:51:16.098Z" itemprop="datePublished">
+          2020-10-10
+      </time>
+    
+    
+    | 
+    <a href='/hexo/tags/windows/'>windows</a>,
+    
+    <a href='/hexo/tags/命令行/'>命令行</a>
+    
+    
+</span>
+    <h1 class="post-title">当前目录下打开管理员命令行</h1>
+    <section class="post-content">
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.12.0/katex.min.css" /><h1>前言</h1>
+<p>win10 当前目录下打开管理员命令行比较麻烦。一种是<code>win+R</code>然后输入<code>cmd</code>接着按住<code>ctrl+shift</code>回车，或直接找到<code>cmd.exe</code>右键以管理员身份运行，再在弹出的窗口里<code>cd /d path</code>到当前路径</p>
+<p><code>win+x</code>现在只能打开<code>powershell</code>，虽然很多说<code>powershell</code>比<code>cmd</code>好用的，但还是更习惯<code>cmd.exe</code>。</p>
+<p>打开<code>cmd</code>后如果需要转到一个比较长的路径的话，不管是复制粘贴还是**手输+<code>Tab键</code>**都挺麻烦的，因此想要一个更简单的最好鼠标点击两下就完成的操作。</p>
+<a id="more"></a>
+<!--
+details>
+<summary>powershell的使用不习惯原因</summary>
+
+我第一次用的时侯，没好好看文档，碰到不少不习惯的地方，也成为我不喜欢powershell的原因
+
+第一次使用时，用`cd /d`命令，不能用，就想看帮助，`cd help`，`cd /?`，`cd --help`，`cd -h`，都不能用，输入`help`给出`Get-Help`的帮助，以为出错了，然后我试了一下`help cd`，显示`Set-Location`的帮助，才知道`cd`，`help`等命令应该是为了习惯了用命令行的人转用`powershell`给`Set-Location`，`Get-Help`命令起的别名，问题是这些命令的使用方法完全不同，这种别名只会造成迷惑吧？
+
+命令行下输入`help`命令显示全部可用命令简单描述，powershell上只能看到`get-help`命令的用法，还得对每个命令`help <cmdlet>`才能看到每个命令有什么用。
+
+使用时又发现有些命令和命令行相同，输`help attrib`的时候给出现不相关的命令列表，又用`attrib /?`发现能输出，又尝试了很多命令，最后试了一下通配符`help *`列出了全部命令列表，但没有简单描述各命令的作用。
+
+另外powershell中命令写起来比较复杂，例如原来的`dir /s /b /aohs`就得写成`dir -depth num -name -attributes system,hidden,offline,reparsepoint`
+
+还有powershell那个红色的报错配合背景色看着别扭。
+
+我觉得如果简单地写一些处理命令，`powershell`并不合适，命令长且复杂，一些被视为优点的新特性也用不到。`powershell`应该是适合那些更专业的人，需要做许多比较复杂的操作的。
+</details
+-->
+<h1>方案</h1>
+<p>我之前一直用的是如下方案：</p>
+<p>下面脚本复制自<code>stack overflow</code>，做了些改动,命名为 sudo.bat 放在 system32 文件夹下,<br>
+并且向注册表中添加<code>open admin here</code>右键菜单项，command 项值为<code>sudo.bat &quot;%V&quot;</code>，脚本的逻辑是</p>
+<ol>
+<li>执行一条需要管理员权限的命令，通过 errorlevel 来判断执行是否成功如果成功直接执行 gotAdmin</li>
+<li>如果失败，执行 UACPromt 生成临时的 vbs 脚本文件，在脚本中通过 UAC 请求管理员（会有弹窗问向用户询问授权，都见过的那个）权限后再执行一次 sudo.bat，此时 sudo.bat 会执行 gotAdmin 部分的代码</li>
+<li>gotAdmin 的代码 cd 到参数指向的路径</li>
+</ol>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line">:: BatchGotAdmin</span><br><span class="line">:-------------------------------------</span><br><span class="line">@echo off</span><br><span class="line">REM --&gt; Check for permissions</span><br><span class="line">REM --&gt;nul 2&gt;&amp;1 "%SYSTEMROOT%\system32\icacls.exe" "%SYSTEMROOT%\system32\config\system"</span><br><span class="line">if "%1" == "1" (</span><br><span class="line">    goto gotAdmin</span><br><span class="line">)</span><br><span class="line"><span class="meta">#</span><span class="bash"> 此命令需要管理员权限</span></span><br><span class="line">netstat -naob&gt;&gt;"%temp%\getadmin.txt"</span><br><span class="line"></span><br><span class="line">REM --&gt; If error flag set, we do not have admin.</span><br><span class="line">if '%errorlevel%' NEQ '0' (</span><br><span class="line">    echo Requesting administrative privileges...</span><br><span class="line">    goto UACPrompt</span><br><span class="line">) else ( goto gotAdmin )</span><br><span class="line"></span><br><span class="line">:UACPrompt</span><br><span class="line">    echo Set UAC = CreateObject^("Shell.Application"^) &gt; "%temp%\getadmin.vbs"</span><br><span class="line">    echo args = "" &gt;&gt; "%temp%\getadmin.vbs"</span><br><span class="line">    echo For Each strArg in WScript.Arguments &gt;&gt; "%temp%\getadmin.vbs"</span><br><span class="line">    echo args = args ^&amp; strArg ^&amp; " "  &gt;&gt; "%temp%\getadmin.vbs"</span><br><span class="line">    echo Next &gt;&gt; "%temp%\getadmin.vbs"</span><br><span class="line">    echo UAC.ShellExecute "%~f0", args, "", "runas", 1 &gt;&gt; "%temp%\getadmin.vbs"</span><br><span class="line">    REM type %temp%\getadmin.vbs</span><br><span class="line">    REM 命令行执行</span><br><span class="line">    "%temp%\getadmin.vbs" 1 "%cd%" %*</span><br><span class="line">    echo %*</span><br><span class="line">    exit /B</span><br><span class="line"></span><br><span class="line">:gotAdmin</span><br><span class="line">    if exist "%temp%\getadmin.vbs" ( del "%temp%\getadmin.vbs" )</span><br><span class="line">    echo "%%1: %3,%~dp3" "%%2: %2" "%%~f1: %~f1"</span><br><span class="line">    if "%3"=="" ( CD /D "%~f2" ) else ( CD /D "%~df3" )</span><br><span class="line">    cmd /k</span><br><span class="line">:--------------------------------------</span><br></pre></td></tr></table></figure>
+<h2 id="问题">问题</h2>
+<p>然而脚本有一个缺点：用 setx 命令把带空格路径添加到系统变量时，通过 sudo.bat 在当前路径打开管理员命令行发现带空格的路径会被识别为两个参数</p>
+<details>
+<summary>失败尝试</summary>
+<p>一开始不知道哪出了问题，就想寻找替代方案打开管理员命令行，runas 因此登场（其实 runas 之前试过每次都以失败告终此已经是第 N 次尝试）。</p>
+<h2 id="runas-尝试">runas 尝试</h2>
+<p><img src="/hexo/image/runas/%E6%89%BE%E4%B8%8D%E5%88%B0%E8%B7%AF%E5%BE%84.png" alt="图片无法显示"></p>
+<p>runas 的使用格式<code>runas /user:domain\username &quot;要执行的命令&quot;</code>，其他的可在命令行下<code>runas /?</code>查看。<br>
+可以不输入 domain，不输入时为当前主机<br>
+网上都说<code>runas /user:admin &quot;你的命令&quot;</code>或者<code>runas /user:administrator &quot;你的命令&quot;</code>就行。<br>
+然而至少 win10 下并不是这样：<br>
+执行<code>runas /user:我的当前用户名（有管理员身份） &quot;cmd /k&quot;</code>输入密码打开新的 cmd 的窗口发现并没什么用，得到的窗口还是普通用户权限，试了另一个由管理员账号的用户名，发现还是普通用户权限。</p>
+<p><img src="/hexo/image/runas/%E6%97%A0%E6%95%88.png" alt="图片无法显示"></p>
+<p>按网上教的直接执行<code>runas /user:administrator &quot;cmd /k&quot;</code>，也要求输入 administrator 用户的密码，但是我根本没有设置这个用户的密码。我电脑唯一设置的密码只有我的当前用户的密码，输入这个密码提示用户名和密码错误，不输入直接回车提示 runas 不能不输入密码执行。。。</p>
+<p><img src="/hexo/image/runas/%E5%AF%86%E7%A0%81%E4%B8%8D%E6%AD%A3%E7%A1%AE.png" alt="图片无法显示"></p>
+<p>另外 runsa 不管输入什么用户名都会提示输入密码，而不会检查用户是否存在，也就是说 administrator 用户不一定存在，需要查看我的电脑上到底有哪些用户，哪些用户是管理员，于是打开了控制面板，系统用户、管理其他用户，发现只有一个当前用户，但是我明明记得之前还有一个用户名不同的本地用户，一个是用邮箱注册的 microsoft 官网用户，都可以用 runas 登录，和当前账户的性质肯定不同，难道又是什么别名。</p>
+<p><strong>能看到的用户(另一个是我后来加的)</strong></p>
+<p><img src="/hexo/image/runas/%E7%B3%BB%E7%BB%9F%E7%94%A8%E6%88%B7.png" alt="图片无法显示"></p>
+<p>我还发现控制面板改不了用户密码了，只能到 win10 的设置里改当前用户密码，改不了其他用户的密码。</p>
+<p><img src="/hexo/image/runas/%E5%BD%93%E5%89%8D%E7%94%A8%E6%88%B7.png" alt="图片无法显示"></p>
+<p>另外计算机管理里面没有了用户和组管理，根据百度用 mmc 控制台打开也没有用，直接提示不能用。<br>
+根本看不到具体有哪些用户了，真的是越更新越难用。</p>
+<p><img src="/hexo/image/runas/mmc.png" alt="图片无法显示"></p>
+<p>然后再用<code>net user</code>命令查看用户，发现能看到本地，但看不到不是本地的当前用户，而且还多了一个奇怪的名字是我邮箱开头五个字母的奇怪用户，我不记得我创建过，以及一个默认的 guest 用户。越看越糊涂。这两个查看到的用户都明显不全。</p>
+<p><img src="/hexo/image/runas/netuser.png" alt="图片无法显示">v</p>
+<h3 id="runas-结论">runas 结论</h3>
+<p>最后我通过<strong>修改文件属性–&gt;安全–&gt;高级–&gt;添加</strong>里的<strong>搜索用户</strong>功能终于搜到了比较全面的用户列表。</p>
+<p><img src="/hexo/image/runas/%E7%94%A8%E6%88%B7%E5%88%97%E8%A1%A8.png" alt="图片无法显示"></p>
+<p>确实存在 administrator 这个用户，但是不知道这个用户的密码，于是又百度，得到的解答是<strong>必须得为执行<code>runas</code>命令的用户设置一个密码</strong>，但是像上文说的，win10 上我无法更改其他用户的密码，甚至无法在设置里看到这个 administrator 用户。。。并且以 administartor 身份执行 runas 命令打开的命令行窗口不一定就有管理员权限，毕竟我的当前用户也有管理员身份，因此最终得到结论 win10 上 runas 以管理员身份运行命令不可行（至少我目前这么低的水平做不到），顶多是以其他用户身份普通用户权限执行命令执行。</p>
+</details>
+<h2 id="解决问题">解决问题</h2>
+<p>最终还是花了不少时间改了 sudo.bat</p>
+<h3 id="问题解析">问题解析</h3>
+<ol>
+<li>命令设置为<code>sudo.bat 当前路径</code>时，如果当前路径是带空格的路径，会被当成两个参数，无法正确处理。</li>
+<li>如果命令为<code>sudo.bat &quot;当前路径&quot;</code>参数的引号不会被去除，带引号的参数传到<code>vbs</code>文件里引号会被去除，因此<code>bat</code>文件中参数是路径时最好用<code>~</code>去除引号（如<code>%~1</code>），否则容易引起混乱，这个问题导致我自己写<code>test.bat</code>以及<code>test.vbs</code>调试时浪费了许多时间。</li>
+<li><code>vbs</code>文件中用<code>ShellExecute</code>执行<code>bat</code>文件时实际上执行的是<code>cmd /c 文件.bat 参数</code>，因此即使<code>bat</code>文件执行出错会立即退出窗口，不方便测试查看错误。</li>
+</ol>
+<h3 id="最终结果">最终结果</h3>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br></pre></td><td class="code"><pre><span class="line">:: BatchGotAdmin</span><br><span class="line">:-------------------------------------</span><br><span class="line">@echo off</span><br><span class="line">@REM Check for permissions</span><br><span class="line">@REM nul 2&gt;&amp;1 "%SYSTEMROOT%\system32\icacls.exe" "%SYSTEMROOT%\system32\config\system"</span><br><span class="line">@REM If error flag set, we do not have admin.</span><br><span class="line">@REM netstat -naob需要管理员权限</span><br><span class="line"></span><br><span class="line">@REM 启用变量延迟</span><br><span class="line">setlocal enabledelayedexpansion</span><br><span class="line">call:increase %~2</span><br><span class="line"></span><br><span class="line">@REM &gt;nul似乎是用于重定向回显信息及错误提示到空设备（即屏蔽不显示），nul代表空设备</span><br><span class="line">netstat -naob&gt;nul</span><br><span class="line">if '%errorlevel%' NEQ '0' (</span><br><span class="line">    @REM 由于不太清楚errorlevel机制，限制尝试次数，避免errorlevel值出现意外情况</span><br><span class="line">    if !trytime! GTR 3 (</span><br><span class="line">        echo get privileges failed</span><br><span class="line">        pause</span><br><span class="line">        exit /B</span><br><span class="line">    ) else (</span><br><span class="line">        echo Requesting administrative privileges...</span><br><span class="line">        goto UACPrompt</span><br><span class="line">    )</span><br><span class="line">) else (</span><br><span class="line">    echo got administrative privileges</span><br><span class="line">    goto gotAdmin</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line">:UACPrompt</span><br><span class="line">    echo Set UAC = CreateObject^("Shell.Application"^) &gt; "%temp%\getadmin.vbs"</span><br><span class="line">    echo args = "/k %~f0 " &gt;&gt; "%temp%\getadmin.vbs"</span><br><span class="line">    echo For Each strArg in WScript.Arguments &gt;&gt; "%temp%\getadmin.vbs"</span><br><span class="line">    @REM ^为bat文件转义符，""""在vbs中代表一个双引号字符</span><br><span class="line">    @REM 字符串拼装</span><br><span class="line">    echo args = args ^&amp; """" ^&amp; strArg ^&amp; """" ^&amp; " "  &gt;&gt; "%temp%\getadmin.vbs"</span><br><span class="line">    echo Next &gt;&gt; "%temp%\getadmin.vbs"</span><br><span class="line">    @REM echo msgbox(args) &gt;&gt; "%temp%\getadmin.vbs"</span><br><span class="line">    @REM ShellExecute第一个参数不是.exe可执行文件时，实际上会执行cmd /c sudo.bat ...</span><br><span class="line">    @REM 为了避免这一情况选择cmd.exe作为可执行文件</span><br><span class="line">    echo UAC.ShellExecute "cmd", args, "", "runas", 1 &gt;&gt; "%temp%\getadmin.vbs"</span><br><span class="line">    %temp%\getadmin.vbs "%cd%" !trytime!</span><br><span class="line">    @REM exit退出，/B代表退出脚本而不是退出cmd</span><br><span class="line">    exit /B</span><br><span class="line"></span><br><span class="line">:gotAdmin</span><br><span class="line">    if exist "%temp%\getadmin.vbs" ( del "%temp%\getadmin.vbs" )</span><br><span class="line">    @REM echo "%%~f1: %~f1"</span><br><span class="line">    title %~f1</span><br><span class="line">    cmd /k CD /D "%~f1"</span><br><span class="line"></span><br><span class="line">@REM trytime值加1</span><br><span class="line">:increase</span><br><span class="line">    set trytime=%~1</span><br><span class="line">    @REM 单引号避免空值引起错误</span><br><span class="line">    if '!trytime!' == '' (</span><br><span class="line">        set trytime=0</span><br><span class="line">    )</span><br><span class="line">    set /a trytime=!trytime!+1</span><br><span class="line">    exit /B</span><br><span class="line">:--------------------------------------</span><br></pre></td></tr></table></figure>
+<p><strong>注意</strong></p>
+<ol>
+<li>使用路径作为参数时最好用<code>~</code>去除双引号，否则可能出问题，如<code>%~f1</code>。</li>
+<li>不管是否有双引号，<code>cmd /c</code>或<code>cmd /k</code>无法正确执行路径中带空格的文件</li>
+</ol>
+
+    </section>
+    <footer class="post-footer">
+      <section class="author">
+    <h4>flyingfisherman</h4>
+    <p>前端工程师，热爱技术，坚信知识技术改变生活。最高兴的场合莫过于学到的技术为自己、亲友或他人提供了些许的便利、帮助。</p>
+</section>
+      <section class="share">
+    <h4>Share this post</h4>
+    <a class="icon-twitter" href="http://twitter.com/share?url=https://github.flyingfishman.io/hexo/2020/10/10/runas/"
+       onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+        <span class="hidden">Twitter</span>
+    </a>
+    <a class="icon-facebook" href="https://www.facebook.com/sharer/sharer.php?u=https://github.flyingfishman.io/hexo/2020/10/10/runas/"
+       onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+        <span class="hidden">Facebook</span>
+    </a>
+    <a class="icon-google-plus" href="https://plus.google.com/share?url=https://github.flyingfishman.io/hexo/2020/10/10/runas/"
+       onclick="window.open(this.href, 'google-plus-share', 'width=490,height=530');return false;">
+        <span class="hidden">Google+</span>
+    </a>
+</section>
+    </footer>
+  </article>
+  <nav class="pagination" role="pagination">
+    
+    <a class="newer-posts" href="/hexo/2020/11/23/程序作为服务启动/">
+        ← centos下程序作为服务启动
+    </a>
+    
+    <span class="page-number">•</span>
+    
+    <a class="older-posts" href="/hexo/2020/08/08/record/">
+        rainmeter皮肤google翻译工具编写 →
+    </a>
+    
+</nav>
+  <div id="comment" class="comments-area">
+    <h1 class="title"><a href="#disqus_comments" name="disqus_comments">Comments</a></h1>
+
+    
+</div>
+</main>
+
+
+  
+<footer class="site-footer">
+  
+  <a class="subscribe icon-feed" href="/rss.xml"><span class="tooltip">Subscribe!</span></a>
+  
+  <div class="inner">
+     <section class="copyright">All content copyright <a href="/hexo/">日常点滴</a> &copy; 2014 &bull; All rights reserved.</section>
+     <section class="poweredby">Proudly published with <a class="icon-ghost" href="http://zespia.tw/hexo/">Hexo</a></section>
+  </div>
+</footer>
+
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+<script type="text/javascript" src="/hexo/js/jquery.fitvids.js"></script>
+<script type="text/javascript" src="/hexo/js/index.js"></script>
+
+
+
+
+
+
+</body>
+</html>

@@ -1,0 +1,23 @@
+div.site-info {
+  background-color: #ffffff;
+  padding: 10px;
+  text-align: center;
+  box-shadow: 1px 1px 5px -1px; }
+  div.site-info img {
+    height: 100px;
+    width: 100px; }
+  div.site-info a {
+    margin: 5px;
+    display: inline-block; }
+  div.site-info a.author-name {
+    font-weight: 900; }
+  div.site-info a.rss {
+    background: url() no-repeat 0 5px/15px auto;
+    padding: 5px;
+    padding-left: 20px;
+    border: solid 1px #969696;
+    margin-top: 10px;
+    border-radius: 10%; }
+  div.site-info a.rss:hover {
+    background-color: #969696;
+    color: #ffffff; }

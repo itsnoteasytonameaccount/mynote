@@ -1,0 +1,27 @@
+div#exceptional {
+  text-align: center; }
+  div#exceptional a.button {
+    background-color: red;
+    border-radius: 10%;
+    color: #ffffff;
+    width: 60px;
+    line-height: 30px;
+    display: inline-block;
+    font-weight: bold; }
+  div#exceptional .button:hover + .pics {
+    display: block; }
+  div#exceptional div.pics {
+    display: none;
+    margin: 0 auto;
+    margin-top: 20px; }
+    div#exceptional div.pics div {
+      display: inline-block;
+      margin: 0 20px; }
+      div#exceptional div.pics div a[data-fancybox] {
+        display: inline-block;
+        font-size: 0px; }
+      div#exceptional div.pics div img {
+        width: 200px; }
+
+hr {
+  opacity: 0.1; }

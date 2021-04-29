@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html" charset="UTF-8" >
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+  <title>x8086汇编语言基础 | 日常点滴</title>
+  <meta name="description" content="" />
+  <meta name="HandheldFriendly" content="True" />
+  <meta name="MobileOptimized" content="320" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <link rel="stylesheet" type="text/css" href="/hexo/css/screen.css" />
+  <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Noto+Serif:400,700,400italic|Open+Sans:700,400" />
+
+  <meta name="generator" content="日常点滴">
+
+  
+  <link rel="alternate" type="application/rss+xml" title="RSS" href="/rss.xml">
+  
+  
+  <link rel="alternate" type="application/atom+xml" title="Atom 0.3" href="rss.xml">
+  
+  
+
+  
+</head>
+
+
+<body class="post-template">
+
+  <header class="site-head"  style="background-image: url(/image/cover.png)" >
+    <div class="vertical">
+        <div class="site-head-content inner">
+             <a class="blog-logo" href="/hexo/"><img src="https://avatars.githubusercontent.com/u/26755276" alt="Blog Logo"/></a> 
+            <h1 class="blog-title">日常点滴</h1>
+            <h2 class="blog-description"></h2>
+        </div>
+    </div>
+</header>
+  
+
+<main class="content" role="main">
+  <article class="post">
+    <span class="post-meta">
+      <time datetime="2018-06-11T16:00:00.000Z" itemprop="datePublished">
+          2018-06-12
+      </time>
+    
+    
+    | 
+    <a href='/hexo/tags/汇编/'>汇编</a>,
+    
+    <a href='/hexo/tags/x8086/'>x8086</a>
+    
+    
+</span>
+    <h1 class="post-title">x8086汇编语言基础</h1>
+    <section class="post-content">
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.12.0/katex.min.css" /><h1>前言</h1>
+<p>最近学汇编的笔记</p>
+<a id="more"></a>
+<h1>概念</h1>
+<h2 id="编址方式">编址方式</h2>
+<p>分段，一段即指一块内存区域。<br>
+段地址指的是：对应一块内存区域起始位置。<br>
+段内偏移地址指：相对段地址偏移的字节数</p>
+<h2 id="寻址方式">寻址方式</h2>
+<ol>
+<li>
+<p>立即寻址<br>
+操作数即为要操作的数据时。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mov 目的操作数,100</span><br></pre></td></tr></table></figure>
+</li>
+<li>
+<p>寄存器寻址<br>
+要操作的数据存在寄存器中，操作数为寄存器名</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mov 目的操作数,ax</span><br></pre></td></tr></table></figure>
+</li>
+<li>
+<p>直接寻址<br>
+操作数为要操作数据的地址，或变量名</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mov 目的操作数,value</span><br></pre></td></tr></table></figure>
+</li>
+<li>
+<p>寄存器间接寻址<br>
+要操作的数据地址存在寄存器中，操作数形式为中括号内加上寄存器名</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mov 目的操作数,[bx]</span><br></pre></td></tr></table></figure>
+</li>
+<li>
+<p>寄存器相对寻址<br>
+寄存器内的地址加上偏移量为要操作数据的段内偏移地址，操作数形式如下</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mov 目的操作数,[cx+n]</span><br></pre></td></tr></table></figure>
+</li>
+<li>
+<p>基址变址寻址<br>
+通过两个寄存器的内容获取要操作的数据的地址</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mov 目的操作数,[ax+bx]</span><br></pre></td></tr></table></figure>
+</li>
+<li>
+<p>相对基址变址寻址<br>
+5，6混合使用</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mov 目的操作数,[ax+bx+6]</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<h2 id="基本常用指令">基本常用指令</h2>
+<ol>
+<li>mov a,b<br>
+将b内容复制到a中,a不可为数字，可为寄存器等，要注意a,b数据形式限制</li>
+<li>push/pop a<br>
+a的内容压栈，或弹栈入a,栈的概念请另自行查找</li>
+<li>lea a,b<br>
+b的段内偏移地址存入a中</li>
+<li>xchg a,b<br>
+交换a,b内容，a,b都不可为数字</li>
+<li>and  a,b<br>
+a,b按位与结果存入a,cf,of设为0,af无定义</li>
+<li>or   a,b<br>
+a,b按位或结果存入a,对标志位影响同5</li>
+<li>xor  a,b<br>
+a,b按位异或结果存入a,对标志位影响同5</li>
+<li>not  a<br>
+a按位取反，结果存入a</li>
+<li>shl/shr  a,n<br>
+a各位左/右移n位,空出的位补0,当最高位改变时of=1,否则为0,对其他位无影响（注意无影响和未定义区别，未定义指对原有值有影响但结果完全随机）</li>
+<li>sal/sar  a,n<br>
+a各位左/右移n位,移出的位依次存入cf,空出的位若为高位补上原有值，低位补上0,标志位影响同9</li>
+<li>rol/ror  a,n<br>
+a各位左/右移n位,移出的位依次补至空出的位,对标志位影响同9</li>
+<li>add/sub  a,b<br>
+a加/减b结果存入a,加法时进位cf=1,减法a&lt;b则cf=1,同符号相加结果符号改变则of=1，异号相减结果符号与b相同则of=1，减法时结果为0则zf=1</li>
+<li>adc/sbb  a,b<br>
+加法带进位，减法有借位，cf为进位或借位标记，加法时要加cf,减法时减cf，其余同12</li>
+<li>inc a<br>
+a自增一</li>
+<li>cmp a, b<br>
+a,b相减不存结果，标志位影响同sub</li>
+<li>jmp a<br>
+无条件转移至代码段的a位置</li>
+<li>jz/jnz a<br>
+条件转移至代码段的a位置(jump if zf equals/not equals 0),其他条件转移指令自行查找</li>
+</ol>
+<h2 id="子程序">子程序</h2>
+<p>直接上例子</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">; ...</span><br><span class="line">call func  ;调用,此时ip,cs内容入栈</span><br><span class="line">; ...</span><br><span class="line">func:</span><br><span class="line">     ; ....</span><br><span class="line">     ret   ;返回，此时原来存的ip,cs出栈</span><br></pre></td></tr></table></figure>
+<h2 id="常用中断程序-21h号中断">常用中断程序,21h号中断</h2>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">中断号</th>
+<th style="text-align:center">作用</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">01h</td>
+<td style="text-align:center">输入一个字符，结果存入dl</td>
+</tr>
+<tr>
+<td style="text-align:center">02h</td>
+<td style="text-align:center">从dl显示一个字符</td>
+</tr>
+<tr>
+<td style="text-align:center">09h</td>
+<td style="text-align:center">输出ds:[dx]为起始地址，以’$'结束的字符串</td>
+</tr>
+<tr>
+<td style="text-align:center">0ah</td>
+<td style="text-align:center">输入以回车结束的字符串,结果存入ds:[dx]</td>
+</tr>
+<tr>
+<td style="text-align:center">0ch</td>
+<td style="text-align:center">清空键盘输入缓存</td>
+</tr>
+</tbody>
+</table>
+<p>用法</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">;输出字符0</span><br><span class="line">mov ah,02h</span><br><span class="line">mov dl,30h    ;字符0的ascii码</span><br><span class="line">int 21h</span><br></pre></td></tr></table></figure>
+<h2 id="数据">数据</h2>
+<p>db(byte)/dw(word)/dd(double)/dq(quad) 分别用于定义:字节/字长/双字长/四字长数据，长度分别为1/2/4/8字节，可在数据段代码段堆栈段使用<br>
+dup:定义重复数据，使用方法</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">db 10 dup(?)  ;定义10字节空闲内存</span><br></pre></td></tr></table></figure>
+<p>?占位代表数据未定义</p>
+
+    </section>
+    <footer class="post-footer">
+      <section class="author">
+    <h4>flyingfisherman</h4>
+    <p>前端工程师，热爱技术，坚信知识技术改变生活。最高兴的场合莫过于学到的技术为自己、亲友或他人提供了些许的便利、帮助。</p>
+</section>
+      <section class="share">
+    <h4>Share this post</h4>
+    <a class="icon-twitter" href="http://twitter.com/share?url=https://github.flyingfishman.io/hexo/2018/06/12/asm/"
+       onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+        <span class="hidden">Twitter</span>
+    </a>
+    <a class="icon-facebook" href="https://www.facebook.com/sharer/sharer.php?u=https://github.flyingfishman.io/hexo/2018/06/12/asm/"
+       onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+        <span class="hidden">Facebook</span>
+    </a>
+    <a class="icon-google-plus" href="https://plus.google.com/share?url=https://github.flyingfishman.io/hexo/2018/06/12/asm/"
+       onclick="window.open(this.href, 'google-plus-share', 'width=490,height=530');return false;">
+        <span class="hidden">Google+</span>
+    </a>
+</section>
+    </footer>
+  </article>
+  <nav class="pagination" role="pagination">
+    
+    <a class="newer-posts" href="/hexo/2018/07/14/linux3/">
+        ← centos安装配置mysql
+    </a>
+    
+    <span class="page-number">•</span>
+    
+    <a class="older-posts" href="/hexo/2018/05/31/rainmeter/">
+        rainmeter美化工具使用 →
+    </a>
+    
+</nav>
+  <div id="comment" class="comments-area">
+    <h1 class="title"><a href="#disqus_comments" name="disqus_comments">Comments</a></h1>
+
+    
+</div>
+</main>
+
+
+  
+<footer class="site-footer">
+  
+  <a class="subscribe icon-feed" href="/rss.xml"><span class="tooltip">Subscribe!</span></a>
+  
+  <div class="inner">
+     <section class="copyright">All content copyright <a href="/hexo/">日常点滴</a> &copy; 2014 &bull; All rights reserved.</section>
+     <section class="poweredby">Proudly published with <a class="icon-ghost" href="http://zespia.tw/hexo/">Hexo</a></section>
+  </div>
+</footer>
+
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+<script type="text/javascript" src="/hexo/js/jquery.fitvids.js"></script>
+<script type="text/javascript" src="/hexo/js/index.js"></script>
+
+
+
+
+
+
+</body>
+</html>

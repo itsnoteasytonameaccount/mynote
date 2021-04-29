@@ -1,0 +1,1055 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html" charset="UTF-8" >
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+  <title>webpack的使用 | 日常点滴</title>
+  <meta name="description" content="" />
+  <meta name="HandheldFriendly" content="True" />
+  <meta name="MobileOptimized" content="320" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <link rel="stylesheet" type="text/css" href="/hexo/css/screen.css" />
+  <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Noto+Serif:400,700,400italic|Open+Sans:700,400" />
+
+  <meta name="generator" content="日常点滴">
+
+  
+  <link rel="alternate" type="application/rss+xml" title="RSS" href="/rss.xml">
+  
+  
+  <link rel="alternate" type="application/atom+xml" title="Atom 0.3" href="rss.xml">
+  
+  
+
+  
+</head>
+
+
+<body class="post-template">
+
+  <header class="site-head"  style="background-image: url(/image/cover.png)" >
+    <div class="vertical">
+        <div class="site-head-content inner">
+             <a class="blog-logo" href="/hexo/"><img src="https://avatars.githubusercontent.com/u/26755276" alt="Blog Logo"/></a> 
+            <h1 class="blog-title">日常点滴</h1>
+            <h2 class="blog-description"></h2>
+        </div>
+    </div>
+</header>
+  
+
+<main class="content" role="main">
+  <article class="post">
+    <span class="post-meta">
+      <time datetime="2018-05-18T16:00:00.000Z" itemprop="datePublished">
+          2018-05-19
+      </time>
+    
+    
+    | 
+    <a href='/hexo/tags/javascript/'>javascript</a>,
+    
+    <a href='/hexo/tags/webpack/'>webpack</a>,
+    
+    <a href='/hexo/tags/nodejs/'>nodejs</a>
+    
+    
+</span>
+    <h1 class="post-title">webpack的使用</h1>
+    <section class="post-content">
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.12.0/katex.min.css" /><h1>前言</h1>
+<p>先看<a href="https://www.webpackjs.com/configuration/other-options/#amd" target="_blank" rel="noopener">官方文档</a>，文档不可解决再看别人的，本文为官方文档重要常用部分摘录，版本 4，部分加入自身理解进行了些修改，手打一遍，仅为巩固记忆</p>
+<a id="more"></a>
+<h1>安装</h1>
+<p>首先计算机得有 Nodejs 环境，安装方法略</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 安装webpack和webpack-cli</span></span><br><span class="line"><span class="comment"># 全局,webpack命令可全局使用,官方不推荐</span></span><br><span class="line">npm install -g webpack webpack-cli</span><br><span class="line"><span class="comment"># 当前项文件夹，使用时需要在package.json中配置scripts,然后npm run</span></span><br><span class="line">npm install --save-dev webpack webpack-cli</span><br></pre></td></tr></table></figure>
+<h1>概念</h1>
+<h2 id="入口-entry">入口(entry)</h2>
+<p>程序入口，把文件依赖看成树状结构，入口就是根节点，从此处开始遍历查找依赖图。把某个文件看作父节点，被依赖的文件即是其子节点</p>
+<h2 id="出口-output">出口(output)</h2>
+<p>output 输出，打包后生成的文件名，位置等</p>
+<h2 id="解析器-loader">解析器(loader)</h2>
+<p>处理特定类型文件，将其内容转化为 webpack 可理解处理的结构，需要配置的部分为匹配规则和使用的 loader</p>
+<h2 id="模式-mode">模式(mode)</h2>
+<p>开发环境 development 或者生产环境 production(production 自动启用 UglifyPlugin 等)</p>
+<h2 id="插件-plugins">插件(plugins)</h2>
+<p>插件意思不用过多解释，webpack 中插件为一个有 apply 属性的 js 对象，会被 webpack 的 compile 调用，使用时需要 new 创建实例</p>
+<h2 id="配置">配置</h2>
+<p>配置文件是 commjs 模块，引用依赖通过 require,编写时可以像编写 js 一样，也可以使用其他语言（详见官方文档），只需要保证配置文件最终输出的是 webpack 要求的特定函数（根据环境动态生成配置），特定对象(一般配置），或特定对象数组(规定多组配置每组配置都生成一个结果)<br>
+不建议一个文件里写太长配置，需要分文件</p>
+<h2 id="manifest-和-runtime">manifest 和 runtime</h2>
+<p>manifest 是记录模块信息的部分代码，runtime 是决定如何加载调度模块的部分代码</p>
+<h2 id="目标-target">目标(target)</h2>
+<p>目标平台</p>
+<h2 id="热替换-hmr">热替换(hmr)</h2>
+<p>普通情况，一次代码更改需更新整个依赖图；热替换情况一次代码更新之只更新代码改变了的模块部分</p>
+<h1>配置</h1>
+<details>
+<summary>官网给出的主要配置</summary>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br><span class="line">191</span><br><span class="line">192</span><br><span class="line">193</span><br><span class="line">194</span><br><span class="line">195</span><br><span class="line">196</span><br><span class="line">197</span><br><span class="line">198</span><br><span class="line">199</span><br><span class="line">200</span><br><span class="line">201</span><br><span class="line">202</span><br><span class="line">203</span><br><span class="line">204</span><br><span class="line">205</span><br><span class="line">206</span><br><span class="line">207</span><br><span class="line">208</span><br><span class="line">209</span><br><span class="line">210</span><br><span class="line">211</span><br><span class="line">212</span><br><span class="line">213</span><br><span class="line">214</span><br><span class="line">215</span><br><span class="line">216</span><br><span class="line">217</span><br><span class="line">218</span><br><span class="line">219</span><br><span class="line">220</span><br><span class="line">221</span><br><span class="line">222</span><br><span class="line">223</span><br><span class="line">224</span><br><span class="line">225</span><br><span class="line">226</span><br><span class="line">227</span><br><span class="line">228</span><br><span class="line">229</span><br><span class="line">230</span><br><span class="line">231</span><br><span class="line">232</span><br><span class="line">233</span><br><span class="line">234</span><br><span class="line">235</span><br><span class="line">236</span><br><span class="line">237</span><br><span class="line">238</span><br><span class="line">239</span><br><span class="line">240</span><br><span class="line">241</span><br><span class="line">242</span><br><span class="line">243</span><br><span class="line">244</span><br><span class="line">245</span><br><span class="line">246</span><br><span class="line">247</span><br><span class="line">248</span><br><span class="line">249</span><br><span class="line">250</span><br><span class="line">251</span><br><span class="line">252</span><br><span class="line">253</span><br><span class="line">254</span><br><span class="line">255</span><br><span class="line">256</span><br><span class="line">257</span><br><span class="line">258</span><br><span class="line">259</span><br><span class="line">260</span><br><span class="line">261</span><br><span class="line">262</span><br><span class="line">263</span><br><span class="line">264</span><br><span class="line">265</span><br><span class="line">266</span><br><span class="line">267</span><br><span class="line">268</span><br><span class="line">269</span><br><span class="line">270</span><br><span class="line">271</span><br><span class="line">272</span><br><span class="line">273</span><br><span class="line">274</span><br><span class="line">275</span><br><span class="line">276</span><br><span class="line">277</span><br><span class="line">278</span><br><span class="line">279</span><br><span class="line">280</span><br><span class="line">281</span><br><span class="line">282</span><br><span class="line">283</span><br><span class="line">284</span><br><span class="line">285</span><br><span class="line">286</span><br><span class="line">287</span><br><span class="line">288</span><br><span class="line">289</span><br><span class="line">290</span><br><span class="line">291</span><br><span class="line">292</span><br><span class="line">293</span><br><span class="line">294</span><br><span class="line">295</span><br><span class="line">296</span><br><span class="line">297</span><br><span class="line">298</span><br><span class="line">299</span><br><span class="line">300</span><br><span class="line">301</span><br><span class="line">302</span><br><span class="line">303</span><br><span class="line">304</span><br><span class="line">305</span><br><span class="line">306</span><br><span class="line">307</span><br><span class="line">308</span><br><span class="line">309</span><br><span class="line">310</span><br><span class="line">311</span><br><span class="line">312</span><br><span class="line">313</span><br><span class="line">314</span><br><span class="line">315</span><br><span class="line">316</span><br><span class="line">317</span><br><span class="line">318</span><br><span class="line">319</span><br><span class="line">320</span><br><span class="line">321</span><br><span class="line">322</span><br><span class="line">323</span><br><span class="line">324</span><br><span class="line">325</span><br><span class="line">326</span><br><span class="line">327</span><br><span class="line">328</span><br><span class="line">329</span><br><span class="line">330</span><br><span class="line">331</span><br><span class="line">332</span><br><span class="line">333</span><br><span class="line">334</span><br><span class="line">335</span><br><span class="line">336</span><br><span class="line">337</span><br><span class="line">338</span><br><span class="line">339</span><br><span class="line">340</span><br><span class="line">341</span><br><span class="line">342</span><br><span class="line">343</span><br><span class="line">344</span><br><span class="line">345</span><br><span class="line">346</span><br><span class="line">347</span><br><span class="line">348</span><br><span class="line">349</span><br><span class="line">350</span><br><span class="line">351</span><br><span class="line">352</span><br><span class="line">353</span><br><span class="line">354</span><br><span class="line">355</span><br><span class="line">356</span><br><span class="line">357</span><br><span class="line">358</span><br><span class="line">359</span><br><span class="line">360</span><br><span class="line">361</span><br><span class="line">362</span><br><span class="line">363</span><br><span class="line">364</span><br><span class="line">365</span><br><span class="line">366</span><br><span class="line">367</span><br><span class="line">368</span><br><span class="line">369</span><br><span class="line">370</span><br><span class="line">371</span><br><span class="line">372</span><br><span class="line">373</span><br><span class="line">374</span><br><span class="line">375</span><br><span class="line">376</span><br><span class="line">377</span><br><span class="line">378</span><br><span class="line">379</span><br><span class="line">380</span><br><span class="line">381</span><br><span class="line">382</span><br><span class="line">383</span><br><span class="line">384</span><br><span class="line">385</span><br><span class="line">386</span><br><span class="line">387</span><br><span class="line">388</span><br><span class="line">389</span><br><span class="line">390</span><br><span class="line">391</span><br><span class="line">392</span><br><span class="line">393</span><br><span class="line">394</span><br><span class="line">395</span><br><span class="line">396</span><br><span class="line">397</span><br><span class="line">398</span><br><span class="line">399</span><br><span class="line">400</span><br><span class="line">401</span><br><span class="line">402</span><br><span class="line">403</span><br><span class="line">404</span><br><span class="line">405</span><br><span class="line">406</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> path = <span class="built_in">require</span>(<span class="string">'path'</span>);</span><br><span class="line"></span><br><span class="line"><span class="built_in">module</span>.exports = &#123;</span><br><span class="line">  mode: <span class="string">"production"</span>, <span class="comment">// "production" | "development" | "none"</span></span><br><span class="line">  mode: <span class="string">"production"</span>, <span class="comment">// enable many optimizations for production builds</span></span><br><span class="line">  mode: <span class="string">"development"</span>, <span class="comment">// enabled useful tools for development</span></span><br><span class="line">  mode: <span class="string">"none"</span>, <span class="comment">// no defaults</span></span><br><span class="line">  <span class="comment">// Chosen mode tells webpack to use its built-in optimizations accordingly.</span></span><br><span class="line"></span><br><span class="line">  entry: <span class="string">"./app/entry"</span>, <span class="comment">// string | object | array</span></span><br><span class="line">  entry: [<span class="string">"./app/entry1"</span>, <span class="string">"./app/entry2"</span>],</span><br><span class="line">  entry: &#123;</span><br><span class="line">    a: <span class="string">"./app/entry-a"</span>,</span><br><span class="line">    b: [<span class="string">"./app/entry-b1"</span>, <span class="string">"./app/entry-b2"</span>]</span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="comment">// 这里应用程序开始执行</span></span><br><span class="line">  <span class="comment">// webpack 开始打包</span></span><br><span class="line"></span><br><span class="line">  output: &#123;</span><br><span class="line">    <span class="comment">// webpack 如何输出结果的相关选项</span></span><br><span class="line"></span><br><span class="line">    path: path.resolve(__dirname, <span class="string">"dist"</span>), <span class="comment">// string</span></span><br><span class="line">    <span class="comment">// 所有输出文件的目标路径</span></span><br><span class="line">    <span class="comment">// 必须是绝对路径（使用 Node.js 的 path 模块）</span></span><br><span class="line"></span><br><span class="line">    filename: <span class="string">"bundle.js"</span>, <span class="comment">// string</span></span><br><span class="line">    filename: <span class="string">"[name].js"</span>, <span class="comment">// 用于多个入口点(entry point)（出口点？）</span></span><br><span class="line">    filename: <span class="string">"[chunkhash].js"</span>, <span class="comment">// 用于长效缓存</span></span><br><span class="line">    <span class="comment">// 「入口分块(entry chunk)」的文件名模板（出口分块？）</span></span><br><span class="line"></span><br><span class="line">    publicPath: <span class="string">"/assets/"</span>, <span class="comment">// string</span></span><br><span class="line">    publicPath: <span class="string">""</span>,</span><br><span class="line">    publicPath: <span class="string">"https://cdn.example.com/"</span>,</span><br><span class="line">    <span class="comment">// 输出解析文件的目录，url 相对于 HTML 页面</span></span><br><span class="line"></span><br><span class="line">    library: <span class="string">"MyLibrary"</span>, <span class="comment">// string,</span></span><br><span class="line">    <span class="comment">// 导出库(exported library)的名称</span></span><br><span class="line"></span><br><span class="line">    libraryTarget: <span class="string">"umd"</span>, <span class="comment">// 通用模块定义</span></span><br><span class="line">        libraryTarget: <span class="string">"umd2"</span>, <span class="comment">// 通用模块定义</span></span><br><span class="line">        libraryTarget: <span class="string">"commonjs2"</span>, <span class="comment">// exported with module.exports</span></span><br><span class="line">        libraryTarget: <span class="string">"commonjs-module"</span>, <span class="comment">// 使用 module.exports 导出</span></span><br><span class="line">        libraryTarget: <span class="string">"commonjs"</span>, <span class="comment">// 作为 exports 的属性导出</span></span><br><span class="line">        libraryTarget: <span class="string">"amd"</span>, <span class="comment">// 使用 AMD 定义方法来定义</span></span><br><span class="line">        libraryTarget: <span class="string">"this"</span>, <span class="comment">// 在 this 上设置属性</span></span><br><span class="line">        libraryTarget: <span class="string">"var"</span>, <span class="comment">// 变量定义于根作用域下</span></span><br><span class="line">        libraryTarget: <span class="string">"assign"</span>, <span class="comment">// 盲分配(blind assignment)</span></span><br><span class="line">        libraryTarget: <span class="string">"window"</span>, <span class="comment">// 在 window 对象上设置属性</span></span><br><span class="line">        libraryTarget: <span class="string">"global"</span>, <span class="comment">// property set to global object</span></span><br><span class="line">        libraryTarget: <span class="string">"jsonp"</span>, <span class="comment">// jsonp wrapper</span></span><br><span class="line">    <span class="comment">// 导出库(exported library)的类型</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 高级输出配置（点击显示） */</span></span><br><span class="line"></span><br><span class="line">    pathinfo: <span class="literal">true</span>, <span class="comment">// boolean</span></span><br><span class="line">    <span class="comment">// 在生成代码时，引入相关的模块、导出、请求等有帮助的路径信息。</span></span><br><span class="line"></span><br><span class="line">    chunkFilename: <span class="string">"[id].js"</span>,</span><br><span class="line">    chunkFilename: <span class="string">"[chunkhash].js"</span>, <span class="comment">// 长效缓存(/guides/caching)</span></span><br><span class="line">    <span class="comment">// 「附加分块(additional chunk)」的文件名模板</span></span><br><span class="line"></span><br><span class="line">    jsonpFunction: <span class="string">"myWebpackJsonp"</span>, <span class="comment">// string</span></span><br><span class="line">    <span class="comment">// 用于加载分块的 JSONP 函数名</span></span><br><span class="line"></span><br><span class="line">    sourceMapFilename: <span class="string">"[file].map"</span>, <span class="comment">// string</span></span><br><span class="line">    sourceMapFilename: <span class="string">"sourcemaps/[file].map"</span>, <span class="comment">// string</span></span><br><span class="line">    <span class="comment">// 「source map 位置」的文件名模板</span></span><br><span class="line"></span><br><span class="line">    devtoolModuleFilenameTemplate: <span class="string">"webpack:///[resource-path]"</span>, <span class="comment">// string</span></span><br><span class="line">    <span class="comment">// 「devtool 中模块」的文件名模板</span></span><br><span class="line"></span><br><span class="line">    devtoolFallbackModuleFilenameTemplate: <span class="string">"webpack:///[resource-path]?[hash]"</span>, <span class="comment">// string</span></span><br><span class="line">    <span class="comment">// 「devtool 中模块」的文件名模板（用于冲突）</span></span><br><span class="line"></span><br><span class="line">    umdNamedDefine: <span class="literal">true</span>, <span class="comment">// boolean</span></span><br><span class="line">    <span class="comment">// 在 UMD 库中使用命名的 AMD 模块</span></span><br><span class="line"></span><br><span class="line">    crossOriginLoading: <span class="string">"use-credentials"</span>, <span class="comment">// 枚举</span></span><br><span class="line">    crossOriginLoading: <span class="string">"anonymous"</span>,</span><br><span class="line">    crossOriginLoading: <span class="literal">false</span>,</span><br><span class="line">    <span class="comment">// 指定运行时如何发出跨域请求问题</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 专家级输出配置（自行承担风险） */</span></span><br><span class="line"></span><br><span class="line">    devtoolLineToLine: &#123;</span><br><span class="line">      test: <span class="regexp">/\.jsx$/</span></span><br><span class="line">    &#125;,</span><br><span class="line">    <span class="comment">// 为这些模块使用 1:1 映射 SourceMaps（快速）</span></span><br><span class="line"></span><br><span class="line">    hotUpdateMainFilename: <span class="string">"[hash].hot-update.json"</span>, <span class="comment">// string</span></span><br><span class="line">    <span class="comment">// 「HMR 清单」的文件名模板</span></span><br><span class="line"></span><br><span class="line">    hotUpdateChunkFilename: <span class="string">"[id].[hash].hot-update.js"</span>, <span class="comment">// string</span></span><br><span class="line">    <span class="comment">// 「HMR 分块」的文件名模板</span></span><br><span class="line"></span><br><span class="line">    sourcePrefix: <span class="string">"\t"</span>, <span class="comment">// string</span></span><br><span class="line">    <span class="comment">// 包内前置式模块资源具有更好可读性</span></span><br><span class="line">  &#125;,</span><br><span class="line"></span><br><span class="line">  <span class="built_in">module</span>: &#123;</span><br><span class="line">    <span class="comment">// 关于模块配置</span></span><br><span class="line"></span><br><span class="line">    rules: [</span><br><span class="line">      <span class="comment">// 模块规则（配置 loader、解析器等选项）</span></span><br><span class="line"></span><br><span class="line">      &#123;</span><br><span class="line">        test: <span class="regexp">/\.jsx?$/</span>,</span><br><span class="line">        include: [</span><br><span class="line">          path.resolve(__dirname, <span class="string">"app"</span>)</span><br><span class="line">        ],</span><br><span class="line">        exclude: [</span><br><span class="line">          path.resolve(__dirname, <span class="string">"app/demo-files"</span>)</span><br><span class="line">        ],</span><br><span class="line">        <span class="comment">// 这里是匹配条件，每个选项都接收一个正则表达式或字符串</span></span><br><span class="line">        <span class="comment">// test 和 include 具有相同的作用，都是必须匹配选项</span></span><br><span class="line">        <span class="comment">// exclude 是必不匹配选项（优先于 test 和 include）</span></span><br><span class="line">        <span class="comment">// 最佳实践：</span></span><br><span class="line">        <span class="comment">// - 只在 test 和 文件名匹配 中使用正则表达式</span></span><br><span class="line">        <span class="comment">// - 在 include 和 exclude 中使用绝对路径数组</span></span><br><span class="line">        <span class="comment">// - 尽量避免 exclude，更倾向于使用 include</span></span><br><span class="line"></span><br><span class="line">        issuer: &#123; test, include, exclude &#125;,</span><br><span class="line">        <span class="comment">// issuer 条件（导入源）</span></span><br><span class="line"></span><br><span class="line">        enforce: <span class="string">"pre"</span>,</span><br><span class="line">        enforce: <span class="string">"post"</span>,</span><br><span class="line">        <span class="comment">// 标识应用这些规则，即使规则覆盖（高级选项）</span></span><br><span class="line"></span><br><span class="line">        loader: <span class="string">"babel-loader"</span>,</span><br><span class="line">        <span class="comment">// 应该应用的 loader，它相对上下文解析</span></span><br><span class="line">        <span class="comment">// 为了更清晰，`-loader` 后缀在 webpack 2 中不再是可选的</span></span><br><span class="line">        <span class="comment">// 查看 webpack 1 升级指南。</span></span><br><span class="line"></span><br><span class="line">        options: &#123;</span><br><span class="line">          presets: [<span class="string">"es2015"</span>]</span><br><span class="line">        &#125;,</span><br><span class="line">        <span class="comment">// loader 的可选项</span></span><br><span class="line">      &#125;,</span><br><span class="line"></span><br><span class="line">      &#123;</span><br><span class="line">        test: <span class="regexp">/\.html$/</span>,</span><br><span class="line">        test: <span class="string">"\.html$"</span></span><br><span class="line"></span><br><span class="line">        use: [</span><br><span class="line">          <span class="comment">// 应用多个 loader 和选项</span></span><br><span class="line">          <span class="string">"htmllint-loader"</span>,</span><br><span class="line">          &#123;</span><br><span class="line">            loader: <span class="string">"html-loader"</span>,</span><br><span class="line">            options: &#123;</span><br><span class="line">              <span class="comment">/* ... */</span></span><br><span class="line">            &#125;</span><br><span class="line">          &#125;</span><br><span class="line">        ]</span><br><span class="line">      &#125;,</span><br><span class="line"></span><br><span class="line">      &#123; <span class="attr">oneOf</span>: [ <span class="comment">/* rules */</span> ] &#125;,</span><br><span class="line">      <span class="comment">// 只使用这些嵌套规则之一</span></span><br><span class="line"></span><br><span class="line">      &#123; <span class="attr">rules</span>: [ <span class="comment">/* rules */</span> ] &#125;,</span><br><span class="line">      <span class="comment">// 使用所有这些嵌套规则（合并可用条件）</span></span><br><span class="line"></span><br><span class="line">      &#123; <span class="attr">resource</span>: &#123; <span class="attr">and</span>: [ <span class="comment">/* 条件 */</span> ] &#125; &#125;,</span><br><span class="line">      <span class="comment">// 仅当所有条件都匹配时才匹配</span></span><br><span class="line"></span><br><span class="line">      &#123; <span class="attr">resource</span>: &#123; <span class="attr">or</span>: [ <span class="comment">/* 条件 */</span> ] &#125; &#125;,</span><br><span class="line">      &#123; <span class="attr">resource</span>: [ <span class="comment">/* 条件 */</span> ] &#125;,</span><br><span class="line">      <span class="comment">// 任意条件匹配时匹配（默认为数组）</span></span><br><span class="line"></span><br><span class="line">      &#123; <span class="attr">resource</span>: &#123; <span class="attr">not</span>: <span class="comment">/* 条件 */</span> &#125; &#125;</span><br><span class="line">      <span class="comment">// 条件不匹配时匹配</span></span><br><span class="line">    ],</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 高级模块配置（点击展示） */</span></span><br><span class="line"></span><br><span class="line">    noParse: [</span><br><span class="line">      /special-library\.js$/</span><br><span class="line">    ],</span><br><span class="line">    <span class="comment">// 不解析这里的模块</span></span><br><span class="line"></span><br><span class="line">    unknownContextRequest: <span class="string">"."</span>,</span><br><span class="line">    unknownContextRecursive: <span class="literal">true</span>,</span><br><span class="line">    unknownContextRegExp: <span class="regexp">/^\.\/.*$/</span>,</span><br><span class="line">    unknownContextCritical: <span class="literal">true</span>,</span><br><span class="line">    exprContextRequest: <span class="string">"."</span>,</span><br><span class="line">    exprContextRegExp: <span class="regexp">/^\.\/.*$/</span>,</span><br><span class="line">    exprContextRecursive: <span class="literal">true</span>,</span><br><span class="line">    exprContextCritical: <span class="literal">true</span>,</span><br><span class="line">    wrappedContextRegExp: <span class="regexp">/.*/</span>,</span><br><span class="line">    wrappedContextRecursive: <span class="literal">true</span>,</span><br><span class="line">    wrappedContextCritical: <span class="literal">false</span>,</span><br><span class="line">    <span class="comment">// specifies default behavior for dynamic requests</span></span><br><span class="line">  &#125;,</span><br><span class="line"></span><br><span class="line">  resolve: &#123;</span><br><span class="line">    <span class="comment">// 解析模块请求的选项</span></span><br><span class="line">    <span class="comment">// （不适用于对 loader 解析）</span></span><br><span class="line"></span><br><span class="line">    modules: [</span><br><span class="line">      <span class="string">"node_modules"</span>,</span><br><span class="line">      path.resolve(__dirname, <span class="string">"app"</span>)</span><br><span class="line">    ],</span><br><span class="line">    <span class="comment">// 用于查找模块的目录</span></span><br><span class="line"></span><br><span class="line">    extensions: [<span class="string">".js"</span>, <span class="string">".json"</span>, <span class="string">".jsx"</span>, <span class="string">".css"</span>],</span><br><span class="line">    <span class="comment">// 使用的扩展名</span></span><br><span class="line"></span><br><span class="line">    alias: &#123;</span><br><span class="line">      <span class="comment">// 模块别名列表</span></span><br><span class="line"></span><br><span class="line">      <span class="string">"module"</span>: <span class="string">"new-module"</span>,</span><br><span class="line">      <span class="comment">// 起别名："module" -&gt; "new-module" 和 "module/path/file" -&gt; "new-module/path/file"</span></span><br><span class="line"></span><br><span class="line">      <span class="string">"only-module$"</span>: <span class="string">"new-module"</span>,</span><br><span class="line">      <span class="comment">// 起别名 "only-module" -&gt; "new-module"，但不匹配 "only-module/path/file" -&gt; "new-module/path/file"</span></span><br><span class="line"></span><br><span class="line">      <span class="string">"module"</span>: path.resolve(__dirname, <span class="string">"app/third/module.js"</span>),</span><br><span class="line">      <span class="comment">// 起别名 "module" -&gt; "./app/third/module.js" 和 "module/file" 会导致错误</span></span><br><span class="line">      <span class="comment">// 模块别名相对于当前上下文导入</span></span><br><span class="line">    &#125;,</span><br><span class="line">    <span class="comment">/* 可供选择的别名语法（点击展示） */</span></span><br><span class="line">    alias: [</span><br><span class="line">      &#123;</span><br><span class="line">        name: <span class="string">"module"</span>,</span><br><span class="line">        <span class="comment">// 旧的请求</span></span><br><span class="line"></span><br><span class="line">        alias: <span class="string">"new-module"</span>,</span><br><span class="line">        <span class="comment">// 新的请求</span></span><br><span class="line"></span><br><span class="line">        onlyModule: <span class="literal">true</span></span><br><span class="line">        <span class="comment">// 如果为 true，只有 "module" 是别名</span></span><br><span class="line">        <span class="comment">// 如果为 false，"module/inner/path" 也是别名</span></span><br><span class="line">      &#125;</span><br><span class="line">    ],</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 高级解析选项（点击展示） */</span></span><br><span class="line"></span><br><span class="line">    symlinks: <span class="literal">true</span>,</span><br><span class="line">    <span class="comment">// 遵循符号链接(symlinks)到新位置</span></span><br><span class="line"></span><br><span class="line">    descriptionFiles: [<span class="string">"package.json"</span>],</span><br><span class="line">    <span class="comment">// 从 package 描述中读取的文件</span></span><br><span class="line"></span><br><span class="line">    mainFields: [<span class="string">"main"</span>],</span><br><span class="line">    <span class="comment">// 从描述文件中读取的属性</span></span><br><span class="line">    <span class="comment">// 当请求文件夹时</span></span><br><span class="line"></span><br><span class="line">    aliasFields: [<span class="string">"browser"</span>],</span><br><span class="line">    <span class="comment">// 从描述文件中读取的属性</span></span><br><span class="line">    <span class="comment">// 以对此 package 的请求起别名</span></span><br><span class="line"></span><br><span class="line">    enforceExtension: <span class="literal">false</span>,</span><br><span class="line">    <span class="comment">// 如果为 true，请求必不包括扩展名</span></span><br><span class="line">    <span class="comment">// 如果为 false，请求可以包括扩展名</span></span><br><span class="line"></span><br><span class="line">    moduleExtensions: [<span class="string">"-module"</span>],</span><br><span class="line">    enforceModuleExtension: <span class="literal">false</span>,</span><br><span class="line">    <span class="comment">// 类似 extensions/enforceExtension，但是用模块名替换文件</span></span><br><span class="line"></span><br><span class="line">    unsafeCache: <span class="literal">true</span>,</span><br><span class="line">    unsafeCache: &#123;&#125;,</span><br><span class="line">    <span class="comment">// 为解析的请求启用缓存</span></span><br><span class="line">    <span class="comment">// 这是不安全，因为文件夹结构可能会改动</span></span><br><span class="line">    <span class="comment">// 但是性能改善是很大的</span></span><br><span class="line"></span><br><span class="line">    cachePredicate: <span class="function">(<span class="params">path, request</span>) =&gt;</span> <span class="literal">true</span>,</span><br><span class="line">    <span class="comment">// predicate function which selects requests for caching</span></span><br><span class="line"></span><br><span class="line">    plugins: [</span><br><span class="line">      <span class="comment">// ...</span></span><br><span class="line">    ]</span><br><span class="line">    <span class="comment">// 应用于解析器的附加插件</span></span><br><span class="line">  &#125;,</span><br><span class="line"></span><br><span class="line">  performance: &#123;</span><br><span class="line">    hints: <span class="string">"warning"</span>, <span class="comment">// 枚举</span></span><br><span class="line">    hints: <span class="string">"error"</span>, <span class="comment">// 性能提示中抛出错误</span></span><br><span class="line">    hints: <span class="literal">false</span>, <span class="comment">// 关闭性能提示</span></span><br><span class="line">    maxAssetSize: <span class="number">200000</span>, <span class="comment">// 整数类型（以字节为单位）</span></span><br><span class="line">    maxEntrypointSize: <span class="number">400000</span>, <span class="comment">// 整数类型（以字节为单位）</span></span><br><span class="line">    assetFilter: <span class="function"><span class="keyword">function</span>(<span class="params">assetFilename</span>) </span>&#123;</span><br><span class="line">      <span class="comment">// 提供资源文件名的断言函数</span></span><br><span class="line">      <span class="keyword">return</span> assetFilename.endsWith(<span class="string">'.css'</span>) || assetFilename.endsWith(<span class="string">'.js'</span>);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;,</span><br><span class="line"></span><br><span class="line">  devtool: <span class="string">"source-map"</span>, <span class="comment">// enum</span></span><br><span class="line">  devtool: <span class="string">"inline-source-map"</span>, <span class="comment">// 嵌入到源文件中</span></span><br><span class="line">  devtool: <span class="string">"eval-source-map"</span>, <span class="comment">// 将 SourceMap 嵌入到每个模块中</span></span><br><span class="line">  devtool: <span class="string">"hidden-source-map"</span>, <span class="comment">// SourceMap 不在源文件中引用</span></span><br><span class="line">  devtool: <span class="string">"cheap-source-map"</span>, <span class="comment">// 没有模块映射(module mappings)的 SourceMap 低级变体(cheap-variant)</span></span><br><span class="line">  devtool: <span class="string">"cheap-module-source-map"</span>, <span class="comment">// 有模块映射(module mappings)的 SourceMap 低级变体</span></span><br><span class="line">  devtool: <span class="string">"eval"</span>, <span class="comment">// 没有模块映射，而是命名模块。以牺牲细节达到最快。</span></span><br><span class="line">  <span class="comment">// 通过在浏览器调试工具(browser devtools)中添加元信息(meta info)增强调试</span></span><br><span class="line">  <span class="comment">// 牺牲了构建速度的 `source-map' 是最详细的。</span></span><br><span class="line"></span><br><span class="line">  context: __dirname, <span class="comment">// string（绝对路径！）</span></span><br><span class="line">  <span class="comment">// webpack 的主目录</span></span><br><span class="line">  <span class="comment">// entry 和 module.rules.loader 选项</span></span><br><span class="line">  <span class="comment">// 相对于此目录解析</span></span><br><span class="line"></span><br><span class="line">  target: <span class="string">"web"</span>, <span class="comment">// 枚举</span></span><br><span class="line">  target: <span class="string">"webworker"</span>, <span class="comment">// WebWorker</span></span><br><span class="line">  target: <span class="string">"node"</span>, <span class="comment">// node.js 通过 require</span></span><br><span class="line">  target: <span class="string">"async-node"</span>, <span class="comment">// Node.js 通过 fs and vm</span></span><br><span class="line">  target: <span class="string">"node-webkit"</span>, <span class="comment">// nw.js</span></span><br><span class="line">  target: <span class="string">"electron-main"</span>, <span class="comment">// electron，主进程(main process)</span></span><br><span class="line">  target: <span class="string">"electron-renderer"</span>, <span class="comment">// electron，渲染进程(renderer process)</span></span><br><span class="line">  target: <span class="function">(<span class="params">compiler</span>) =&gt;</span> &#123; <span class="comment">/* ... */</span> &#125;, <span class="comment">// 自定义</span></span><br><span class="line">  <span class="comment">// 包(bundle)应该运行的环境</span></span><br><span class="line">  <span class="comment">// 更改 块加载行为(chunk loading behavior) 和 可用模块(available module)</span></span><br><span class="line"></span><br><span class="line">  externals: [<span class="string">"react"</span>, /^@angular\<span class="comment">//],</span></span><br><span class="line">  externals: <span class="string">"react"</span>, <span class="comment">// string（精确匹配）</span></span><br><span class="line">  externals: <span class="regexp">/^[a-z\-]+($|\/)/</span>, <span class="comment">// 正则</span></span><br><span class="line">  externals: &#123; <span class="comment">// 对象</span></span><br><span class="line">    angular: <span class="string">"this angular"</span>, <span class="comment">// this["angular"]</span></span><br><span class="line">    react: &#123; <span class="comment">// UMD</span></span><br><span class="line">      commonjs: <span class="string">"react"</span>,</span><br><span class="line">      commonjs2: <span class="string">"react"</span>,</span><br><span class="line">      amd: <span class="string">"react"</span>,</span><br><span class="line">      root: <span class="string">"React"</span></span><br><span class="line">    &#125;</span><br><span class="line">  &#125;,</span><br><span class="line">  externals: <span class="function">(<span class="params">request</span>) =&gt;</span> &#123; <span class="comment">/* ... */</span> <span class="keyword">return</span> <span class="string">"commonjs "</span> + request &#125;</span><br><span class="line">  <span class="comment">// 不要遵循/打包这些模块，而是在运行时从环境中请求他们</span></span><br><span class="line"></span><br><span class="line">  stats: <span class="string">"errors-only"</span>,</span><br><span class="line">  stats: &#123; <span class="comment">//object</span></span><br><span class="line">    assets: <span class="literal">true</span>,</span><br><span class="line">    colors: <span class="literal">true</span>,</span><br><span class="line">    errors: <span class="literal">true</span>,</span><br><span class="line">    errorDetails: <span class="literal">true</span>,</span><br><span class="line">    hash: <span class="literal">true</span>,</span><br><span class="line">    <span class="comment">// ...</span></span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="comment">// 精确控制要显示的 bundle 信息</span></span><br><span class="line"></span><br><span class="line">  devServer: &#123;</span><br><span class="line">    proxy: &#123; <span class="comment">// proxy URLs to backend development server</span></span><br><span class="line">      <span class="string">'/api'</span>: <span class="string">'http://localhost:3000'</span></span><br><span class="line">    &#125;,</span><br><span class="line">    contentBase: path.join(__dirname, <span class="string">'public'</span>), <span class="comment">// boolean | string | array, static file location</span></span><br><span class="line">    compress: <span class="literal">true</span>, <span class="comment">// enable gzip compression</span></span><br><span class="line">    historyApiFallback: <span class="literal">true</span>, <span class="comment">// true for index.html upon 404, object for multiple paths</span></span><br><span class="line">    hot: <span class="literal">true</span>, <span class="comment">// hot module replacement. Depends on HotModuleReplacementPlugin</span></span><br><span class="line">    https: <span class="literal">false</span>, <span class="comment">// true for self-signed, object for cert authority</span></span><br><span class="line">    noInfo: <span class="literal">true</span>, <span class="comment">// only errors &amp; warns on hot reload</span></span><br><span class="line">    <span class="comment">// ...</span></span><br><span class="line">  &#125;,</span><br><span class="line"></span><br><span class="line">  plugins: [</span><br><span class="line">    <span class="comment">// ...</span></span><br><span class="line">  ],</span><br><span class="line">  <span class="comment">// 附加插件列表</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">  <span class="comment">/* 高级配置（点击展示） */</span></span><br><span class="line"></span><br><span class="line">  resolveLoader: &#123; <span class="comment">/* 等同于 resolve */</span> &#125;</span><br><span class="line">  <span class="comment">// 独立解析选项的 loader</span></span><br><span class="line"></span><br><span class="line">  parallelism: <span class="number">1</span>, <span class="comment">// number</span></span><br><span class="line">  <span class="comment">// 限制并行处理模块的数量</span></span><br><span class="line"></span><br><span class="line">  profile: <span class="literal">true</span>, <span class="comment">// boolean</span></span><br><span class="line">  <span class="comment">// 捕获时机信息</span></span><br><span class="line"></span><br><span class="line">  bail: <span class="literal">true</span>, <span class="comment">//boolean</span></span><br><span class="line">  <span class="comment">// 在第一个错误出错时抛出，而不是无视错误。</span></span><br><span class="line"></span><br><span class="line">  cache: <span class="literal">false</span>, <span class="comment">// boolean</span></span><br><span class="line">  <span class="comment">// 禁用/启用缓存</span></span><br><span class="line"></span><br><span class="line">  watch: <span class="literal">true</span>, <span class="comment">// boolean</span></span><br><span class="line">  <span class="comment">// 启用观察</span></span><br><span class="line"></span><br><span class="line">  watchOptions: &#123;</span><br><span class="line">    aggregateTimeout: <span class="number">1000</span>, <span class="comment">// in ms</span></span><br><span class="line">    <span class="comment">// 将多个更改聚合到单个重构建(rebuild)</span></span><br><span class="line"></span><br><span class="line">    poll: <span class="literal">true</span>,</span><br><span class="line">    poll: <span class="number">500</span>, <span class="comment">// 间隔单位 ms</span></span><br><span class="line">    <span class="comment">// 启用轮询观察模式</span></span><br><span class="line">    <span class="comment">// 必须用在不通知更改的文件系统中</span></span><br><span class="line">    <span class="comment">// 即 nfs shares（译者注：Network FileSystem，最大的功能就是可以透過網路，讓不同的機器、不同的作業系統、可以彼此分享個別的檔案 ( share file )）</span></span><br><span class="line">  &#125;,</span><br><span class="line"></span><br><span class="line">  node: &#123;</span><br><span class="line">    <span class="comment">// Polyfills and mocks to run Node.js-</span></span><br><span class="line">    <span class="comment">// environment code in non-Node environments.</span></span><br><span class="line"></span><br><span class="line">    <span class="built_in">console</span>: <span class="literal">false</span>, <span class="comment">// boolean | "mock"</span></span><br><span class="line">    global: <span class="literal">true</span>, <span class="comment">// boolean | "mock"</span></span><br><span class="line">    process: <span class="literal">true</span>, <span class="comment">// boolean</span></span><br><span class="line">    __filename: <span class="string">"mock"</span>, <span class="comment">// boolean | "mock"</span></span><br><span class="line">    __dirname: <span class="string">"mock"</span>, <span class="comment">// boolean | "mock"</span></span><br><span class="line">    Buffer: <span class="literal">true</span>, <span class="comment">// boolean | "mock"</span></span><br><span class="line">    setImmediate: <span class="literal">true</span> <span class="comment">// boolean | "mock" | "empty"</span></span><br><span class="line">  &#125;,</span><br><span class="line"></span><br><span class="line">  recordsPath: path.resolve(__dirname, <span class="string">"build/records.json"</span>),</span><br><span class="line">  recordsInputPath: path.resolve(__dirname, <span class="string">"build/records.json"</span>),</span><br><span class="line">  recordsOutputPath: path.resolve(__dirname, <span class="string">"build/records.json"</span>),</span><br><span class="line">  <span class="comment">// TODO</span></span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</details>
+<h2 id="多种配置类型">多种配置类型</h2>
+<p>配置文件可以导出函数类型，Promise 对象类型，数组类型</p>
+<ol>
+<li>导出函数类型时参数为 env,和其余参数，返回值为配置对象，以此根据参数决定配置</li>
+<li>导出 Promise 时同理，异步生成配置</li>
+<li>导出数组时每个数组项生成一个结果，每个项可以是函数，Promise,和对象</li>
+</ol>
+<h2 id="context-和入口">context 和入口</h2>
+<h3 id="context">context</h3>
+<p>项目根路径（绝对路径），默认使用当前路径，官方推荐传值<br>
+传值可能会用到 path 对象生成绝对路径，<a href="http://nodejs.cn/api/path.html#path_path_dirname_path" target="_blank" rel="noopener">path 的文档</a></p>
+<h3 id="entry">entry</h3>
+<p><code>string | [string] | object { &lt;key&gt;: string | [string] } | (function: () =&gt; string | [string] | object { &lt;key&gt;: string | [string] })</code></p>
+<p>从上可见 entry 有如下配置格式</p>
+<ol>
+<li>字符串（入口文件）</li>
+<li>字符串数组（入口文件列表）</li>
+<li>对象（对象的成员值应当是字符串或字符串数组）</li>
+<li>返回上述三种类型任意一种的函数，或 promsie</li>
+</ol>
+<h2 id="devtool-选项">devtool 选项</h2>
+<p><code>String|false</code></p>
+<p>devtool 用于配置源代码映射(source map)<br>
+devtool 有以下可选值</p>
+<p>devtool 不设置或设为 undefined 的话默认表现为 eval 而似乎不像官网说的是不生成 source-map<br>
+devtool 设置&quot;&quot;,false 这两个 bool 值为 false 的值时，表现为 false 值</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">devtool</th>
+<th style="text-align:left">构建速度</th>
+<th style="text-align:left">重新构建速度</th>
+<th style="text-align:left">生产环境</th>
+<th style="text-align:left">质量</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">false 值</td>
+<td style="text-align:left">+3</td>
+<td style="text-align:left">+3</td>
+<td style="text-align:left">可选</td>
+<td style="text-align:left">打包后的代码</td>
+</tr>
+<tr>
+<td style="text-align:left">eval</td>
+<td style="text-align:left">+3</td>
+<td style="text-align:left">+3</td>
+<td style="text-align:left">不可选</td>
+<td style="text-align:left">生成后的代码</td>
+</tr>
+<tr>
+<td style="text-align:left">cheap-eval-source-map</td>
+<td style="text-align:left">+1</td>
+<td style="text-align:left">+2</td>
+<td style="text-align:left">不可选</td>
+<td style="text-align:left">转译过的代码（仅限行）</td>
+</tr>
+<tr>
+<td style="text-align:left">cheap-module-eval-source-map</td>
+<td style="text-align:left">0</td>
+<td style="text-align:left">+2</td>
+<td style="text-align:left">不可选</td>
+<td style="text-align:left">原始源代码（仅限行）</td>
+</tr>
+<tr>
+<td style="text-align:left">eval-source-map</td>
+<td style="text-align:left">-2</td>
+<td style="text-align:left">+1</td>
+<td style="text-align:left">不可选</td>
+<td style="text-align:left">原始源代码</td>
+</tr>
+<tr>
+<td style="text-align:left">cheap-source-map</td>
+<td style="text-align:left">+1</td>
+<td style="text-align:left">0</td>
+<td style="text-align:left">不可选</td>
+<td style="text-align:left">转译过的代码（仅限行）</td>
+</tr>
+<tr>
+<td style="text-align:left">cheap-module-source-map</td>
+<td style="text-align:left">0</td>
+<td style="text-align:left">-1</td>
+<td style="text-align:left">不可选</td>
+<td style="text-align:left">原始源代码（仅限行）</td>
+</tr>
+<tr>
+<td style="text-align:left">inline-cheap-source-map</td>
+<td style="text-align:left">+1</td>
+<td style="text-align:left">0</td>
+<td style="text-align:left">不可选</td>
+<td style="text-align:left">转译过的代码（仅限行）</td>
+</tr>
+<tr>
+<td style="text-align:left">inlien-cheap-module-source-map</td>
+<td style="text-align:left">0</td>
+<td style="text-align:left">-1</td>
+<td style="text-align:left">不可选</td>
+<td style="text-align:left">原始源代码（仅限行）</td>
+</tr>
+<tr>
+<td style="text-align:left">source-map</td>
+<td style="text-align:left">-2</td>
+<td style="text-align:left">-2</td>
+<td style="text-align:left">可选</td>
+<td style="text-align:left">原始源代码</td>
+</tr>
+<tr>
+<td style="text-align:left">inline-source-map</td>
+<td style="text-align:left">-2</td>
+<td style="text-align:left">-2</td>
+<td style="text-align:left">不可选</td>
+<td style="text-align:left">原始源代码</td>
+</tr>
+<tr>
+<td style="text-align:left">hidden-source-map</td>
+<td style="text-align:left">-2</td>
+<td style="text-align:left">-2</td>
+<td style="text-align:left">可选</td>
+<td style="text-align:left">原始源代码</td>
+</tr>
+<tr>
+<td style="text-align:left">nosources-source-map</td>
+<td style="text-align:left">-2</td>
+<td style="text-align:left">-2</td>
+<td style="text-align:left">可选</td>
+<td style="text-align:left">无源代码内容</td>
+</tr>
+</tbody>
+</table>
+<h3 id="映射质量的含义">映射质量的含义</h3>
+<p><a href="https://www.webpackjs.com/configuration/devtool/#%E5%93%81%E8%B4%A8%E8%AF%B4%E6%98%8E-quality-" target="_blank" rel="noopener">详见此处</a><br>
+代码映射的质量决定了你在浏览器中调试时能看到 webpack 处理到哪个阶段的代码<br>
+代码处理阶段越后，浏览器调试时定位错误越困难，具体区别可以自己配置 devServer，devtool 在浏览器打开 f12 开发者工具转到 sources 查看</p>
+<p>分为 4 个阶段</p>
+<ol>
+<li>loader 转译前（原始源代码）<br>
+这时的代码映射可以看到源代码的文件结构（模块划分），文件内的代码内容也是源代码内容</li>
+<li>转译后，webpack 转换前（转译过的代码）<br>
+这时的代码映射可以看到源代码的文件结构（模块划分），文件内的代码内容是经过 loader 处理过的内容，如果你没配置 loader 的话和阶段 1 是没有区别的。</li>
+<li>webpack 转换后，打包前（生成后的代码）<br>
+这时的代码映射仍可以看到源代码的文件结构（模块划分），文件内的代码内容是经过 webpack 转换后的内容，类似 import，之类的语句都被转换为 var module<strong>WEBPACK_IMPORTED_MODULE_1</strong> = <strong>webpack_require</strong>(42);之类的语句</li>
+<li>打包后的代码，即为你用 build 打包后产生的那些文件里的代码（打包后的代码）<br>
+这时的代码映射只能看到一个打包结果，文件结构以及内容与你在相同配置下 build 到 dist 文件夹里的相同，无法看到源文件结构（模块划分）</li>
+</ol>
+<p>（仅限行）指的是没有列映射。<br>
+无源代码内容：只有映射，可以看到源代码文件结构（模块划分），但无法看到源文件中的代码<br>
+hidden-source-map 生成了代码映射，但是没有在打包结果中指定映射文件路径，因此在浏览器的开发者工具中无法看到源代码和源文件结构</p>
+<h3 id="各修饰词意思">各修饰词意思</h3>
+<p>source-map:有源代码映射文件（即不存在 eval 和 inline 修饰词时会在代码生成路径生成.map 文件）<br>
+cheap:消耗更小的源代码映射（无列映射）<br>
+eval:代码和代码映射被 eval 包裹<br>
+inline:产生的代码映射数据直接转成 dataurl 打包到生成的 js 中</p>
+<h3 id="考量因素">考量因素</h3>
+<ol>
+<li>
+<p>对于开发环境，需要不断地重新构建，因此构建速度和重新构建速度是一个重要因素，另外代码映射质量也比较重要。<br>
+因此我认为 cheap-module-eval-source-map 为最佳选择，既有速度又有质量，虽然只有行映射</p>
+</li>
+<li>
+<p>在生产环境很少需要定位到源代码，不想暴露源代码的结构，并且希望打包出来的 js 文件尽量小<br>
+因此官方建议生产环境 devtool 配置选用：<br>
+false 值，hidden-source-map，nosources-source-map，source-map(选用 source-map 时应当配置服务器不允许普通用户请求你的.map 文件)</p>
+</li>
+</ol>
+<h3 id="进阶配置">进阶配置</h3>
+<p>可以使用 SourceMapDevToolPlugin 进行更细粒度的配置，代替 devtool 的效果。</p>
+<h2 id="output">output</h2>
+<blockquote>
+<p>output 位于对象最顶级键(key)，包括了一组选项，指示 webpack 如何去输出、以及在哪里输出你的「bundle、asset 和其他你所打包或使用 webpack 载入的任何内容」。<br>
+<a href="https://www.webpackjs.com/configuration/output/" target="_blank" rel="noopener">中文文档</a></p>
+</blockquote>
+<h3 id="output-chunkFilename"><code>output.chunkFilename</code></h3>
+<p><code>string = '[id].js'</code><br>
+此选项决定了非入口(non-entry)(chunk)文件的名称。</p>
+<p>请注意，这些文件名需要在运行时生成，以发送对块的请求。 因此，占位符（如<code>[name]</code>和<code>[chunkhash]</code>）需要在 Webpack 运行时中将从块 ID 到占位符值的映射添加到输出包。 这会增加大小，并且当任何块的占位符值更改时，包可能会失效。(意义不明)</p>
+<p>默认是<code>[id].js</code>，或者由 filename 转化成的值（filename 中的&quot;[name]“占位符会被替换为”[id]“,或者”[name]“前会添加”[id].&quot;</p>
+<h3 id="output-filename"><code>output.filename</code></h3>
+<p><code>string</code> <code>function (pathData, assetInfo) =&gt; string</code></p>
+<p>输出文件名，影响打包产生的文件,对于有多个入口的情况，或者通过插件拆分代码时应当使用模板字符串。</p>
+<blockquote>
+<p>注意，此选项不会影响那些「按需加载 chunk」的输出文件。对于这些文件，请使用 output.chunkFilename 选项来控制输出。通过 loader 创建的文件也不受影响。在这种情况下，你必须尝试 loader 特定的可用选项。<br>
+类似 html-webpack-plugin 等插件产生的文件名也不会被影响。</p>
+</blockquote>
+<p><strong>模板字符串</strong></p>
+<table>
+<thead>
+<tr>
+<th>模板</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>[hash]</td>
+<td>模块标识符(module identifier)的 hash</td>
+</tr>
+<tr>
+<td>[contenthash]</td>
+<td>the hash of the content of a file, which is different for each asset</td>
+</tr>
+<tr>
+<td>[chunkhash]</td>
+<td>chunk 内容的 hash</td>
+</tr>
+<tr>
+<td>[name]</td>
+<td>模块名</td>
+</tr>
+<tr>
+<td>[id]</td>
+<td>模块标识符</td>
+</tr>
+<tr>
+<td>[query]</td>
+<td>模块文件名后的 query 字符串</td>
+</tr>
+<tr>
+<td>[function]</td>
+<td>能返回 string 类型文件名的函数</td>
+</tr>
+</tbody>
+</table>
+<p>当使用<a href="/plugins/extract-text-webpack-plugin"><code>ExtractTextWebpackPlugin</code></a>插件时, 可以使用 <code>[contenthash]</code>提取文件的 hash 值.</p>
+<h3 id="output-path"><code>output.path</code></h3>
+<p><code>string = path.join(process.cwd(), 'dist')</code></p>
+<p>输出路径，格式是绝对路径。</p>
+<h3 id="output-publicPath"><code>output.publicPath</code></h3>
+<p><code>string|function</code><br>
+默认为&quot;&quot;<br>
+不影响代码输出至哪个文件夹，但影响代码中引用的路径，比如在网页中引用了<em>b.png</em>,<em>b.png</em>被打包至<em>dist/images/</em>，则引用的的地址就变成</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">path.join(publicPath, <span class="string">"images/b.png"</span>);</span><br></pre></td></tr></table></figure>
+<p>同时影响 devServer 的地址根路径。<br>
+此选项在需要将程序部署到域名的子路径时配置，程序部署根路径为<em>host/</em>时,一般不用配置.<br>
+中文文档说明</p>
+<blockquote>
+<p>此选项指定在浏览器中所引用的「此输出目录对应的公开 URL」。相对 URL(relative URL) 会被相对于 HTML 页面（或 <base> 标签）解析。相对于服务的 URL(Server-relative URL)，相对于协议的 URL(protocol-relative URL) 或绝对 URL(absolute URL) 也可是可能用到的，或者有时必须用到，例如：当将资源托管到 CDN 时。</p>
+</blockquote>
+<h2 id="resolve">resolve</h2>
+<p>路径解析配置</p>
+<h3 id="resolve-alias"><code>resolve.alias</code></h3>
+<p>路径别名，绝对路径<br>
+别名后面带$表示绝对匹配（只匹配和别名完全相同的，不匹配子目录）<br>
+样式中使用路径别名需要在路径前加<code>~</code>符号</p>
+<p><strong>例子</strong></p>
+<table>
+<thead>
+<tr>
+<th><code>alias:</code></th>
+<th><code>import 'xyz'</code></th>
+<th><code>import 'xyz/file.js'</code></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>{}</code></td>
+<td><code>/abc/node_modules/xyz/index.js</code></td>
+<td><code>/abc/node_modules/xyz/file.js</code></td>
+</tr>
+<tr>
+<td><code>{ xyz: '/abc/path/to/file.js' }</code></td>
+<td><code>/abc/path/to/file.js</code></td>
+<td>error</td>
+</tr>
+<tr>
+<td><code>{ xyz$: '/abc/path/to/file.js' }</code></td>
+<td><code>/abc/path/to/file.js</code></td>
+<td><code>/abc/node_modules/xyz/file.js</code></td>
+</tr>
+<tr>
+<td><code>{ xyz: './dir/file.js' }</code></td>
+<td><code>/abc/dir/file.js</code></td>
+<td>error</td>
+</tr>
+<tr>
+<td><code>{ xyz$: './dir/file.js' }</code></td>
+<td><code>/abc/dir/file.js</code></td>
+<td><code>/abc/node_modules/xyz/file.js</code></td>
+</tr>
+<tr>
+<td><code>{ xyz: '/some/dir' }</code></td>
+<td><code>/some/dir/index.js</code></td>
+<td><code>/some/dir/file.js</code></td>
+</tr>
+<tr>
+<td><code>{ xyz$: '/some/dir' }</code></td>
+<td><code>/some/dir/index.js</code></td>
+<td><code>/abc/node_modules/xyz/file.js</code></td>
+</tr>
+<tr>
+<td><code>{ xyz: './dir' }</code></td>
+<td><code>/abc/dir/index.js</code></td>
+<td><code>/abc/dir/file.js</code></td>
+</tr>
+<tr>
+<td><code>{ xyz: 'modu' }</code></td>
+<td><code>/abc/node_modules/modu/index.js</code></td>
+<td><code>/abc/node_modules/modu/file.js</code></td>
+</tr>
+<tr>
+<td><code>{ xyz$: 'modu' }</code></td>
+<td><code>/abc/node_modules/modu/index.js</code></td>
+<td><code>/abc/node_modules/xyz/file.js</code></td>
+</tr>
+<tr>
+<td><code>{ xyz: 'modu/some/file.js' }</code></td>
+<td><code>/abc/node_modules/modu/some/file.js</code></td>
+<td>error</td>
+</tr>
+<tr>
+<td><code>{ xyz: 'modu/dir' }</code></td>
+<td><code>/abc/node_modules/modu/dir/index.js</code></td>
+<td><code>/abc/node_modules/modu/dir/file.js</code></td>
+</tr>
+<tr>
+<td><code>{ xyz$: 'modu/dir' }</code></td>
+<td><code>/abc/node_modules/modu/dir/index.js</code></td>
+<td><code>/abc/node_modules/xyz/file.js</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="resolve-extensions"><code>resolve.extensions</code></h3>
+<p><code>[string] = ['.wasm', '.mjs', '.js', '.json']</code><br>
+自动解析的扩展名，数组<br>
+默认是</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">module</span>.exports = &#123;</span><br><span class="line">  resolve: &#123;</span><br><span class="line">    extensions: [<span class="string">".wasm"</span>, <span class="string">".mjs"</span>, <span class="string">".js"</span>, <span class="string">".json"</span>],</span><br><span class="line">  &#125;,</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>这使得 import 模块时，不需要写这些文件的扩展名，如下</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> file <span class="keyword">from</span> <span class="string">"file.js"</span>;</span><br><span class="line"><span class="comment">// 可以写成</span></span><br><span class="line"><span class="keyword">import</span> file <span class="keyword">from</span> <span class="string">"file"</span>;</span><br></pre></td></tr></table></figure>
+<h3 id="resolve-mainFields"><code>resolve.mainFields</code></h3>
+<p><code>[string]</code><br>
+默认值根据 target 的配置有所不同</p>
+<p>当 target 属性设置为 webworker, web 或者没有指定，默认值为：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">module</span>.exports = &#123;</span><br><span class="line">  <span class="comment">//...</span></span><br><span class="line">  resolve: &#123;</span><br><span class="line">    mainFields: [<span class="string">"browser"</span>, <span class="string">"module"</span>, <span class="string">"main"</span>],</span><br><span class="line">  &#125;,</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>对于其他任意的 target（包括 node），默认值为：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">module</span>.exports = &#123;</span><br><span class="line">  <span class="comment">//...</span></span><br><span class="line">  resolve: &#123;</span><br><span class="line">    mainFields: [<span class="string">"module"</span>, <span class="string">"main"</span>],</span><br><span class="line">  &#125;,</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>node_modules 里安装的包的 package.json 文件里大多有字段（如’main’)指示该到哪找模块<br>
+如 webpack 包的 package.json 中就有个,可自行打开 node_modules/webpack/package.json 看看</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  ...</span><br><span class="line">  "main": "lib/webpack.js",</span><br><span class="line">  ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>有的依赖包的 package.json 文件中有多个字段指示导入位置<br>
+mainFields 决定对这些字段的搜索顺序。<br>
+假设一个名为<em>d3</em>的包的 package.json 有如下字段</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  ...</span><br><span class="line">  "main":"index.js",</span><br><span class="line">  "test":"lib/index.js"</span><br><span class="line">  ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>配置的 mainFields 如下</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">module</span>.exports = &#123;</span><br><span class="line">  resolve: &#123;</span><br><span class="line">    mainFields: [<span class="string">"test"</span>, <span class="string">"main"</span>],</span><br><span class="line">  &#125;,</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>则当你<code>import d3 from &quot;d3&quot;</code>webpack 会优先从该包的 lib/index.js 处引入模块</p>
+<h3 id="resolve-modules"><code>resolve.modules</code></h3>
+<p><code>[string] = [&quot;node_modules&quot;]</code><br>
+在哪寻找模块，默认值是<code>[&quot;node_modules&quot;]</code><br>
+数组项元素可以是绝对路径和相对路径，是相对路径时，会在当前文件夹，及父级文件夹寻找，如设<code>[&quot;path&quot;]</code>,会搜索<code>&quot;./path&quot;</code>和<code>&quot;../path&quot;</code></p>
+<h3 id="resolve-更多选项">resolve 更多选项</h3>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">名</th>
+<th style="text-align:left">类型</th>
+<th style="text-align:left">默认值</th>
+<th style="text-align:left">描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">plugins</td>
+<td style="text-align:left">array</td>
+<td style="text-align:left">无</td>
+<td style="text-align:left">额外插件</td>
+</tr>
+<tr>
+<td style="text-align:left">mainFiles</td>
+<td style="text-align:left">array</td>
+<td style="text-align:left">[“index”]</td>
+<td style="text-align:left">文件夹里的主文件，<code>import &quot;/a/&quot;</code>时默认变为<code>import &quot;/a/index&quot;</code>，类似加载网页路径时默认加载的主页面 index.html</td>
+</tr>
+<tr>
+<td style="text-align:left">enforceModuleExtension</td>
+<td style="text-align:left">boolean</td>
+<td style="text-align:left">false</td>
+<td style="text-align:left">是否强制要求使用扩展名</td>
+</tr>
+</tbody>
+</table>
+<h3 id="resolveLoader"><code>resolveLoader</code></h3>
+<p>与 resolve 对象基本可设置的选项相同，但只用来处理 loader<br>
+比如设置</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">module</span>.exports = &#123;</span><br><span class="line">  resolveLoader:&#123;</span><br><span class="line">    alias:&#123;</span><br><span class="line">      file:<span class="string">"file-loader"</span></span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
+<p>你可以在 loader 配置中用 file 代替 file-loader</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">module</span>.exports = &#123;</span><br><span class="line">  <span class="built_in">module</span>: &#123;</span><br><span class="line">    rules: [</span><br><span class="line">      &#123;</span><br><span class="line">        test: <span class="regexp">/\.png$/</span>,</span><br><span class="line">        use: [</span><br><span class="line">          <span class="comment">//此处本应写file-loader</span></span><br><span class="line">          <span class="string">"file?name=i/[hash].[ext]"</span>,</span><br><span class="line">        ],</span><br><span class="line">      &#125;,</span><br><span class="line">    ],</span><br><span class="line">  &#125;,</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<h3 id="resolveLoader-moduleExtensions"><code>resolveLoader.moduleExtensions</code></h3>
+<p><code>array</code><br>
+处理自动解析后缀的,和 resolve 的 extensions 类似,比如设置了<code>[&quot;-loader&quot;]</code>,配置 Loader 的时候就可以不写后面的<code>-loader</code></p>
+<h2 id="plugins">plugins</h2>
+<p><code>array</code><br>
+插件列表</p>
+<h2 id="target">target</h2>
+<p><code>string | function(compiler)</code><br>
+目标平台，不同的值默认使用了一些不同的插件来转化代码</p>
+<p><a href="https://github.com/webpack/webpack/blob/master/lib/WebpackOptionsApply.js" target="_blank" rel="noopener">支持的字符串设置</a></p>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>async-node</code></td>
+<td>Compile for usage in a Node.js-like environment (uses <code>fs</code> and <code>vm</code> to load chunks asynchronously)</td>
+</tr>
+<tr>
+<td><code>electron-main</code></td>
+<td>Compile for <a href="https://electronjs.org/" target="_blank" rel="noopener">Electron</a> for main process.</td>
+</tr>
+<tr>
+<td><code>electron-renderer</code></td>
+<td>Compile for <a href="https://electronjs.org/" target="_blank" rel="noopener">Electron</a> for renderer process, providing a target using <code>JsonpTemplatePlugin</code>, <code>FunctionModulePlugin</code> for browser environments and <code>NodeTargetPlugin</code> and <code>ExternalsPlugin</code> for CommonJS and Electron built-in modules.</td>
+</tr>
+<tr>
+<td><code>electron-preload</code></td>
+<td>Compile for <a href="https://electronjs.org/" target="_blank" rel="noopener">Electron</a> for renderer process, providing a target using <code>NodeTemplatePlugin</code> with <code>asyncChunkLoading</code> set to <code>true</code>, <code>FunctionModulePlugin</code> for browser environments and <code>NodeTargetPlugin</code> and <code>ExternalsPlugin</code> for CommonJS and Electron built-in modules.</td>
+</tr>
+<tr>
+<td><code>node</code></td>
+<td>Compile for usage in a Node.js-like environment (uses Node.js <code>require</code> to load chunks)</td>
+</tr>
+<tr>
+<td><code>node-webkit</code></td>
+<td>Compile for usage in WebKit and uses JSONP for chunk loading. Allows importing of built-in Node.js modules and <a href="http://docs.nwjs.io/en/latest/" target="_blank" rel="noopener"><code>nw.gui</code></a> (experimental)</td>
+</tr>
+<tr>
+<td><code>web</code></td>
+<td>Compile for usage in a browser-like environment <strong>(default)</strong></td>
+</tr>
+<tr>
+<td><code>webworker</code></td>
+<td>Compile as WebWorker</td>
+</tr>
+</tbody>
+</table>
+<p>也可是函数，函数的参数 compile 对象，通过调用 compile.apply 并传入使用的插件列表来达到你需要的转化效果<br>
+<strong>例</strong></p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 不用插件处理</span></span><br><span class="line"><span class="keyword">const</span> options = &#123;</span><br><span class="line">  target: <span class="function"><span class="params">()</span> =&gt;</span> <span class="literal">undefined</span>,</span><br><span class="line">&#125;;</span><br><span class="line"><span class="comment">// 自定义使用的插件</span></span><br><span class="line"><span class="keyword">const</span> webpack = <span class="built_in">require</span>(<span class="string">"webpack"</span>);</span><br><span class="line"><span class="keyword">const</span> options = &#123;</span><br><span class="line">  target: <span class="function">(<span class="params">compiler</span>) =&gt;</span> &#123;</span><br><span class="line">    compiler.apply(</span><br><span class="line">      <span class="keyword">new</span> webpack.JsonpTemplatePlugin(options.output),</span><br><span class="line">      <span class="keyword">new</span> webpack.LoaderTargetPlugin(<span class="string">"web"</span>)</span><br><span class="line">    );</span><br><span class="line">  &#125;,</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<h2 id="module">module</h2>
+<h3 id="module-noParse"><code>module.noParse</code></h3>
+<p><code>RegExp | [RegExp] | function</code><br>
+loader 不处理匹配到的文件</p>
+<h3 id="module-rules"><code>module.rules</code></h3>
+<p><code>[(Object Rule)]</code><br>
+Rule(处理规则)对象列表</p>
+<h3 id="Rule">Rule</h3>
+<p>处理规则对象<br>
+分为三部分：条件，结果，和嵌套规则<br>
+<strong>rule 条件</strong><br>
+resource：被请求文件的绝对位置。issuer：文件请求者的绝对位置。<br>
+<strong>Condition</strong><br>
+条件</p>
+<blockquote>
+<p>条件(Condition)可以是这些之一：</p>
+<ol>
+<li>字符串：用来匹配以提供的字符串为开头的文件或文件夹路径。</li>
+<li>正则表达式</li>
+<li>函数：根据参数计算匹配结果，返回真值时表示匹配成功。</li>
+<li>条件数组：至少匹配一个条件。</li>
+<li>对象：匹配所有属性。每个属性都有一个定义行为如下。<br>
+{ test: Condition }匹配特定条件。一般是提供一个正则表达式或正则表达式的数组，但这不是强制的。<br>
+{ include: Condition }：匹配特定条件。一般是提供一个字符串或者字符串数组，但这不是强制的。<br>
+{ exclude: Condition }：排除特定条件。一般是提供一个字符串或字符串数组，但这不是强制的。<br>
+{ and: [Condition] }：必须匹配数组中的所有条件<br>
+{ or: [Condition] }：匹配数组中任何一个条件<br>
+{ not: [Condition] }：必须排除这个条件</li>
+</ol>
+</blockquote>
+<p><strong>rule 结果</strong><br>
+匹配到文件后如何处理。</p>
+<p><strong>Rule 属性如下</strong></p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">名称</th>
+<th style="text-align:left">类型</th>
+<th style="text-align:left">描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">enforece</td>
+<td style="text-align:left"><code>&quot;pre&quot;</code> <code>&quot;post&quot;</code></td>
+<td style="text-align:left">影响 loader 类型,按使用顺序排序分为前置，行内，普通，和后置，不设置时为普通所有普通 loader 可以通过在请求中加上 ! 前缀来忽略（覆盖）。所有普通和前置 loader 可以通过在请求中加上 -! 前缀来忽略（覆盖）。所有普通，后置和前置 loader 可以通过在请求中加上 !! 前缀来忽略（覆盖）。</td>
+</tr>
+<tr>
+<td style="text-align:left">exclude</td>
+<td style="text-align:left"><code>Condition</code></td>
+<td style="text-align:left">loader 不处理匹配到的 resource</td>
+</tr>
+<tr>
+<td style="text-align:left">include</td>
+<td style="text-align:left"><code>Condition</code></td>
+<td style="text-align:left">loader 处理匹配到的 resource</td>
+</tr>
+<tr>
+<td style="text-align:left">issuer</td>
+<td style="text-align:left"><code>Condition</code></td>
+<td style="text-align:left">loader 处理匹配到的 issuer 所请求的 resource</td>
+</tr>
+<tr>
+<td style="text-align:left">loader</td>
+<td style="text-align:left"><code>String</code></td>
+<td style="text-align:left"><code>use:[{loader}]</code>的简写</td>
+</tr>
+<tr>
+<td style="text-align:left">oneOf</td>
+<td style="text-align:left"><code>[(object Rule)]</code></td>
+<td style="text-align:left">嵌套规则，只匹配一个规则，优先级从前往后</td>
+</tr>
+<tr>
+<td style="text-align:left">parse</td>
+<td style="text-align:left"><code>Object</code></td>
+<td style="text-align:left">启用或禁用解析器,<a href="https://www.webpackjs.com/configuration/module/#rule-parser" target="_blank" rel="noopener">详见此</a></td>
+</tr>
+<tr>
+<td style="text-align:left">resource</td>
+<td style="text-align:left"><code>Object</code></td>
+<td style="text-align:left">包含各种条件，include,exclude 及其他都是 resource.include,resource.exclude 的简写，详见下文<a href="#resource%E5%AF%B9%E8%B1%A1%E7%9A%84%E5%86%85%E5%AE%B9">resource 对象的内容</a></td>
+</tr>
+<tr>
+<td style="text-align:left">resourceQuery</td>
+<td style="text-align:left"><code>Condition</code></td>
+<td style="text-align:left">请求路径中的 query 字符串</td>
+</tr>
+<tr>
+<td style="text-align:left">rules</td>
+<td style="text-align:left"><code>[(Object Rule)]</code></td>
+<td style="text-align:left">嵌套规则</td>
+</tr>
+<tr>
+<td style="text-align:left">test</td>
+<td style="text-align:left"><code>Condition</code></td>
+<td style="text-align:left">loader 处理匹配到的 resource</td>
+</tr>
+<tr>
+<td style="text-align:left">use</td>
+<td style="text-align:left"><code>[(UseEntry)]</code></td>
+<td style="text-align:left">UseEntry 列表,每个 UseEntry 指定一个 loader,<code>use:[&quot;style-loader&quot;]</code>是<code>use:[{loader:&quot;style-loader&quot;}]</code>的简写形式</td>
+</tr>
+</tbody>
+</table>
+<p><strong>UseEntry 定义</strong><br>
+必须有一个 String 类型的 loader 属性，指明使用哪个 loader<br>
+options 属性可以设置用来为 Loader 添加额外的设置</p>
+<h3 id="resource-对象的内容">resource 对象的内容</h3>
+<p>{ test: Condition }：匹配特定条件。一般是提供一个正则表达式或正则表达式的数组，但这不是强制的。<br>
+{ include: Condition }：匹配特定条件。一般是提供一个字符串或者字符串数组，但这不是强制的。<br>
+{ exclude: Condition }：排除特定条件。一般是提供一个字符串或字符串数组，但这不是强制的。<br>
+{ and: [Condition] }：必须匹配数组中的所有条件<br>
+{ or: [Condition] }：匹配数组中任何一个条件<br>
+{ not: [Condition] }：必须排除这个条件</p>
+<h2 id="devServer">devServer</h2>
+<p>只记录常用配置，<a href="https://www.webpackjs.com/configuration/dev-server/#devserver" target="_blank" rel="noopener">其余配置请看此</a></p>
+<h3 id="devServer-after"><code>devServer.after</code></h3>
+<p><code>function</code><br>
+提供在所有其他中间件执行完成后执行自定义中间件的功能</p>
+<h3 id="devServer-before"><code>devServer.before</code></h3>
+<p><code>function</code><br>
+提供在其他所有中间件执行之前执行自定义中间件的功能，者可以被用来定义自定义请求处理器<br>
+例如</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">before(app)&#123;</span><br><span class="line">  app.get(<span class="string">'/some/path'</span>, <span class="function"><span class="keyword">function</span>(<span class="params">req, res</span>) </span>&#123;</span><br><span class="line">    res.json(&#123; <span class="attr">custom</span>: <span class="string">'response'</span> &#125;);</span><br><span class="line">  &#125;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="devServer-clientLogLevel"><code>devServer.clientLogLevel</code></h3>
+<p><code>string</code><br>
+输出提示信息级别</p>
+<h3 id="devServer-compress"><code>devServer.compress</code></h3>
+<p><code>boolean</code><br>
+是否启用 gzip 压缩</p>
+<h3 id="devServer-contentBase"><code>devServer.contentBase</code></h3>
+<p><code>boolean</code> <code>string</code> <code>array</code><br>
+不需要编译的静态文件的位置</p>
+<h3 id="devServer-filename"><code>devServer.filename</code></h3>
+<p><code>string</code><br>
+lazy mode 下每个请求会产生全新的编译结果，使用 filename,可以指只某个文件被请求时编译。</p>
+<h3 id="devServer-hot"><code>devServer.hot</code></h3>
+<p><code>boolean</code><br>
+是否启用热模块替换。</p>
+<p>模块热替换并不像网上的博客说得那么简单，改个配置 jia 插件就行，不设置好的话实际上就是没有的功能（仍会全局刷新，或修改文件后直接不更新）。</p>
+<p>js 的热替问题换参看<a href="https://www.webpackjs.com/guides/hot-module-replacement/#%E9%97%AE%E9%A2%98" target="_blank" rel="noopener">模块热替换</a>。</p>
+<p>对于特定框架来说还需要做一些额外设置来配合 <a href="https://www.webpackjs.com/guides/hot-module-replacement/#%E5%85%B6%E4%BB%96%E4%BB%A3%E7%A0%81%E5%92%8C%E6%A1%86%E6%9E%B6" target="_blank" rel="noopener">其他代码和框架</a>。</p>
+<p><strong>例 react webpack 项目启用热替换</strong>:<br>
+<a href="https://github.com/gaearon/react-hot-loader" target="_blank" rel="noopener">官方文档</a><br>
+事实上以下配置有时会失灵（某些情况下修改文件后界面仍会全局刷新而不是替换局部组件），由于学习不够深入，可能配置中有一些不对或不足，仅供参考。</p>
+<ol>
+<li>
+<p>设置<code>devServer.hot</code>为<code>true</code></p>
+</li>
+<li>
+<p>使用<code>react-hot-loader</code>处理 jsx 文件，配置如下</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">module</span>.exports = &#123;</span><br><span class="line">  <span class="built_in">module</span>: &#123;</span><br><span class="line">    rules: [</span><br><span class="line">      &#123;</span><br><span class="line">        exclude: <span class="regexp">/node_modules/</span>,</span><br><span class="line">        use: [<span class="string">"react-hot-loader/webpack"</span>, <span class="string">"babel-loader"</span>, <span class="string">"eslint-loader"</span>],</span><br><span class="line">        test: <span class="regexp">/\.jsx|\.js$/</span>,</span><br><span class="line">      &#125;,</span><br><span class="line">    ],</span><br><span class="line">  &#125;,</span><br><span class="line">  plugins: [</span><br><span class="line">    <span class="comment">// 非必要</span></span><br><span class="line">    <span class="keyword">new</span> webpack.NamedModulesPlugin(),</span><br><span class="line">    <span class="keyword">new</span> webpack.HotModuleReplacementPlugin(),</span><br><span class="line">  ],</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+</li>
+<li>
+<p>在入口文件代码前插入</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (<span class="built_in">module</span>.hot) &#123;</span><br><span class="line">  <span class="built_in">module</span>.hot.accept();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li>
+<p>babel 配置文件中加入<code>react-hot-loader/babel</code>插件</p>
+</li>
+<li>
+<p>再修改入口(是否需要存疑)</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">module</span>.exports = &#123;</span><br><span class="line">  entry: &#123;</span><br><span class="line">    App: [<span class="string">"react-hot-loader/patch"</span>, <span class="string">"./src/main.jsx"</span>],</span><br><span class="line">  &#125;,</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+</li>
+<li>
+<p>再在程序入口文件修改如下</p>
+<figure class="highlight jsx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> App <span class="keyword">from</span> <span class="string">"@/router/"</span>;</span><br><span class="line">ReactDom.render(</span><br><span class="line">  &lt;AppContainer&gt;</span><br><span class="line">    &lt;App /&gt;</span><br><span class="line">  &lt;<span class="regexp">/AppContainer&gt;,</span></span><br><span class="line"><span class="regexp">  document.getElementById("app")</span></span><br><span class="line"><span class="regexp">);</span></span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<p><a href="https://www.webpackjs.com/configuration/dev-server/#devserver-hot" target="_blank" rel="noopener">官方文档此处</a>有如下说明，我不确定我是否理解错了意思，毕竟<a href="https://www.webpackjs.com/guides/hot-module-replacement/#%E5%90%AF%E7%94%A8-hmr" target="_blank" rel="noopener">官网给出的配置</a>设置了<code>hot</code>为<code>true</code>仍需要在 webpack 配置中添加<code>HotModuleReplacementPlugin</code>，而下文却说不用。</p>
+<blockquote>
+<p>Note that webpack.HotModuleReplacementPlugin is required to fully enable HMR. If webpack or webpack-dev-server are launched with the --hot option, this plugin will be added automatically, so you may not need to add this to your webpack.config.js. See the HMR concepts page for more information.</p>
+</blockquote>
+<blockquote>
+<p>需要使用 webpack.HotModuleReplacementPlugin 来完全启用 HMR。如果 webpack 或者 webpack-dev-server 通过–hot 选项启动，这个插件会被自动添加，此时你不需要把这个添加到你的 webpack.config.js。查看 HMR 概念页面来获取更多信息。</p>
+</blockquote>
+<h3 id="devServer-inline"><code>devServer.inline</code></h3>
+<p><code>boolean</code><br>
+内联模式还是 Iframe 模式，默认时内联模式。inline 模式构建消息会出现在浏览器控制台。iframe 的构架消息出现在 iframe 中.模块热替换启用时，建议使用内联模式</p>
+<h3 id="devServer-lazy"><code>devServer.lazy</code></h3>
+<p><code>boolean</code><br>
+启用时，只有在请求时包才会被编译，watchOptions 在启用 lazy mode 时无效</p>
+<h3 id="devServer-open"><code>devServer.open</code></h3>
+<p><code>boolean</code> <code>string</code><br>
+启动时是否打开浏览器，可以指定浏览器名称</p>
+<h3 id="devServer-openPage"><code>devServer.openPage</code></h3>
+<p><code>string</code> <code>array</code><br>
+打开浏览器时默认打开的路径,可以是多个</p>
+<h3 id="devServer-port"><code>devServer.port</code></h3>
+<p><code>Object</code><br>
+服务端口</p>
+<h3 id="proxy"><code>proxy</code></h3>
+<p><code>Object</code> <code>array</code><br>
+指定某些请求的代理服务地址，可以是对象，也可以是对象列表，对象配置格式为</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 简单格式</span></span><br><span class="line"><span class="built_in">module</span>.exports = &#123;</span><br><span class="line">  proxy: &#123;</span><br><span class="line">    <span class="string">"/api"</span>: <span class="string">"http://localhost:3000"</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// 对代理的路径进行详细配置</span></span><br><span class="line"><span class="comment">// 重写请求路径</span></span><br><span class="line"><span class="built_in">module</span>.exports = &#123;</span><br><span class="line">  proxy: &#123;</span><br><span class="line">  <span class="string">"/api"</span>: &#123;</span><br><span class="line">    target: <span class="string">"http://localhost:3000"</span>,</span><br><span class="line">    pathRewrite: &#123;<span class="string">"^/api"</span> : <span class="string">""</span>&#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// 不进行https的证书验证</span></span><br><span class="line"><span class="built_in">module</span>.exports = &#123;</span><br><span class="line">  proxy: &#123;</span><br><span class="line">  <span class="string">"/api"</span>: &#123;</span><br><span class="line">    target: <span class="string">"https://other-server.example.com"</span>,</span><br><span class="line">    secure: <span class="literal">false</span>,</span><br><span class="line">    <span class="comment">// 换源，此时请求和响应不同源</span></span><br><span class="line">    changeOrigin:<span class="literal">true</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// 对请求进行一些过滤处理</span></span><br><span class="line"><span class="comment">// bypass返回false时，直接返回404错误</span></span><br><span class="line"><span class="comment">// bypass返回null和undefine时，继续请求代理服务</span></span><br><span class="line"><span class="comment">// bypass返回路径字符串，则直接响应对应路径的文件而不请求代理服务</span></span><br><span class="line"><span class="comment">// bypass有个很不错的作用，将所有的路径请求转为对特定页的请求，可以确保测试环境刷新时请求路径不会出错：如vue项目中的路由使用history模式时，非根路径刷新时会导致没加载到页面文件，用bypass就可以解决</span></span><br><span class="line"><span class="built_in">module</span>.exports = &#123;</span><br><span class="line">  <span class="comment">//...</span></span><br><span class="line">  devServer: &#123;</span><br><span class="line">    proxy: &#123;</span><br><span class="line">      <span class="string">'/api'</span>: &#123;</span><br><span class="line">        target: <span class="string">'http://localhost:3000'</span>,</span><br><span class="line">        bypass: <span class="function"><span class="keyword">function</span>(<span class="params">req, res, proxyOptions</span>) </span>&#123;</span><br><span class="line">          <span class="keyword">if</span> (req.headers.accept.indexOf(<span class="string">'html'</span>) !== <span class="number">-1</span>) &#123;</span><br><span class="line">            <span class="built_in">console</span>.log(<span class="string">'Skipping proxy for browser request.'</span>);</span><br><span class="line">            <span class="keyword">return</span> <span class="string">'/index.html'</span>;</span><br><span class="line">          &#125;</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;;</span><br><span class="line"><span class="comment">// 当需要代理根路径时，需要指定index为假值</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">module</span>.exports = &#123;</span><br><span class="line">  <span class="comment">//...</span></span><br><span class="line">  devServer: &#123;</span><br><span class="line">    index: <span class="string">''</span>, <span class="comment">// specify to enable root proxying</span></span><br><span class="line">    host: <span class="string">'...'</span>,</span><br><span class="line">    contentBase: <span class="string">'...'</span>,</span><br><span class="line">    proxy: &#123;</span><br><span class="line">      context: <span class="function"><span class="params">()</span> =&gt;</span> <span class="literal">true</span>,</span><br><span class="line">      target: <span class="string">'http://localhost:1234'</span></span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<h3 id="devServer-publicPath"><code>devServer.publicPath</code></h3>
+<p><code>string</code><br>
+决定文件所在位置,例如打包成 bundle.js,则请求时需请求 publicPath/bundle.js<br>
+可以是完整的 url 路径</p>
+<h3 id="devServer-watchOptions"><code>devServer.watchOptions</code></h3>
+<p><code>Object</code><br>
+一些监视文件相关的配置，<a href="https://www.webpackjs.com/configuration/watch" target="_blank" rel="noopener">更多设置</a></p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 使用轮询来监听文件变化</span></span><br><span class="line"><span class="built_in">module</span>.exports = &#123;</span><br><span class="line">  watchOptions: &#123;</span><br><span class="line">    <span class="comment">// 也可以是整数指定轮询间隔毫秒数</span></span><br><span class="line">    poll: <span class="literal">true</span>,</span><br><span class="line">  &#125;,</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<h2 id="externals">externals</h2>
+<p><code>string</code> <code>array</code> <code>object</code> <code>function</code><br>
+指定外部扩展<br>
+指定一些引用的包不会被打包到 bundle 中，而是在运行时获取<br>
+例如，从 CDN 引入 jQuery，而不是把它打包：<br>
+配置</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">module</span>.exports = &#123;</span><br><span class="line">  externals: &#123;</span><br><span class="line">    jquery: <span class="string">"jQuery"</span>,</span><br><span class="line">  &#125;,</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>然后在 html 中</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">script</span></span></span><br><span class="line"><span class="tag">  <span class="attr">src</span>=<span class="string">"https://code.jquery.com/jquery-3.1.0.js"</span></span></span><br><span class="line"><span class="tag">  <span class="attr">integrity</span>=<span class="string">"sha256-slogkvB1K3VOkzAI8QITxV3VzpOnkeNVsKvtkYLMjfk="</span></span></span><br><span class="line"><span class="tag">  <span class="attr">crossorigin</span>=<span class="string">"anonymous"</span></span></span><br><span class="line"><span class="tag">&gt;</span><span class="undefined"></span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>这样在 js 中引用 jquery 模块就不需要在本地安装 jquery 库，而是会在运行时在全局变量中寻找变量 jQuery</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> $ <span class="keyword">from</span> <span class="string">'jquery'</span>;</span><br><span class="line"></span><br><span class="line">$(<span class="string">'.my-element'</span>).animate(...);</span><br></pre></td></tr></table></figure>
+<h3 id="外部库可以通过以下形式引入">外部库可以通过以下形式引入</h3>
+<p>root: 外部库是全局变量<br>
+commonjs: 外部库是 commonjs 模块<br>
+commonjs2: 外部库是 commonjs2 模块<br>
+amd: 外部库是 amd 模块</p>
+<h3 id="配置为-string-类型">配置为 string 类型</h3>
+<p>例子如上文指出<br>
+另一个例子</p>
+<p>配置</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">module</span>.exports = &#123;</span><br><span class="line">  externals: &#123;</span><br><span class="line">    jquery: <span class="string">"commonjs2 jQuery"</span>,</span><br><span class="line">  &#125;,</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>效果如下</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> fs <span class="keyword">from</span> <span class="string">"fs-extra"</span>;</span><br><span class="line"><span class="comment">// 由于配置中指定了commonjs环境,上述代码会被打包为如下</span></span><br><span class="line"><span class="keyword">const</span> fs = <span class="built_in">require</span>(<span class="string">"fs-extra"</span>);</span><br></pre></td></tr></table></figure>
+<h3 id="string-类型">[string]类型</h3>
+<p>引入模块的部分成员</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">module</span>.exports = &#123;</span><br><span class="line">  <span class="comment">//...</span></span><br><span class="line">  externals: &#123;</span><br><span class="line">    subtract: [<span class="string">"./math"</span>, <span class="string">"subtract"</span>],</span><br><span class="line">  &#125;,</span><br><span class="line">&#125;;</span><br><span class="line"><span class="keyword">import</span> subtract <span class="keyword">from</span> <span class="string">"subtract"</span>;</span><br><span class="line"><span class="comment">// 被打包成</span></span><br><span class="line">subtract = <span class="built_in">require</span>(<span class="string">"./math"</span>).subtract;</span><br></pre></td></tr></table></figure>
+<h3 id="Object-类型">Object 类型</h3>
+<p>指定不同系统下的访问方式</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">module</span>.exports = &#123;</span><br><span class="line">  <span class="comment">//...</span></span><br><span class="line">  externals: &#123;</span><br><span class="line">    react: <span class="string">"react"</span>,</span><br><span class="line">  &#125;,</span><br><span class="line"></span><br><span class="line">  <span class="comment">// or</span></span><br><span class="line"></span><br><span class="line">  externals: &#123;</span><br><span class="line">    lodash: &#123;</span><br><span class="line">      commonjs: <span class="string">"lodash"</span>,</span><br><span class="line">      amd: <span class="string">"lodash"</span>,</span><br><span class="line">      root: <span class="string">"_"</span>,</span><br><span class="line">    &#125;,</span><br><span class="line">  &#125;,</span><br><span class="line"></span><br><span class="line">  <span class="comment">// or</span></span><br><span class="line"></span><br><span class="line">  externals: &#123;</span><br><span class="line">    subtract: &#123;</span><br><span class="line">      root: [<span class="string">"math"</span>, <span class="string">"subtract"</span>],</span><br><span class="line">    &#125;,</span><br><span class="line">  &#125;,</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<h3 id="function-类型">function 类型</h3>
+<p>自定义筛选一些外部模块如何加载</p>
+<h3 id="regex-类型">regex 类型</h3>
+<p>排除所有匹配到的模块</p>
+<h2 id="performance">performance</h2>
+<p>性能提示配置</p>
+<h2 id="node">node</h2>
+<p>是否在浏览器中添加 Nodejs 的 api 垫片</p>
+<h2 id="stats">stats</h2>
+<p>配置命令行显示与不显示哪些信息</p>
+<h1>插件</h1>
+<p><a href="https://www.webpackjs.com/plugins/" target="_blank" rel="noopener">插件文档</a></p>
+<h2 id="splitChunkPlugin">splitChunkPlugin</h2>
+<p><strong>说明：</strong></p>
+<ul>
+<li>一个块指的是某个文件及其依赖（非异步）组成的整体，也指一个块被分割后的每个结果。</li>
+<li>初始块指的是入口和入口的依赖组成的整体。</li>
+<li>按需（异步）块指得是通过<code>import()</code>,<code>require.ensure</code>等方式引入的块，这些块在页面中表现为在第一次使用到时才请求内容，所以称为按需块。</li>
+<li>入口：配置文件中的 entry</li>
+</ul>
+<p><strong>举例</strong></p>
+<p>如下依赖结构 index.js，index3.js 两个文件为一个初始块<br>
+如下依赖结构 index2.js，index3.js，index4.js 三个文件为一个按需块</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// index.js</span></span><br><span class="line"><span class="keyword">import</span>(<span class="string">"./index2.js"</span>);</span><br><span class="line"><span class="keyword">import</span> <span class="string">"./index3.js"</span>;</span><br><span class="line"><span class="keyword">const</span> str = <span class="string">"index.js"</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// index2.js</span></span><br><span class="line"><span class="keyword">import</span> <span class="string">"./index3.js"</span>;</span><br><span class="line"><span class="keyword">import</span> <span class="string">"./index4.js"</span>;</span><br><span class="line"><span class="keyword">const</span> str = <span class="string">"index2.js"</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// index3.js</span></span><br><span class="line"><span class="keyword">const</span> str = <span class="string">"index3.js"</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// index4.js</span></span><br><span class="line"><span class="keyword">const</span> str = <span class="string">"index4.js"</span>;</span><br></pre></td></tr></table></figure>
+<p><strong>配置说明</strong></p>
+<p>为便于理解，配置可以分为四种</p>
+<ol>
+<li>匹配规则
+<ul>
+<li>这种配置用于决定哪些文件或块包括在缓存组中、适用生成规则</li>
+<li>test，chunks，minChunks，type 属于此列</li>
+</ul>
+</li>
+<li>生成规则
+<ul>
+<li>这种配置决定新块如何产生，生成的文件名</li>
+<li>name，filename，enforce，automaticNameDelimiter 属于此列</li>
+</ul>
+</li>
+<li>限制条件
+<ul>
+<li>在根据生成规则得出分割结果后再根据限制条件进行一定调整，不影响缓存组匹配文件</li>
+<li>minSize，maxAsyncRequests，maxInitialRequests 属于此类</li>
+</ul>
+</li>
+</ol>
+<p><strong>配置列表</strong></p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">配置</th>
+<th style="text-align:left">类型</th>
+<th style="text-align:left">取值</th>
+<th style="text-align:left">说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><code>optimization.splitChunks</code></td>
+<td style="text-align:left"><code>Object</code></td>
+<td style="text-align:left"></td>
+<td style="text-align:left">配置对象</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>splitChunks.automaticNameDelimiter</code></td>
+<td style="text-align:left"><code>String</code></td>
+<td style="text-align:left"><code>any</code></td>
+<td style="text-align:left">分隔符</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>splitChunks.chunks</code></td>
+<td style="text-align:left"><code>String</code> <code>Function</code></td>
+<td style="text-align:left"><code>'async'</code> <code>'initial'</code> <code>'all'</code> <code>function (chunk)</code></td>
+<td style="text-align:left">用来匹配块，字符串取值分别对应按需块，初始块，全部；函数返回值为 true 时为匹配正确，每有一个块执行一次</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>splitChunks.maxAsyncRequests</code></td>
+<td style="text-align:left"><code>Number</code></td>
+<td style="text-align:left"><code>(0,Infinity)</code></td>
+<td style="text-align:left">最大并行异步请求数：当使用到某个按需块，会进行一组请求，来加载这个按需块。<code>maxAsyncRequests</code>这个选项指示完成这样一次加载最多发送多少次请求（表现为将这个按需块最多分为多少个包）</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>splitChunks.maxInitialRequests</code></td>
+<td style="text-align:left"><code>Number</code></td>
+<td style="text-align:left"><code>(0,Infinity)</code></td>
+<td style="text-align:left">一个入口的最大并行请求数，与前述异步块最大并行请求数同理</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>splitChunks.minChunks</code></td>
+<td style="text-align:left"><code>Number</code></td>
+<td style="text-align:left"><code>(0,Infinity)</code></td>
+<td style="text-align:left">最小被依赖数，对于通过<code>import ...</code>,<code>require()</code>等方式引入的依赖，最少需要被几个入口或者几个按需块引入才可被缓存组匹配到</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>splitChunks.name</code></td>
+<td style="text-align:left"><code>Boolean</code> <code>String</code> <code>Function</code></td>
+<td style="text-align:left"><code>true</code> <code>function (module, chunks, cacheGroupKey) =&gt; string</code> <code>any string</code></td>
+<td style="text-align:left">分割出来的块的名字，若设为静态字符串会导致分割出的块都被打包到一个文件中，设为函数时缓存组匹配到的每个块中包含的每个文件都会使 name 函数执行一次，可通过 name 中返回不同的值，来将块中的每个文件单独分割出来</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>splitChunks.cacheGroups</code></td>
+<td style="text-align:left"><code>Object</code></td>
+<td style="text-align:left"></td>
+<td style="text-align:left">缓存组对象，可以使用<code>splitChunks</code>对象的所有选项，并且<code>test</code>, <code>priority</code>和<code>reuseExistingChunk</code>只能在缓存组中设置，若某些选项不设置，默认会采用<code>splitChunks</code>对象中的设置</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>splitChunks.cacheGroups.{cacheGroup}.priority</code></td>
+<td style="text-align:left"><code>Number</code></td>
+<td style="text-align:left"><code>(-Infinity,Infinity)</code></td>
+<td style="text-align:left">优先级，当两个缓存组同时匹配到一个块，会先分出优先级高的那个缓存组的块，剩余再根据优先级低的缓存组规则分块，不填为 0</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>splitChunks.cacheGroups.{cacheGroup}.reuseExistingChunk</code></td>
+<td style="text-align:left"><code>Boolean</code></td>
+<td style="text-align:left"><code>true</code> <code>false</code></td>
+<td style="text-align:left">如果当前块包含已经从主包中分割出来的模块，这个模块将会被复用，而不是重新生成。这会影响生成的块的名称。</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>splitChunks.cacheGroups.{cacheGroup}.type</code></td>
+<td style="text-align:left"><code>String</code></td>
+<td style="text-align:left"><code>any string</code></td>
+<td style="text-align:left">允许根据模块类型分配模块到一个缓存组。</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>splitChunks.cacheGroups.{cacheGroup}.test</code></td>
+<td style="text-align:left"><code>RegExp</code> <code>String</code> <code>Function</code></td>
+<td style="text-align:left"><code>any reg</code> <code>any string</code> <code>function (module, chunk) =&gt; boolean</code></td>
+<td style="text-align:left">精确匹配路径，块名等，每有一个文件执行一次</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>splitChunks.cacheGroups.{cacheGroup}.filename</code></td>
+<td style="text-align:left"><code>String</code> <code>Function</code></td>
+<td style="text-align:left"><code>any string</code> <code>function (pathData, assetInfo) =&gt; string</code></td>
+<td style="text-align:left">仅对初始块使用，覆盖输出文件名</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>splitChunks.cacheGroups.{cacheGroup}.enforce</code></td>
+<td style="text-align:left"><code>Boolean</code></td>
+<td style="text-align:left"><code>true</code> <code>false</code></td>
+<td style="text-align:left">忽略限制，总是为当前缓存组生成一个块</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>splitChunks.minSize</code></td>
+<td style="text-align:left"><code>Number</code></td>
+<td style="text-align:left"><code>(0,Infinithy)</code></td>
+<td style="text-align:left">限制分割出的块的最小体积,不符合条件则不分割</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>splitChunks.maxSize</code></td>
+<td style="text-align:left"><code>Number</code></td>
+<td style="text-align:left"><code>(0,Infinithy)</code></td>
+<td style="text-align:left">指示当某个块大于<code>maxSize</code>且分割不会造成产生违反<code>minSize</code>的选项时，将块分为更小的块，<code>splitChunks.maxAsyncSize</code>，<code>splitChunks.maxInitialSize</code>效果与<code>maxSize</code>选项相同只是作用范围不同。适用优先级<code>maxInitialRequest/maxAsyncRequests &lt; maxSize &lt; minSize</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="分离-runtime">分离 runtime</h3>
+<p>可直接配置（webpack4 以上可行其余不知可否）</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">module</span>.exports = &#123;</span><br><span class="line">  <span class="comment">// ...</span></span><br><span class="line">  optimization: &#123;</span><br><span class="line">    runtimeChunk: &#123;</span><br><span class="line">      name: <span class="string">"runtime"</span>,</span><br><span class="line">    &#125;,</span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="comment">// ...</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<h3 id="示例-1，maxAsyncRequests-使用">示例 1，maxAsyncRequests 使用</h3>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// index.js</span></span><br><span class="line"><span class="keyword">import</span>(<span class="string">"./index2"</span>);</span><br><span class="line"><span class="keyword">const</span> str = <span class="string">"this is index.js"</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// index2.js</span></span><br><span class="line"><span class="keyword">import</span> <span class="string">"./index3"</span>;</span><br><span class="line"><span class="keyword">import</span> <span class="string">"./index4"</span>;</span><br><span class="line"><span class="keyword">import</span> <span class="string">"./index5"</span>;</span><br><span class="line"><span class="keyword">const</span> str = <span class="string">"this is index2.js"</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// index3.js</span></span><br><span class="line"><span class="keyword">const</span> str = <span class="string">"this is index3.js"</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// index4.js</span></span><br><span class="line"><span class="keyword">const</span> str = <span class="string">"this is index4.js"</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// index5.js</span></span><br><span class="line"><span class="keyword">const</span> str = <span class="string">"this is index5.js"</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// webpack.config.js</span></span><br><span class="line"><span class="built_in">module</span>.exports = &#123;</span><br><span class="line">  <span class="comment">// ...</span></span><br><span class="line">  optimization: &#123;</span><br><span class="line">    <span class="comment">// 将runtime代码分离出去方便查看打包后的代码</span></span><br><span class="line">    runtimeChunk: &#123;</span><br><span class="line">      name: <span class="string">"runtime"</span>,</span><br><span class="line">    &#125;,</span><br><span class="line">    splitChunks: &#123;</span><br><span class="line">      <span class="comment">// 影响所有缓存组，也可以在缓存组里设置</span></span><br><span class="line">      maxAsyncRequests: <span class="number">2</span>,</span><br><span class="line">      cacheGroups: &#123;</span><br><span class="line">        <span class="comment">// 关闭默认缓存组</span></span><br><span class="line">        <span class="keyword">default</span>: <span class="literal">false</span>,</span><br><span class="line">        asyncChunk: &#123;</span><br><span class="line">          chunks: <span class="string">"async"</span>,</span><br><span class="line">          <span class="comment">// 用不同name将一个块里的文件拆分出来</span></span><br><span class="line">          name(<span class="built_in">module</span>, chunks, cacheGroupKey) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="string">"asyncChunk"</span> + <span class="built_in">Math</span>.floor(<span class="built_in">Math</span>.random() * <span class="number">1000</span>);</span><br><span class="line">          &#125;,</span><br><span class="line">          minSize: <span class="number">0</span>,</span><br><span class="line">        &#125;,</span><br><span class="line">      &#125;,</span><br><span class="line">    &#125;,</span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="comment">// ...</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>如上 index.js 中按需引入了 index2.js，index2.js 依赖 index[3|4|5].js。</li>
+<li>所以 index.js 在运行到引入 index2.js 的代码处时，会进行请求，以获取 index[2345].js 这四个文件包含的代码。这四个文件视作为一个<strong>按需块 A</strong>。</li>
+<li>由于设置了 minSize = 0，chunks = ‘async’，以及 name 函数，只要生成的文件大于 0byte 的都会被从<strong>按需块 A</strong>中分离出来生成单独文件，index[2|3|4|5]都满足这个条件。</li>
+<li>但由于 maxAsyncRequests = 2，限制了 index.js 按需引入<strong>按需块 A</strong>时最大只能进行两次并行请求，因此只有 index2.js 会被从<strong>按需块 A</strong>分离出来。故而<strong>按需块 A</strong>分割成两个文件，一个文件包含了<strong>按需块 A</strong>剩余代码即 index[345].js 的代码，一个文件包括 index2.js 代码。index.js 引入<strong>按需块 A</strong>时会并行请求这两个文件。</li>
+<li>当 maxAsyncRequests 改为 3，index2.js，index3.js 会被从块中分离成单独的文件。其他情况依次类推，文件被分离的优先级似乎是依照文件名的字符串比较结果决定的，即若存在一个 a.js 最先被分离出来的将不是 index2.js 而是 a.js。</li>
+<li>将上述配置所有 async 改为 initial，maxAsyncRequests 改为 maxInitialRequests，以及代码<code>import(&quot;./index2.js)</code>改为<code>import &quot;./index2.js&quot;</code>后，产生的分块效果相同</li>
+</ul>
+<h3 id="示例-2，minChunks-使用">示例 2，minChunks 使用</h3>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// index.js</span></span><br><span class="line"><span class="keyword">import</span>(<span class="string">"./index2"</span>);</span><br><span class="line"><span class="keyword">import</span>(<span class="string">"./index3"</span>);</span><br><span class="line"><span class="keyword">const</span> str = <span class="string">"this is index.js"</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// index2.js</span></span><br><span class="line"><span class="keyword">import</span> <span class="string">"./index4"</span>;</span><br><span class="line"><span class="keyword">import</span> <span class="string">"./index5"</span>;</span><br><span class="line"><span class="keyword">const</span> str = <span class="string">"this is index2.js"</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// index3.js</span></span><br><span class="line"><span class="keyword">import</span> <span class="string">"./index4"</span>;</span><br><span class="line"><span class="keyword">const</span> str = <span class="string">"this is index4.js"</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// index4.js</span></span><br><span class="line"><span class="keyword">const</span> str = <span class="string">"this is index4.js"</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// index5.js</span></span><br><span class="line"><span class="keyword">const</span> str = <span class="string">"this is index5.js"</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// webpack.config.js</span></span><br><span class="line"><span class="built_in">module</span>.exports = &#123;</span><br><span class="line">  <span class="comment">// ...</span></span><br><span class="line">  optimization: &#123;</span><br><span class="line">    <span class="comment">// 将runtime代码分离出去方便看打包后的代码</span></span><br><span class="line">    runtimeChunk: &#123;</span><br><span class="line">      name: <span class="string">"runtime"</span>,</span><br><span class="line">    &#125;,</span><br><span class="line">    splitChunks: &#123;</span><br><span class="line">      <span class="comment">// 影响所有缓存组，也可以设置到单个缓存组里</span></span><br><span class="line">      maxAsyncRequests: <span class="number">2</span>,</span><br><span class="line">      cacheGroups: &#123;</span><br><span class="line">        <span class="comment">// 关闭默认缓存组</span></span><br><span class="line">        <span class="keyword">default</span>: <span class="literal">false</span>,</span><br><span class="line">        asyncChunk: &#123;</span><br><span class="line">          chunks: <span class="string">"async"</span>,</span><br><span class="line">          <span class="comment">// 匹配任何块</span></span><br><span class="line">          minSize: <span class="number">0</span>,</span><br><span class="line">          minChunks: <span class="number">2</span>,</span><br><span class="line">        &#125;,</span><br><span class="line">      &#125;,</span><br><span class="line">    &#125;,</span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="comment">// ...</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>如上，index.js 有两个按需引入分别为包含 index[245].js 的(按需块 A)，和包含 index[34].js 的(按需块 B)</li>
+<li>minChunks 设为 2，只有 index4.js 同时被两个按需块依赖，故而 index[2345]总共生成三个文件，(按需块 A)包含 index[25].js，(按需块 B)包含 index3.js，(共享块 C)包含 index4.js</li>
+<li>上述结果同时满足 maxAsyncRequests=2，即 index.js 运行到<code>import(&quot;index2.js&quot;)</code>时并行请求(按需块 A)和(共享块 C)，不大于二</li>
+<li>如果 maxAsyncRequests=1，会被优先满足，index4.js 也不会被分离出来，而是同时包含在(按需块 A)和(按需块 B)中。</li>
+<li>将上述配置 async 改为 initial，并去除入口 index.js，然后将 index2.js，index3.js 设为入口得到效果相同</li>
+</ul>
+<h3 id="test-函数类型，chunks-函数类型，name-函数类型，等使用">test 函数类型，chunks 函数类型，name 函数类型，等使用</h3>
+<ul>
+<li>
+<p>开启 debug 模式</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 全局安装node-nightly</span></span><br><span class="line">npm i -g node-nightly</span><br><span class="line"><span class="comment"># 运行</span></span><br><span class="line">node-nightly --inspect-brk ./node_modules/webpack/bin/webpack.js</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<p><strong>test,chunks,name 为函数时执行规则</strong></p>
+<p>以下执行规律为 debug 模式（用 node-nightly 和 chrome://inspect）测出，可能存在理解错误</p>
+<ol>
+<li>对每个文件，test 最先执行一次，chunk 在 test 之后执行，name 最后执行</li>
+<li>每有一个 js 文件，test 会执行一 ���，传入参数<code>module</code>为请求的文件信息，<code>chunks</code>为该文件所属的块。</li>
+<li>name 执行规律如下：
+<ul>
+<li>当 test 匹配到文件 index.js，且 index.js 属于块 A，则 name 会执行 1 次，传入的参数是描述 index.js 的 module 对象、chunks 列表<code>[chunkA]</code>、缓存组键名。</li>
+<li>当 test 匹配到文件 index2.js，且 index2.js 属于块 A 和块 B，则 name 会依次执行 3 次，每次传入的参数第一个是 module 对象；第二个为 chunks 列表，三次执行时值依次是<code>[chunkA, chunkB]</code>，<code>[chunkA]</code>，<code>[chunkB]</code>(前提是 chunks 函数总是返回 true)；第三个为缓存组键名。</li>
+</ul>
+</li>
+<li>chunks 执行方式比较怪异，不同时设置 test，name 为函数根本看不出这玩意是按什么规律执行的;也不知道它的 chunk 参数是干嘛的，传了也是白传，基本上能获取到的信息只有 <a href="http://chunk.name" target="_blank" rel="noopener">chunk.name</a>，其他不是 undefined 就是 null，按需块连 name 都是 null。chunks 在产生 name 之前执行，执行规则如下：
+<ul>
+<li>在每次 name 执行前根据条件执行，取决于 name 函数的参数 chunks 列表，遍历 chunks 列表，列表每个 chunk 元素执行一次 chunks 函数。</li>
+<li>具体规律举例如下：</li>
+<li>时间 1：对 index.js 属于块 A，即<code>chunks列表 = [chunkA]</code>，name 执行之前 chunks 会执行一次，传入块 A 的描述对象；</li>
+<li>时间 2：对于 index2.js 属于块 A 块 B，name 执行 3 次。name 第一次执行时<code>chunks列表 = [chunkA, chunkB]</code>，chunks 函数遍历 chunks 列表执行两次；name 第二次执行时<code>chunks列表 = [chunkA]</code>，则不会执行 chunks 函数，而是直接使用时间 1 的结果；name 第三次执行时<code>chunks列表 = [chunkB]</code>，chunks 又会执行一次，因为之前不存在<code>chunks列表 = [chunkB]</code>的情况。</li>
+</ul>
+</li>
+</ol>
+<p>虽然上述规律大部分时候用不到，但了解一下总没坏处</p>
+<h2 id="HtmlWebpackPlugin">HtmlWebpackPlugin</h2>
+<p><a href="https://github.com/jantimon/html-webpack-plugin#third-party-addons" target="_blank" rel="noopener">文档</a></p>
+<h2 id="HotModuleReplacementPlugin">HotModuleReplacementPlugin</h2>
+<p>启用只需要</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//使用默认配置</span></span><br><span class="line"><span class="keyword">new</span> webpack.HotModuleReplacementPlugin();</span><br><span class="line"><span class="comment">// devServer中只需要配置hot选项为true,似乎能自动启用本插件不用配置</span></span><br></pre></td></tr></table></figure>
+<h2 id="ExtractTextPlugin">ExtractTextPlugin</h2>
+<p>此配置和模块热替换冲突<br>
+webpack4.0 以上改用 mini-css-extract-plugin</p>
+<h2 id="SpritesmithPlugin">SpritesmithPlugin</h2>
+<p>用于生成雪碧图，<a href="https://github.com/mixtur/webpack-spritesmith" target="_blank" rel="noopener">文档</a></p>
+<h1>loader</h1>
+<h2 id="postcss-loader">postcss-loader</h2>
+<p>用来预处理样式，加浏览器前缀之类的<br>
+<a href="https://www.npmjs.com/package/postcss-loader" target="_blank" rel="noopener">文档</a></p>
+<h2 id="style-loader">style-loader</h2>
+<p>将样式添加到 html 文件头部的<code>&lt;style&gt;</code>标签中<br>
+<a href="https://www.webpackjs.com/loaders/style-loader/" target="_blank" rel="noopener">文档</a></p>
+
+    </section>
+    <footer class="post-footer">
+      <section class="author">
+    <h4>flyingfisherman</h4>
+    <p>前端工程师，热爱技术，坚信知识技术改变生活。最高兴的场合莫过于学到的技术为自己、亲友或他人提供了些许的便利、帮助。</p>
+</section>
+      <section class="share">
+    <h4>Share this post</h4>
+    <a class="icon-twitter" href="http://twitter.com/share?url=https://github.flyingfishman.io/hexo/2018/05/19/webpack/"
+       onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+        <span class="hidden">Twitter</span>
+    </a>
+    <a class="icon-facebook" href="https://www.facebook.com/sharer/sharer.php?u=https://github.flyingfishman.io/hexo/2018/05/19/webpack/"
+       onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+        <span class="hidden">Facebook</span>
+    </a>
+    <a class="icon-google-plus" href="https://plus.google.com/share?url=https://github.flyingfishman.io/hexo/2018/05/19/webpack/"
+       onclick="window.open(this.href, 'google-plus-share', 'width=490,height=530');return false;">
+        <span class="hidden">Google+</span>
+    </a>
+</section>
+    </footer>
+  </article>
+  <nav class="pagination" role="pagination">
+    
+    <a class="newer-posts" href="/hexo/2018/05/31/rainmeter/">
+        ← rainmeter美化工具使用
+    </a>
+    
+    <span class="page-number">•</span>
+    
+    <a class="older-posts" href="/hexo/2018/05/16/oracle2/">
+        oracle数据库操作 →
+    </a>
+    
+</nav>
+  <div id="comment" class="comments-area">
+    <h1 class="title"><a href="#disqus_comments" name="disqus_comments">Comments</a></h1>
+
+    
+</div>
+</main>
+
+
+  
+<footer class="site-footer">
+  
+  <a class="subscribe icon-feed" href="/rss.xml"><span class="tooltip">Subscribe!</span></a>
+  
+  <div class="inner">
+     <section class="copyright">All content copyright <a href="/hexo/">日常点滴</a> &copy; 2014 &bull; All rights reserved.</section>
+     <section class="poweredby">Proudly published with <a class="icon-ghost" href="http://zespia.tw/hexo/">Hexo</a></section>
+  </div>
+</footer>
+
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+<script type="text/javascript" src="/hexo/js/jquery.fitvids.js"></script>
+<script type="text/javascript" src="/hexo/js/index.js"></script>
+
+
+
+
+
+
+</body>
+</html>

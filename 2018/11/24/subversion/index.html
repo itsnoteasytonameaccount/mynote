@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html" charset="UTF-8" >
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+  <title>subversion配置 | 日常点滴</title>
+  <meta name="description" content="" />
+  <meta name="HandheldFriendly" content="True" />
+  <meta name="MobileOptimized" content="320" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <link rel="stylesheet" type="text/css" href="/hexo/css/screen.css" />
+  <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Noto+Serif:400,700,400italic|Open+Sans:700,400" />
+
+  <meta name="generator" content="日常点滴">
+
+  
+  <link rel="alternate" type="application/rss+xml" title="RSS" href="/rss.xml">
+  
+  
+  <link rel="alternate" type="application/atom+xml" title="Atom 0.3" href="rss.xml">
+  
+  
+
+  
+</head>
+
+
+<body class="post-template">
+
+  <header class="site-head"  style="background-image: url(/image/cover.png)" >
+    <div class="vertical">
+        <div class="site-head-content inner">
+             <a class="blog-logo" href="/hexo/"><img src="https://avatars.githubusercontent.com/u/26755276" alt="Blog Logo"/></a> 
+            <h1 class="blog-title">日常点滴</h1>
+            <h2 class="blog-description"></h2>
+        </div>
+    </div>
+</header>
+  
+
+<main class="content" role="main">
+  <article class="post">
+    <span class="post-meta">
+      <time datetime="2018-11-23T16:00:00.000Z" itemprop="datePublished">
+          2018-11-24
+      </time>
+    
+    
+    | 
+    <a href='/hexo/tags/subversion/'>subversion</a>
+    
+    
+</span>
+    <h1 class="post-title">subversion配置</h1>
+    <section class="post-content">
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.12.0/katex.min.css" /><h1>配置文件</h1>
+<a id="more"></a>
+<h2 id="svnserve-conf">svnserve.conf</h2>
+<p>分三个配置文件，一个是svnserve.conf，svnserve daemon的配置文件，配置svnserve daemon的选项(This file controls the configuration of the svnserve daemon, if you use it to allow access to this repository.  (If you only allow access through http: and/or file: URLs, then this file is irrelevant…))。</p>
+<p>了解的配置</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">[general]</span><br><span class="line"><span class="comment"># 权限可选read,write,none</span></span><br><span class="line"><span class="comment"># 匿名访问者只有读权限</span></span><br><span class="line">anon-access = <span class="built_in">read</span></span><br><span class="line"><span class="comment"># 通过验证登录的访问者有读写权限</span></span><br><span class="line">auth-access = write</span><br><span class="line"><span class="comment"># 用户配置文件的位置</span></span><br><span class="line">password-db = passwd</span><br><span class="line"><span class="comment"># 权限配置文件的位置</span></span><br><span class="line">authz-db = authz</span><br><span class="line"><span class="comment"># 实例描述</span></span><br><span class="line">realm = My First Repository</span><br></pre></td></tr></table></figure>
+<h2 id="authz">authz</h2>
+<p>权限配置,分为单版本库和多版本库</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 别名，具体作用不知，下为模板文件例子</span></span><br><span class="line">[aliases]</span><br><span class="line">joe = /C=XZ/ST=Dessert/L=Snake City/O=Snake Oil, Ltd./OU=Research Institute/CN=Joe Average</span><br><span class="line"><span class="comment"># 用户组，方便批量授权</span></span><br><span class="line">[groups]</span><br><span class="line">admin = admin1,admin2</span><br><span class="line">user = user1,user2</span><br><span class="line"><span class="comment"># 单版本库时直接配置路径</span></span><br><span class="line"><span class="comment"># 仓库的根路径</span></span><br><span class="line">[/]</span><br><span class="line"><span class="comment"># 赋权给用户组</span></span><br><span class="line"><span class="comment"># 'rw'读写，'r'读，''无权限</span></span><br><span class="line">@admin = rw</span><br><span class="line"><span class="comment"># 赋权给用户</span></span><br><span class="line">admin1 = rw</span><br><span class="line"><span class="comment"># 赋权给别名代表的对象</span></span><br><span class="line">&amp;joe = r</span><br><span class="line"><span class="comment"># 赋权给所有人</span></span><br><span class="line">* = r</span><br><span class="line"><span class="comment"># 赋权给匿名用户</span></span><br><span class="line"><span class="variable">$anonymous</span> = r</span><br><span class="line"><span class="comment"># 给子路径单独配置权限</span></span><br><span class="line">[/child]</span><br><span class="line">@user = rw</span><br><span class="line"><span class="comment"># 在父路径设置了某个用户允许读写的话，默认子路径也是允许读写</span></span><br><span class="line"><span class="comment"># 必须显式设置为不可读写</span></span><br><span class="line">@admin =</span><br><span class="line"><span class="comment"># 多版本库时配置标签是仓库名加路径</span></span><br><span class="line">[repo1:/]</span><br><span class="line">@admin = rw</span><br><span class="line"><span class="comment"># 多版本库时配置标签是仓库名加路径</span></span><br><span class="line">[repo2:/]</span><br><span class="line">@user = rw</span><br></pre></td></tr></table></figure>
+<h2 id="passwd">passwd</h2>
+<p>用户配置比较简单</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[users]</span><br><span class="line"><span class="comment"># 格式为 用户名=密码</span></span><br><span class="line">user1 = user1</span><br></pre></td></tr></table></figure>
+<h1>创建仓库和启动关闭</h1>
+<p>创建仓库命令是<code>svnadmin create 仓库名</code>。<br>
+启动svn服务的命令<code>svnserve -d -r 仓库根路径</code>。</p>
+<h2 id="单版本库创建">单版本库创建</h2>
+<p>单版本库只需要调用创建命令创建一个仓库，然后按自己的需求改配置文件即可。<br>
+<strong>例如下</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cd</span> /svn</span><br><span class="line"><span class="comment"># 建仓库</span></span><br><span class="line">svnadmin create repository</span><br><span class="line"><span class="built_in">cd</span> repository</span><br><span class="line"><span class="comment"># 改配置</span></span><br><span class="line">vim conf/svnserve.conf</span><br><span class="line">vim conf/authz</span><br><span class="line">vim conf/passwd</span><br><span class="line"><span class="comment"># 启动服务</span></span><br><span class="line"><span class="comment"># svnserve -d -r /svn/repository</span></span><br><span class="line">svnserve -d -r .</span><br></pre></td></tr></table></figure>
+<p>单版本库也可以管理多个项目：只需要在第一次创建完仓库并启动服务后，checkout，在checkout出来的文件夹中添加多个子文件夹后提交，再在authz为各个子文件夹单独配置权限即可。</p>
+<h2 id="多版本库创建">多版本库创建</h2>
+<p>多版本库创建时，需要先建一个空文件夹<br>
+然后再在这个文件夹中创建多个仓库，以及<code>authz</code>，<code>passwd</code>配置文件，配置用户和用户权限，在每个仓库中配置<code>svnserve.conf</code>文件将<code>authz-db</code>和<code>password-db</code>设为新建的两个配置文件，最后再启动<code>svnserve</code>即可</p>
+<p><strong>示例</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cd</span> /svn</span><br><span class="line">mkdir multirepo</span><br><span class="line"><span class="built_in">cd</span> multirepo</span><br><span class="line">svnadmin create repo1</span><br><span class="line">svnadmin create repo2</span><br><span class="line">vim authz</span><br><span class="line">vim passwd</span><br><span class="line">vim repo1/conf/svnserve.conf</span><br><span class="line">vim repo2/conf/svnserve.conf</span><br><span class="line"><span class="comment"># svnadmin -d -r /svn/multirepo</span></span><br><span class="line">svnadmin -d -r .</span><br></pre></td></tr></table></figure>
+<h2 id="关闭">关闭</h2>
+<p>目前了解到的只有查出id然后kill</p>
+<h1>补充</h1>
+<ol>
+<li>修改authz，passwd这两个文件时可以不重启svnserve</li>
+<li>另外Linux subversion客户端保存的密码在/root/.subversion/auth，windows用totorisesvn的话，在鼠标右键svn–&gt;setting–&gt;savedata里</li>
+</ol>
+
+    </section>
+    <footer class="post-footer">
+      <section class="author">
+    <h4>flyingfisherman</h4>
+    <p>前端工程师，热爱技术，坚信知识技术改变生活。最高兴的场合莫过于学到的技术为自己、亲友或他人提供了些许的便利、帮助。</p>
+</section>
+      <section class="share">
+    <h4>Share this post</h4>
+    <a class="icon-twitter" href="http://twitter.com/share?url=https://github.flyingfishman.io/hexo/2018/11/24/subversion/"
+       onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+        <span class="hidden">Twitter</span>
+    </a>
+    <a class="icon-facebook" href="https://www.facebook.com/sharer/sharer.php?u=https://github.flyingfishman.io/hexo/2018/11/24/subversion/"
+       onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+        <span class="hidden">Facebook</span>
+    </a>
+    <a class="icon-google-plus" href="https://plus.google.com/share?url=https://github.flyingfishman.io/hexo/2018/11/24/subversion/"
+       onclick="window.open(this.href, 'google-plus-share', 'width=490,height=530');return false;">
+        <span class="hidden">Google+</span>
+    </a>
+</section>
+    </footer>
+  </article>
+  <nav class="pagination" role="pagination">
+    
+    <a class="newer-posts" href="/hexo/2018/11/26/c_sharp_dot_net/">
+        ← c#点net笔记
+    </a>
+    
+    <span class="page-number">•</span>
+    
+    <a class="older-posts" href="/hexo/2018/10/20/mysql/">
+        彻底删除mysql服务 →
+    </a>
+    
+</nav>
+  <div id="comment" class="comments-area">
+    <h1 class="title"><a href="#disqus_comments" name="disqus_comments">Comments</a></h1>
+
+    
+</div>
+</main>
+
+
+  
+<footer class="site-footer">
+  
+  <a class="subscribe icon-feed" href="/rss.xml"><span class="tooltip">Subscribe!</span></a>
+  
+  <div class="inner">
+     <section class="copyright">All content copyright <a href="/hexo/">日常点滴</a> &copy; 2014 &bull; All rights reserved.</section>
+     <section class="poweredby">Proudly published with <a class="icon-ghost" href="http://zespia.tw/hexo/">Hexo</a></section>
+  </div>
+</footer>
+
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+<script type="text/javascript" src="/hexo/js/jquery.fitvids.js"></script>
+<script type="text/javascript" src="/hexo/js/index.js"></script>
+
+
+
+
+
+
+</body>
+</html>

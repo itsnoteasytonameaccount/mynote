@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html" charset="UTF-8" >
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+  <title>服务器简单的nginx配置(1) | 日常点滴</title>
+  <meta name="description" content="" />
+  <meta name="HandheldFriendly" content="True" />
+  <meta name="MobileOptimized" content="320" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <link rel="stylesheet" type="text/css" href="/hexo/css/screen.css" />
+  <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Noto+Serif:400,700,400italic|Open+Sans:700,400" />
+
+  <meta name="generator" content="日常点滴">
+
+  
+  <link rel="alternate" type="application/rss+xml" title="RSS" href="/rss.xml">
+  
+  
+  <link rel="alternate" type="application/atom+xml" title="Atom 0.3" href="rss.xml">
+  
+  
+
+  
+</head>
+
+
+<body class="post-template">
+
+  <header class="site-head"  style="background-image: url(/image/cover.png)" >
+    <div class="vertical">
+        <div class="site-head-content inner">
+             <a class="blog-logo" href="/hexo/"><img src="https://avatars.githubusercontent.com/u/26755276" alt="Blog Logo"/></a> 
+            <h1 class="blog-title">日常点滴</h1>
+            <h2 class="blog-description"></h2>
+        </div>
+    </div>
+</header>
+  
+
+<main class="content" role="main">
+  <article class="post">
+    <span class="post-meta">
+      <time datetime="2018-04-13T16:00:00.000Z" itemprop="datePublished">
+          2018-04-14
+      </time>
+    
+    
+    | 
+    <a href='/hexo/tags/linux/'>linux</a>,
+    
+    <a href='/hexo/tags/nginx/'>nginx</a>
+    
+    
+</span>
+    <h1 class="post-title">服务器简单的nginx配置(1)</h1>
+    <section class="post-content">
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.12.0/katex.min.css" /><h1>前言</h1>
+<p>nginx，比较常用的静态文件服务器，记录一下最近学到的用法</p>
+<a id="more"></a>
+<h2 id="安装">安装</h2>
+<p>虽然找到一个比较完整的<a href="http://www.nginx.cn/install" target="_blank" rel="noopener">现成的（点这里）</a>安装教学，还是在此记录一下<br>
+<a href="https://www.cnblogs.com/sign-ptk/p/6723048.html" target="_blank" rel="noopener">另一个现成的</a><br>
+安装前需要先安装支持库，prec,ssl,zlib.</p>
+<p>1.下载</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wget  http://nginx.org/download/nginx-1.6.2.tar.gz</span><br></pre></td></tr></table></figure>
+<p>2.解压</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">tar -xzvf nginx-1.6.2.tar.gz</span><br></pre></td></tr></table></figure>
+<p>3.安装</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">./configure</span><br><span class="line">make</span><br><span class="line">make install</span><br></pre></td></tr></table></figure>
+<p>这里可以在configure后面加编译选项，具体有什么参数也可以参看以上给出的地址里的，<br>
+当然什么都不加采取默认设置也没什么问题，此时安装完后所属用户默认为nginx(安装时自动添加),组默认为nginx(安装时自动添加)<br>
+默认路径似乎各有不同，可以用以下命令很快找出</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">whereis nginx</span><br></pre></td></tr></table></figure>
+<h2 id="配置">配置</h2>
+<p>若采取默认配置，配置文件应当是在/etc/nginx/nginx.conf</p>
+<p>若该路径没有</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">find /etc -name nginx.conf</span><br></pre></td></tr></table></figure>
+<p>即可找到</p>
+<p>初始配置文件内容如下</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br></pre></td><td class="code"><pre><span class="line">user nginx;</span><br><span class="line"><span class="comment"># 所属用户</span></span><br><span class="line">worker_processes auto;</span><br><span class="line">error_log /var/<span class="built_in">log</span>/nginx/error.log;</span><br><span class="line"><span class="comment"># 错误输出位置</span></span><br><span class="line">pid /run/nginx.pid;</span><br><span class="line"><span class="comment"># 运行中程序pid位置，用以reload,stop</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># Load dynamic modules. See /usr/share/nginx/README.dynamic.</span></span><br><span class="line">include /usr/share/nginx/modules/*.conf;</span><br><span class="line"></span><br><span class="line">events &#123;</span><br><span class="line">    worker_connections 1024;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">http &#123;</span><br><span class="line">    log_format  main  <span class="string">'$remote_addr - $remote_user [$time_local] "$request" '</span></span><br><span class="line">                      <span class="string">'$status $body_bytes_sent "$http_referer" '</span></span><br><span class="line">                      <span class="string">'"$http_user_agent" "$http_x_forwarded_for"'</span>;</span><br><span class="line"></span><br><span class="line">    access_log  /var/<span class="built_in">log</span>/nginx/access.log  main;</span><br><span class="line"></span><br><span class="line">    sendfile            on;</span><br><span class="line">    tcp_nopush          on;</span><br><span class="line">    tcp_nodelay         on;</span><br><span class="line">    keepalive_timeout   65;</span><br><span class="line">    types_hash_max_size 2048;</span><br><span class="line"></span><br><span class="line">    include             /etc/nginx/mime.types;</span><br><span class="line">    default_type        application/octet-stream;</span><br><span class="line"></span><br><span class="line">    <span class="comment"># Load modular configuration files from the /etc/nginx/conf.d directory.</span></span><br><span class="line">    <span class="comment"># See http://nginx.org/en/docs/ngx_core_module.html#include</span></span><br><span class="line">    <span class="comment"># for more information.</span></span><br><span class="line">    include /etc/nginx/conf.d/*.conf;</span><br><span class="line"></span><br><span class="line">    <span class="comment"># 服务实例</span></span><br><span class="line">    server&#123;</span><br><span class="line">    	listen        80 ip;</span><br><span class="line">    	<span class="comment"># tcp端口和ip</span></span><br><span class="line">    	server_name   ;<span class="comment"># 域名</span></span><br><span class="line">    	root          ;<span class="comment"># 服务根路径</span></span><br><span class="line">    	include       /etc/nginx/default.d/*.conf;</span><br><span class="line">    	<span class="comment"># 其他配置</span></span><br><span class="line">    	location / &#123;</span><br><span class="line">    		index index.html;</span><br><span class="line">    		<span class="comment"># 设置根路径的默认文件</span></span><br><span class="line">    	&#125;</span><br><span class="line">    	<span class="comment"># 发生错误时，跳转页面，错误用错误码表示，这里是未找到</span></span><br><span class="line">    	error_page 404 /404.html;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>大多数的配置都可以保持默认。<br>
+重点在于server中的内容<br>
+server决定的就是你的服务内容，其中几个参数上面注释中已有<br>
+在server中location配置可以针对某些特定的路径做处理<br>
+location中可以配置的东西有很多<br>
+下面一一介绍</p>
+<ol>
+<li>
+<p>配置参数</p>
+<p>location一般格式如下<br>
+<a href="https://www.cnblogs.com/ustc-anmin/p/10878636.html" target="_blank" rel="noopener">不错的总结</a><br>
+location [匹配方法] 匹配表达式 {</p>
+<p>}<br>
+其中匹配方法用符号选择也可不填<br>
+~代表区分大小写的正则表达式<br>
+=表示匹配某个精确的路径<br>
+~*表示不区分大小写的正则表达式<br>
+^~匹配到当前规则后立刻运用，不向下搜索,不知道为何alias不使用这个，会无限重定向</p>
+<p>匹配表达式则是用于  根据匹配方法匹配用户请求的路径名<br>
+例如</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">location ~ ^/py/* &#123;</span><br><span class="line">	<span class="comment"># nginx可以配置某一特定请求路径对应的位置</span></span><br><span class="line">	root   /path;</span><br><span class="line">	<span class="comment"># 一些处理</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>下面有一种不用正则表达式的方式</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">location /server/&#123;</span><br><span class="line">    proxy_pass localhost:8080/;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment"># 此时对http://ip/server/a的访问会被转到localhost:8080/a</span></span><br></pre></td></tr></table></figure>
+<p>nginx就会对<strong><a href="http://xn--ip-0p3cj1pytflqs6w7a/py/%E4%BB%BB%E6%84%8F%E8%B7%AF%E5%BE%84" target="_blank" rel="noopener">http://你的域名或ip/py/任意路径</a></strong>路径下的请求进行处理</p>
+</li>
+<li>
+<p>静态文件</p>
+<p>据百度,nginx擅长静态文件的处理，也就是图片，css样式，html文档，js脚本之类的文件<br>
+举例location配置方法如下</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">location ~ .(jpg|png|jpeg|ico)$ &#123;</span><br><span class="line">    expires 30d;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment"># 其中，~表示区分大小写的正则匹配，后面就可以用正则表达式来匹配需要处理的路径名了</span></span><br><span class="line"><span class="comment"># expires定义文件过期的日期，静态文件一边不会做更改，因而可以设置较长的过期日期</span></span><br></pre></td></tr></table></figure>
+</li>
+<li>
+<p>rewrite<br>
+rewrite用于对某些路径重定向<br>
+可以用于条件语句中（nginx配置中是可以有if条件语句的）,location中,和直接在server里<br>
+我对rewrite是不甚了解的，只能说是用过，因而这里有个<a href="https://www.cnblogs.com/czlun/articles/7010604.html" target="_blank" rel="noopener">详细的介绍页面</a>,当然，地址可能失效，因而同样记录在这篇博客里。<br>
+以下内容搬自前面给出的博客里。</p>
+<blockquote>
+<p>rewrite使用格式</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&gt;rewrite    &lt;正则表达式&gt;    &lt;replacement&gt;    [flag]</span><br><span class="line">&gt;</span><br></pre></td></tr></table></figure>
+</blockquote>
+<blockquote>
+<p>其中replacement为要rewrite到的内容，flag标记说明如下：<br>
+last  #本条规则匹配完成后，继续向下匹配新的location URI规则<br>
+break  #本条规则匹配完成即终止，不再匹配后面的任何规则<br>
+redirect  #返回302临时重定向，浏览器地址会显示跳转后的URL地址<br>
+permanent  #返回301永久重定向，浏览器地址栏会显示跳转后的URL地址</p>
+</blockquote>
+</li>
+<li>
+<p>反向代理<br>
+location中，可以通过proxy_pass设置反向代理<br>
+上面提到的nginx的优势是静态文件，动态服务就不是其专长了，因而可以对nginx将某些请求转发到特定的其他服务里<br>
+格式</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">proxy_pass ip或域名</span><br><span class="line"><span class="comment"># 例</span></span><br><span class="line">location ~ ^/server/ &#123;</span><br><span class="line">    proxy_pass http://127.0.0.1:8080;</span><br><span class="line">    <span class="comment"># 此处用户访问  http://你的域名/server/app  时</span></span><br><span class="line">    <span class="comment"># 实际上访问了  http://127.0.0.1:8080/server/app</span></span><br><span class="line">    <span class="comment"># 注不可在ip或域名后加上反斜杠 /</span></span><br><span class="line">    <span class="comment"># 否则location不得用正则表达式匹配,下面有介绍</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="comment"># 注由于规则是正则表达式，因此星号的意义不能像许多其他地方一样作为通配符，正则表达式中*代表匹配前一项0到多次</span></span><br><span class="line">location /server/ &#123;</span><br><span class="line">    proxy_pass http://127.0.0.1:8080/;</span><br><span class="line">    <span class="comment"># 此处用户访问  http://你的域名/server/app  时</span></span><br><span class="line">    <span class="comment"># 实际上访问了  http://127.0.0.1:8080/app</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>proxy_pass有一些配置用来优化服务器，以下提几个重要的</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">client_max_body_size ;   <span class="comment"># 允许客户端请求的最大单文件字节数</span></span><br><span class="line">proxy_buffer_size ;             <span class="comment"># 设置代理服务器（nginx）保存用户头信息的缓冲区大小</span></span><br><span class="line">proxy_buffers ;               <span class="comment"># 缓冲区，网页平均在32k以下的话，这样设置</span></span><br><span class="line">proxy_busy_buffers_size ;    <span class="comment"># 高负荷下缓冲大小（proxy_buffers*2）</span></span><br><span class="line"><span class="comment"># 其实，作为一个个人网站来说，不需要太过这些优化配置参数，因为这样一个</span></span><br><span class="line"><span class="comment"># 小破站能同时有几个人访问就很不错了，所以不会对服务器带来什么负担，</span></span><br><span class="line"><span class="comment"># 所以优化问题不是重点，可以待日后在学</span></span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<h2 id="运行">运行</h2>
+<p>控制台输入nginx就行了，如果提示unfound,就通过whereis找到名为nginx的可执行文件的位置，运行它就够了,当让要将其添加到环境变量。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ln -s /path/nginx /usr/<span class="built_in">local</span>/bin/nginx</span><br></pre></td></tr></table></figure>
+<h2 id="重启">重启</h2>
+<p>每次修改完配置后都需要重启，一般</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">nginx -s reload</span><br></pre></td></tr></table></figure>
+<p>重启失败一般有可能是配置格式不对，或Pid文件不存在，前者自行寻找原因。<br>
+当然修改完配置后可以用</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">nginx -t</span><br></pre></td></tr></table></figure>
+<p>测试配置是否正确。<br>
+若是pid文件不存在，创建一个后缀为pid的空文件，在配置文件里将Pid文件路径改为新建的文件路径，之后用以下方法强制重启</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">netstat -apt|grep nginx</span><br><span class="line"><span class="comment"># 执行完上面那步后你可以看到nginx Master进程的pid</span></span><br><span class="line"><span class="built_in">kill</span> pid</span><br><span class="line"><span class="comment"># 终结对应pid</span></span><br><span class="line">nginx</span><br><span class="line"><span class="comment"># 再次启动</span></span><br></pre></td></tr></table></figure>
+<h2 id="结语">结语</h2>
+<p>本页里引用的两个是对我帮助较大存了书签的，还有不少博客对我产生了帮助，忘了保存就不找出来了</p>
+
+    </section>
+    <footer class="post-footer">
+      <section class="author">
+    <h4>flyingfisherman</h4>
+    <p>前端工程师，热爱技术，坚信知识技术改变生活。最高兴的场合莫过于学到的技术为自己、亲友或他人提供了些许的便利、帮助。</p>
+</section>
+      <section class="share">
+    <h4>Share this post</h4>
+    <a class="icon-twitter" href="http://twitter.com/share?url=https://github.flyingfishman.io/hexo/2018/04/14/nginx_config/"
+       onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+        <span class="hidden">Twitter</span>
+    </a>
+    <a class="icon-facebook" href="https://www.facebook.com/sharer/sharer.php?u=https://github.flyingfishman.io/hexo/2018/04/14/nginx_config/"
+       onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+        <span class="hidden">Facebook</span>
+    </a>
+    <a class="icon-google-plus" href="https://plus.google.com/share?url=https://github.flyingfishman.io/hexo/2018/04/14/nginx_config/"
+       onclick="window.open(this.href, 'google-plus-share', 'width=490,height=530');return false;">
+        <span class="hidden">Google+</span>
+    </a>
+</section>
+    </footer>
+  </article>
+  <nav class="pagination" role="pagination">
+    
+    <a class="newer-posts" href="/hexo/2018/04/29/ca/">
+        ← 百夫长统计
+    </a>
+    
+    <span class="page-number">•</span>
+    
+    <a class="older-posts" href="/hexo/2018/04/12/aria2(1)/">
+        利用aria2下载文件 →
+    </a>
+    
+</nav>
+  <div id="comment" class="comments-area">
+    <h1 class="title"><a href="#disqus_comments" name="disqus_comments">Comments</a></h1>
+
+    
+</div>
+</main>
+
+
+  
+<footer class="site-footer">
+  
+  <a class="subscribe icon-feed" href="/rss.xml"><span class="tooltip">Subscribe!</span></a>
+  
+  <div class="inner">
+     <section class="copyright">All content copyright <a href="/hexo/">日常点滴</a> &copy; 2014 &bull; All rights reserved.</section>
+     <section class="poweredby">Proudly published with <a class="icon-ghost" href="http://zespia.tw/hexo/">Hexo</a></section>
+  </div>
+</footer>
+
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+<script type="text/javascript" src="/hexo/js/jquery.fitvids.js"></script>
+<script type="text/javascript" src="/hexo/js/index.js"></script>
+
+
+
+
+
+
+</body>
+</html>

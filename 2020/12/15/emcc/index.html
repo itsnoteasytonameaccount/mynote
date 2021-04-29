@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html" charset="UTF-8" >
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+  <title>windows上安装Emscripten | 日常点滴</title>
+  <meta name="description" content="" />
+  <meta name="HandheldFriendly" content="True" />
+  <meta name="MobileOptimized" content="320" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <link rel="stylesheet" type="text/css" href="/hexo/css/screen.css" />
+  <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Noto+Serif:400,700,400italic|Open+Sans:700,400" />
+
+  <meta name="generator" content="日常点滴">
+
+  
+  <link rel="alternate" type="application/rss+xml" title="RSS" href="/rss.xml">
+  
+  
+  <link rel="alternate" type="application/atom+xml" title="Atom 0.3" href="rss.xml">
+  
+  
+
+  
+</head>
+
+
+<body class="post-template">
+
+  <header class="site-head"  style="background-image: url(/image/cover.png)" >
+    <div class="vertical">
+        <div class="site-head-content inner">
+             <a class="blog-logo" href="/hexo/"><img src="https://avatars.githubusercontent.com/u/26755276" alt="Blog Logo"/></a> 
+            <h1 class="blog-title">日常点滴</h1>
+            <h2 class="blog-description"></h2>
+        </div>
+    </div>
+</header>
+  
+
+<main class="content" role="main">
+  <article class="post">
+    <span class="post-meta">
+      <time datetime="2020-12-15T12:56:00.000Z" itemprop="datePublished">
+          2020-12-15
+      </time>
+    
+</span>
+    <h1 class="post-title">windows上安装Emscripten</h1>
+    <section class="post-content">
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.12.0/katex.min.css" /><h1>前言</h1>
+<p>因为想试试 webassembly ，需要安装 Emscripten，但是安装出了蛮多问题的</p>
+<h2 id="步骤">步骤</h2>
+<p>先用 git 下载 EmscriptSDK，这步比较简单</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git <span class="built_in">clone</span> https://github.com/emscripten-core/emsdk.git</span><br></pre></td></tr></table></figure>
+<p>然后通过 emsdk 安装 Emscripten</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">emsdk install latest</span><br></pre></td></tr></table></figure>
+<h2 id="问题">问题</h2>
+<ol>
+<li>node一直下载失败导致安装步骤退出</li>
+</ol>
+<p>这个问题令我很疑惑，我在同样的地址下载过 node 的压缩包，为什么在命令行就下载不下来呢。<br>
+并且这个暂且不提，我本地明明有三个版本的 node，用 nvm-windows 管理，其他的软件都能检测到，偏偏emsdk这玩意检测不到，还要给我下，令有些喜欢钻牛角尖我非常不爽。</p>
+<p><strong>解决方案</strong>: 本地没有 Node 环境可以用本文<a href="#%E5%8F%82%E8%80%83">参考</a>中引用的链接中的方法，有 node 环境可以改代码。</p>
+<p>只能改 <a href="http://emsdk.py" target="_blank" rel="noopener">emsdk.py</a> 代码来跳过：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 1871行左右，跳过本地已有的环境</span></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">install_tool</span><span class="params">(self)</span>:</span></span><br><span class="line">    <span class="comment"># Avoid doing a redundant reinstall of the tool, if it has already been installed.</span></span><br><span class="line">    <span class="comment"># However all tools that are sourced directly from git branches do need to be</span></span><br><span class="line">    <span class="comment"># installed every time when requested, since the install step is then used to git</span></span><br><span class="line">    <span class="comment"># pull the tool to a newer version.</span></span><br><span class="line"></span><br><span class="line">    <span class="comment"># 判断是否安装安装了的跳过</span></span><br><span class="line">    print(<span class="string">"name is: "</span>+self.name)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">is_installed</span><span class="params">(name)</span>:</span></span><br><span class="line">	<span class="comment">#   不想安装列表</span></span><br><span class="line">      installed_list = [<span class="string">"node"</span>,<span class="string">"python"</span>,<span class="string">"java"</span>]</span><br><span class="line">      <span class="keyword">for</span> installed <span class="keyword">in</span> installed_list:</span><br><span class="line">        <span class="keyword">if</span> installed <span class="keyword">in</span> name:</span><br><span class="line">          <span class="keyword">return</span> <span class="keyword">True</span></span><br><span class="line">      <span class="keyword">return</span> self.is_installed()</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> is_installed(self.name) <span class="keyword">and</span> <span class="keyword">not</span> hasattr(self, <span class="string">'git_branch'</span>):</span><br><span class="line">      print(<span class="string">"Skipped installing "</span> + self.name + <span class="string">", already installed."</span>)</span><br><span class="line">      <span class="keyword">return</span> <span class="keyword">True</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 1243行左右，指定node地址</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">emscripten_npm_install</span><span class="params">(tool, directory)</span>:</span></span><br><span class="line">  <span class="comment"># node_tool = find_latest_installed_tool('node')</span></span><br><span class="line">  <span class="comment"># if not node_tool:</span></span><br><span class="line">  <span class="comment">#   print('Failed to run "npm ci" in installed Emscripten root directory ' + tool.installation_path() + '! Please install node.js first!')</span></span><br><span class="line">  <span class="comment">#   return False</span></span><br><span class="line">  print(<span class="string">"directory is:"</span>+directory)</span><br><span class="line">  <span class="comment"># node_path = os.path.join(node_tool.installation_path(), 'bin')</span></span><br><span class="line">  node_path = <span class="string">"D:\\environment\\node"</span></span><br><span class="line">  npm = os.path.join(node_path, <span class="string">'npm'</span> + (<span class="string">'.cmd'</span> <span class="keyword">if</span> WINDOWS <span class="keyword">else</span> <span class="string">''</span>))</span><br><span class="line">  env = os.environ.copy()</span><br><span class="line">  env[<span class="string">"PATH"</span>] = node_path + os.pathsep + env[<span class="string">"PATH"</span>]</span><br></pre></td></tr></table></figure>
+<ol start="2">
+<li>python版本问题</li>
+</ol>
+<p>安装过程中又提示一个.py文件运行出错，浪费了一些时间，想起本地安了两个python，应该是用了python2的关系。<br>
+就想着给python也有像node的nvm那样管理和切换版本的就好了，因此创建了如下文件</p>
+<p><strong>pyvm.bat</strong><br>
+用来切换版本的命令<br>
+python都放在D:\environment</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">@<span class="built_in">echo</span> off</span><br><span class="line"></span><br><span class="line"><span class="built_in">set</span> environment_path=D:\environment</span><br><span class="line"><span class="keyword">if</span> <span class="string">'%1'</span> == <span class="string">'list'</span> (</span><br><span class="line">    dir /b %environment_path%|findstr /i python</span><br><span class="line">) <span class="keyword">else</span> ( </span><br><span class="line">    <span class="keyword">if</span> exist %environment_path%\%1. (</span><br><span class="line">        switch_python_version.vbs %environment_path%\%1</span><br><span class="line">    ) <span class="keyword">else</span> (</span><br><span class="line">        <span class="built_in">echo</span> <span class="string">"command unrecognized!"</span></span><br><span class="line">    )</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+<p><strong>switch_python_version.vbs</strong></p>
+<p>setx指令需要管理员权限所以用vbs的UAC对象申请</p>
+<figure class="highlight vbs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">args = <span class="string">"/c setx /m PYTHON_HOME "</span></span><br><span class="line"><span class="keyword">Set</span> UAC = <span class="built_in">CreateObject</span>(<span class="string">"Shell.Application"</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">For</span> <span class="keyword">Each</span> strArg <span class="keyword">in</span> WScript.Arguments</span><br><span class="line">    args = args &amp; <span class="string">""</span><span class="string">""</span> &amp; strArg &amp; <span class="string">""</span><span class="string">""</span> &amp; <span class="string">" "</span></span><br><span class="line"><span class="keyword">Next</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">msgBox</span>(args)</span><br><span class="line"></span><br><span class="line">UAC.ShellExecute <span class="string">"cmd"</span>, args,<span class="string">""</span> , <span class="string">"runas"</span>, <span class="number">1</span></span><br></pre></td></tr></table></figure>
+<p>之后在环境变量中添加<code>%python_home%\scripts</code>和<code>%python_home%</code>，就可以自由通过<code>pyvm</code>切换版本了。</p>
+<h2 id="成功">成功</h2>
+<p>安装成功后就输出如下</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">Installing SDK <span class="string">'sdk-releases-upstream-37fc7647c754ac9a28ad588c143b82286de0ef71-64bit'</span>..</span><br><span class="line">name is: node-12.18.1-64bit</span><br><span class="line">Skipped installing node-12.18.1-64bit, already installed.</span><br><span class="line">name is: python-3.7.4-pywin32-64bit</span><br><span class="line">Skipped installing python-3.7.4-pywin32-64bit, already installed.</span><br><span class="line">name is: java-8.152-64bit</span><br><span class="line">Skipped installing java-8.152-64bit, already installed.</span><br><span class="line">name is: releases-upstream-37fc7647c754ac9a28ad588c143b82286de0ef71-64bit</span><br><span class="line">Skipped installing releases-upstream-37fc7647c754ac9a28ad588c143b82286de0ef71-64bit, already installed.</span><br><span class="line">directory is:D:/projects/webnext/emsdk\upstream\emscripten</span><br><span class="line">Running post-install step: npm ci ...</span><br><span class="line">Running post-install step: npm install google-closure-compiler-windows</span><br><span class="line">Done running: npm ci</span><br><span class="line">Done installing SDK <span class="string">'sdk-releases-upstream-37fc7647c754ac9a28ad588c143b82286de0ef71-64bit'</span>.</span><br></pre></td></tr></table></figure>
+<p>接着</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">emsdk activate latest</span><br><span class="line"><span class="comment"># 可附加--permanent永久修改</span></span><br></pre></td></tr></table></figure>
+<p>初始化环境</p>
+<p>因为跳过了一些安装所以有如下提示，关系不大</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Warning: The SDK/tool <span class="string">'node-12.18.1-64bit'</span> cannot be activated since it is not installed! Skipping this tool...</span><br><span class="line">Warning: The SDK/tool <span class="string">'python-3.7.4-pywin32-64bit'</span> cannot be activated since it is not installed! Skipping this tool...</span><br><span class="line">Warning: The SDK/tool <span class="string">'java-8.152-64bit'</span> cannot be activated since it is not installed! Skipping this tool...</span><br></pre></td></tr></table></figure>
+<p>最后测试一下成功没</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">&gt; emcc -v</span><br><span class="line"><span class="comment"># 输出</span></span><br><span class="line">emcc (Emscripten gcc/clang-like replacement + linker emulating GNU ld) 2.0.10</span><br><span class="line">clang version 12.0.0 (Cswircachegitchromium.googlesource.com-external-github.com-llvm-llvm--project 445289aa63e1b82b9eea6497fb2d0443813a9d4e)</span><br><span class="line">Target: x86_64-pc-windows-msvc</span><br><span class="line">Thread model: posix</span><br><span class="line">InstalledDir: D:/projects/webnext/emsdk/upstream/bin</span><br><span class="line">shared:INFO: (Emscripten: Running sanity checks)</span><br></pre></td></tr></table></figure>
+<h1>参考</h1>
+<ol>
+<li><a href="https://www.it610.com/article/1281884758007103488.htm" target="_blank" rel="noopener">《windows下和linux 安装emscripten》</a></li>
+<li><a href="https://www.wasm.com.cn/getting-started/developers-guide/" target="_blank" rel="noopener">webassembly开发者引导</a></li>
+</ol>
+
+    </section>
+    <footer class="post-footer">
+      <section class="author">
+    <h4>flyingfisherman</h4>
+    <p>前端工程师，热爱技术，坚信知识技术改变生活。最高兴的场合莫过于学到的技术为自己、亲友或他人提供了些许的便利、帮助。</p>
+</section>
+      <section class="share">
+    <h4>Share this post</h4>
+    <a class="icon-twitter" href="http://twitter.com/share?url=https://github.flyingfishman.io/hexo/2020/12/15/emcc/"
+       onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+        <span class="hidden">Twitter</span>
+    </a>
+    <a class="icon-facebook" href="https://www.facebook.com/sharer/sharer.php?u=https://github.flyingfishman.io/hexo/2020/12/15/emcc/"
+       onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+        <span class="hidden">Facebook</span>
+    </a>
+    <a class="icon-google-plus" href="https://plus.google.com/share?url=https://github.flyingfishman.io/hexo/2020/12/15/emcc/"
+       onclick="window.open(this.href, 'google-plus-share', 'width=490,height=530');return false;">
+        <span class="hidden">Google+</span>
+    </a>
+</section>
+    </footer>
+  </article>
+  <nav class="pagination" role="pagination">
+    
+    <a class="newer-posts" href="/hexo/2020/12/18/opengl/">
+        ← opengl(1)：库、窗口
+    </a>
+    
+    <span class="page-number">•</span>
+    
+    <a class="older-posts" href="/hexo/2020/11/23/程序作为服务启动/">
+        centos下程序作为服务启动 →
+    </a>
+    
+</nav>
+  <div id="comment" class="comments-area">
+    <h1 class="title"><a href="#disqus_comments" name="disqus_comments">Comments</a></h1>
+
+    
+</div>
+</main>
+
+
+  
+<footer class="site-footer">
+  
+  <a class="subscribe icon-feed" href="/rss.xml"><span class="tooltip">Subscribe!</span></a>
+  
+  <div class="inner">
+     <section class="copyright">All content copyright <a href="/hexo/">日常点滴</a> &copy; 2014 &bull; All rights reserved.</section>
+     <section class="poweredby">Proudly published with <a class="icon-ghost" href="http://zespia.tw/hexo/">Hexo</a></section>
+  </div>
+</footer>
+
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+<script type="text/javascript" src="/hexo/js/jquery.fitvids.js"></script>
+<script type="text/javascript" src="/hexo/js/index.js"></script>
+
+
+
+
+
+
+</body>
+</html>

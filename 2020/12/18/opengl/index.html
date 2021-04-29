@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html" charset="UTF-8" >
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+  <title>opengl(1)：库、窗口 | 日常点滴</title>
+  <meta name="description" content="" />
+  <meta name="HandheldFriendly" content="True" />
+  <meta name="MobileOptimized" content="320" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <link rel="stylesheet" type="text/css" href="/hexo/css/screen.css" />
+  <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Noto+Serif:400,700,400italic|Open+Sans:700,400" />
+
+  <meta name="generator" content="日常点滴">
+
+  
+  <link rel="alternate" type="application/rss+xml" title="RSS" href="/rss.xml">
+  
+  
+  <link rel="alternate" type="application/atom+xml" title="Atom 0.3" href="rss.xml">
+  
+  
+
+  
+</head>
+
+
+<body class="post-template">
+
+  <header class="site-head"  style="background-image: url(/image/cover.png)" >
+    <div class="vertical">
+        <div class="site-head-content inner">
+             <a class="blog-logo" href="/hexo/"><img src="https://avatars.githubusercontent.com/u/26755276" alt="Blog Logo"/></a> 
+            <h1 class="blog-title">日常点滴</h1>
+            <h2 class="blog-description"></h2>
+        </div>
+    </div>
+</header>
+  
+
+<main class="content" role="main">
+  <article class="post">
+    <span class="post-meta">
+      <time datetime="2020-12-17T16:00:00.000Z" itemprop="datePublished">
+          2020-12-18
+      </time>
+    
+    
+    | 
+    <a href='/hexo/tags/opengl/'>opengl</a>
+    
+    
+</span>
+    <h1 class="post-title">opengl(1)：库、窗口</h1>
+    <section class="post-content">
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.12.0/katex.min.css" /><p>以下内容主要来自<a href="https://learnopengl-cn.github.io/" target="_blank" rel="noopener">LearnOpenGL CN</a>文档，另外<a href="https://learnopengl-cn.github.io/" target="_blank" rel="noopener">LearnOpenGL CN</a>每一节都是有讨论区的，用的 disqus，disqus 很早就被墙了，想要在评论区寻求帮助需要翻墙，不要像我，学到模型加载才看到讨论区</p>
+<p>你也可以在<a href="https://www.khronos.org/opengl/wiki/Getting_Started" target="_blank" rel="noopener">此处</a>找到其他opengl官方推荐的资料、教程网站，推荐先用<a href="https://learnopengl-cn.github.io/" target="_blank" rel="noopener">LearnOpenGL CN</a>入门，再去看其他的</p>
+<h1>前言</h1>
+<p>本来是想学 webgl，但是把 mdn 上的 webgl 示例学完之后，还是没办法做到绘制想要的图形，因此想看看能不能直接在 opengl 里找到答案</p>
+<a id="more"></a>
+<h1>环境</h1>
+<p>根据参考的文章，使用 <a href="https://www.glfw.org/" target="_blank" rel="noopener">glfw</a>,<a href="https://glad.dav1d.de/" target="_blank" rel="noopener">glad</a></p>
+<blockquote>
+<p>glfw 是针对 opengl 的 c 语言库,提供了一些渲染物体所需的最低限度的 api<sup><a href="#%E5%8F%82%E8%80%83">[4]</a></sup></p>
+</blockquote>
+<blockquote>
+<p>glad 是保存 opengl 函数指针的库<sup><a href="#%E5%8F%82%E8%80%83">[4]</a></sup></p>
+</blockquote>
+<p>也有别的说法</p>
+<blockquote>
+<p>另外在这里科普一下glad、glew、glfw、Freeglut的区别：glew（The OpenGL Extension Wrangler Library）是对底层OpenGL接口的封装，可以让你的代码跨平台。glad与glew作用相同，可以看作它的升级版。Freeglut（OpenGL Utility Toolkit）主要用于创建OpenGL上下文、接收一些鼠标键盘事件等等。glfw（Graphics Library Framework）是Freeglut升级版，作用基本一样。通常来说glad和glfw配合使用，比如我上面发的那个网站就是。glew和Freeglut配合使用，比如OpenGL红宝书上面的例子。<sup><a href="#%E5%8F%82%E8%80%83">[6]</a></sup></p>
+</blockquote>
+<p>按照本人使用体验，认为后者更正确</p>
+<h2 id="glad-下载">glad 下载</h2>
+<p>glad 库需要生成，生成方式有如下几种：</p>
+<ol>
+<li>用 python -m glad --generate c --outpath path(前提是已安装 python 的 glad 库)</li>
+<li><a href="https://glad.dav1d.de/" target="_blank" rel="noopener">在线服务</a>生成(可能进不去，指定 114.114.114.114 的 dns 服务器就能进去了)</li>
+<li>事实上，glfw 里有例子也是需要依赖 glad 的，下载了 glfw 实际上 deps 文件夹里就有 glad</li>
+</ol>
+<h2 id="cmake-编译-glfw-静态库">cmake 编译 glfw 静态库</h2>
+<p>用 cmake 创建 glfw 的 makefile<br>
+cmake 有图形界面 cmake-gui.exe<br>
+参考链接中有建立 visual studio makefile 的例子,由于实在不想安装 vs,本文中示例用 mingw.</p>
+<p><strong>操作过程</strong><br>
+需要本地有 Mingw，似乎较老版本的 mingw 不行，我一开始用 codeblocks 自带的 mingw 编译失败了因此重下了一个 mingw64</p>
+<ol>
+<li>需要先配置 mingw 的环境变量，否则 Configure 时会无论是否指定编译器位置都会报错<br>
+<img src="/hexo/image/opengl/Configure%E5%A4%B1%E8%B4%A5.png" alt="图片无法显示">
+<blockquote>
+<p>配置错环境变量也会报错，比如我环境变量配置的是新下载的 mingw64 的 bin 文件夹位置，但我指定的 mingw 编译器是 codeblocks 自带的 mingw 的，也会报错<br>
+<img src="/hexo/image/opengl/%E9%85%8D%E7%BD%AE%E9%94%99%E8%AF%AF.png" alt="图片无法显示"></p>
+</blockquote>
+</li>
+<li>配置环境变量，源码位置和输出路径后，第一次点击 Configure 指定生成器,配置如图,之后产生一些编译选项供选择。<br>
+<img src="/hexo/image/opengl/%E6%8C%87%E5%AE%9A%E7%94%9F%E6%88%90%E5%99%A8.png" alt="图片无法显示"></li>
+<li>再次点击 Configure 应用选项后,点击 generate 就会生成 makefile 文件</li>
+<li>之后 cd 到生成路径下执行 mingw32-make,大功告成<br>
+<img src="/hexo/image/opengl/%E5%A4%A7%E5%8A%9F%E5%91%8A%E6%88%90.png" alt="图片无法显示"></li>
+<li>然后会在 src 路径下产生一个 libglfw3.a 文件，就是所需的静态库，同时 examples 里还会有一些示例程序</li>
+</ol>
+<h1>编译自己的 opengl 程序测试</h1>
+<p>用的从 <a href="#%E5%8F%82%E8%80%83">参考链接</a>中复制的代码</p>
+<p>一开始的编译方式如下，系统是 win10，用的 vscode 编辑代码，用 task.json 配置编译选项如下</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="attr">"label"</span>: <span class="string">"编译opengl文件"</span>,</span><br><span class="line">  <span class="attr">"command"</span>: <span class="string">"g++"</span>,</span><br><span class="line">  <span class="attr">"group"</span>: <span class="string">"build"</span>,</span><br><span class="line">  <span class="attr">"args"</span>: [</span><br><span class="line">    <span class="string">"$&#123;env:CUSTOM_LIBS_PATH&#125;/src/glad.c"</span>,</span><br><span class="line">    <span class="string">"c/gltest.cpp"</span>,</span><br><span class="line">    <span class="string">"-I"</span>,</span><br><span class="line">    <span class="string">"$&#123;env:CUSTOM_LIBS_PATH&#125;/include"</span>,</span><br><span class="line">    <span class="string">"-Llib"</span>,</span><br><span class="line">    <span class="string">"-lglfw3"</span>,</span><br><span class="line">    <span class="string">"-o"</span>,</span><br><span class="line">    <span class="string">"dist/main.exe"</span></span><br><span class="line">  ],</span><br><span class="line">  <span class="attr">"problemMatcher"</span>: [<span class="string">"$gcc"</span>]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>用 makefile 的话大致如下</p>
+<figure class="highlight makefile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">INCLUDE_PATH = <span class="variable">$(CUSTOM_LIBS_PATH)</span>/<span class="keyword">include</span></span><br><span class="line">REQUIRED_LIBS = -Llib -lglfw3</span><br><span class="line">TARGET = dist/main.exe</span><br><span class="line"></span><br><span class="line"><span class="section">main: gltest.o</span></span><br><span class="line">    <span class="variable">$(CXX)</span> gltest.o -o <span class="variable">$(TARGET)</span></span><br><span class="line"></span><br><span class="line"><span class="section">gltest.o: glad.o c/gltest.cpp</span></span><br><span class="line">	<span class="variable">$(CXX)</span> -c c/gltest.cpp glad.o <span class="variable">$(REQUIRED_LIBS)</span> -I <span class="variable">$(INCLUDE_PATH)</span></span><br><span class="line"></span><br><span class="line"><span class="section">glad.o: <span class="variable">$(CUSTOM_LIBS_PATH)</span>/src/glad.c</span></span><br><span class="line">	<span class="variable">$(CXX)</span> -c <span class="variable">$(CUSTOM_LIBS_PATH)</span>/src/glad.c -I <span class="variable">$(INCLUDE_PATH)</span></span><br><span class="line"></span><br><span class="line"><span class="section">clean:</span></span><br><span class="line">	del glad.o gltest.o dist\main.exe</span><br></pre></td></tr></table></figure>
+<h2 id="出现的问题">出现的问题</h2>
+<ol>
+<li>
+<p>头文件顺序错误，需要将 glad.h 放在最前面</p>
+<p><img src="/hexo/image/opengl/%E5%A4%B4%E6%96%87%E4%BB%B6%E9%A1%BA%E5%BA%8F.png" alt="图片无法显示"></p>
+</li>
+<li>
+<p>缺少依赖，需要引用 gdi32</p>
+<p><img src="/hexo/image/opengl/%E7%BC%BA%E5%B0%91gdi32.png" alt="图片无法显示"></p>
+</li>
+</ol>
+<p>用 everything 搜索 gdi32 发现，mingw 路径下有一个 libgdi32，但是链接后还是缺少依赖，最后找到一个系统的 gdi32.dll,编译成功</p>
+<h2 id="最终改成如下">最终改成如下</h2>
+<figure class="highlight makefile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">INCLUDE_PATH = <span class="variable">$(CUSTOM_LIBS_PATH)</span>/<span class="keyword">include</span></span><br><span class="line">REQUIRED_LIBS = -Llib -lglfw3 -LC:/Windows/WinSxS/amd64_microsoft-windows-gdi32_31bf3856ad364e35_10.0.18362.1_none_2bdc19f7c689fa4b -lgdi32</span><br><span class="line">TARGET = dist/main.exe</span><br><span class="line"></span><br><span class="line"><span class="section">main: gltest.o</span></span><br><span class="line">    <span class="variable">$(CXX)</span> gltest.o -o <span class="variable">$(TARGET)</span></span><br><span class="line"></span><br><span class="line"><span class="section">gltest.o: glad.o c/gltest.cpp</span></span><br><span class="line">	<span class="variable">$(CXX)</span> -c c/gltest.cpp glad.o <span class="variable">$(REQUIRED_LIBS)</span> -I <span class="variable">$(INCLUDE_PATH)</span></span><br><span class="line"></span><br><span class="line"><span class="section">glad.o: <span class="variable">$(CUSTOM_LIBS_PATH)</span>/src/glad.c</span></span><br><span class="line">	<span class="variable">$(CXX)</span> -c <span class="variable">$(CUSTOM_LIBS_PATH)</span>/src/glad.c -I <span class="variable">$(INCLUDE_PATH)</span></span><br><span class="line"></span><br><span class="line"><span class="section">clean:</span></span><br><span class="line">	del glad.o gltest.o dist\main.exe</span><br></pre></td></tr></table></figure>
+<p>编译，启动，大功告成</p>
+<p><img src="/hexo/image/opengl/%E5%90%AF%E5%8A%A8%E6%88%90%E5%8A%9F.png" alt="图片无法显示"></p>
+<h1>hello world</h1>
+<p>万物之始</p>
+<p>创建一个窗口</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;glad/glad.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;GLFW/glfw3.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">frame_size_callback</span><span class="params">(GLFWwindow *window, <span class="keyword">int</span> width, <span class="keyword">int</span> height)</span></span>;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">processInput</span><span class="params">(GLFWwindow *window)</span></span>;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">draw</span><span class="params">(GLFWwindow *window)</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    glfwInit();</span><br><span class="line">    <span class="comment">// 设置3.3版本</span></span><br><span class="line">    <span class="comment">// opengl主要版本</span></span><br><span class="line">    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, <span class="number">3</span>);</span><br><span class="line">    <span class="comment">// opengl次要版本</span></span><br><span class="line">    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, <span class="number">3</span>);</span><br><span class="line">    <span class="comment">// 核心模式</span></span><br><span class="line">    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 没有装饰器，菜单、边框等</span></span><br><span class="line">    <span class="comment">// glfwWindowHint(GLFW_DECORATED, GLFW_FALSE);</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">// 透明</span></span><br><span class="line">    <span class="comment">// glfwWindowHint(GLFW_TRANSPARENT_FRAMEBUFFER, GLFW_TRUE);</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">// 创建窗口</span></span><br><span class="line">    GLFWwindow *window = glfwCreateWindow(<span class="number">500</span>, <span class="number">500</span>, <span class="string">"hello world"</span>, <span class="literal">NULL</span>, <span class="literal">NULL</span>);</span><br><span class="line">    <span class="keyword">if</span> (window == <span class="literal">NULL</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="built_in">std</span>::<span class="built_in">cout</span> &lt;&lt; <span class="string">"Failed to create GLFW window"</span> &lt;&lt; <span class="built_in">std</span>::<span class="built_in">endl</span>;</span><br><span class="line">        glfwTerminate();</span><br><span class="line">        <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    glfwMakeContextCurrent(window);</span><br><span class="line">    <span class="comment">// 设置回调，每次窗口大小改变，视口大小也改变</span></span><br><span class="line">    glfwSetFramebufferSizeCallback(window, frame_size_callback);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 初始化glad</span></span><br><span class="line">    <span class="keyword">if</span> (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="built_in">std</span>::<span class="built_in">cout</span> &lt;&lt; <span class="string">"Failed to initialize GLAD"</span> &lt;&lt; <span class="built_in">std</span>::<span class="built_in">endl</span>;</span><br><span class="line">        <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 渲染循环</span></span><br><span class="line">    <span class="comment">// 检查是否被要求退出</span></span><br><span class="line">    <span class="keyword">while</span> (!glfwWindowShouldClose(window))</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="comment">// 轮询键盘输入</span></span><br><span class="line">        processInput(window);</span><br><span class="line"></span><br><span class="line">        draw(window);</span><br><span class="line">        <span class="comment">// 交换缓冲区</span></span><br><span class="line">        glfwSwapBuffers(window);</span><br><span class="line">        <span class="comment">// 轮询事件</span></span><br><span class="line">        glfwPollEvents();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="built_in">std</span>::<span class="built_in">cout</span> &lt;&lt; <span class="string">"结束"</span> &lt;&lt; <span class="built_in">std</span>::<span class="built_in">endl</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 退出</span></span><br><span class="line">    glfwTerminate();</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 设置视口的大小</span></span><br><span class="line">    <span class="comment">// glViewPort(0, 0, 800, 600);</span></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">frame_size_callback</span><span class="params">(GLFWwindow *window, <span class="keyword">int</span> width, <span class="keyword">int</span> height)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="comment">// 设置视口位置，前两个参数为左下角坐标，后两个为宽高</span></span><br><span class="line">	<span class="comment">// 参考中的教程说此函数在窗口第一次生成时就会触发，但本人的win10环境中测试，实际上只有窗口大小改变时触发</span></span><br><span class="line">    glViewport(<span class="number">0</span>, <span class="number">0</span>, width - <span class="number">100</span>, height - <span class="number">100</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">processInput</span><span class="params">(GLFWwindow *window)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="comment">// 键是否被按下</span></span><br><span class="line">    <span class="keyword">if</span> (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)</span><br><span class="line">        glfwSetWindowShouldClose(window, <span class="literal">true</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">draw</span><span class="params">(GLFWwindow *window)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="comment">// 设置清空颜色</span></span><br><span class="line">    glClearColor(<span class="number">0</span>, <span class="number">0</span>, <span class="number">0.4</span>, <span class="number">0</span>);</span><br><span class="line">    <span class="comment">// 使用预设深度和颜色清空</span></span><br><span class="line">    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h1>示例</h1>
+<p>用的 opengl3.3,各种操作基本和 webgl2 差不多<br>
+核心模式必须使用顶点数组对象，否则图形无法绘制出来</p>
+<p>和 webgl 有些区别，主要是着色器</p>
+<ol>
+<li>webgl 使用 glsl 100，第一行不需要版本声明，webgl2 和 opengl3.3 的着色器代码第一行必须有版本声明</li>
+<li>webgl 没有 vertex array object</li>
+<li>glsl 300 es 版本的着色器语言 attribute 改成了 in,varying 变成 out</li>
+<li>片段着色器没有了预定义的 gl_FragColor，需要自己声明不以 gl开头的 out 变量</li>
+</ol>
+<p>画一个三角形，参考链接给出的示例代码如下</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br><span class="line">191</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;glad/glad.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;GLFW/glfw3.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;iostream&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> <span class="keyword">char</span> *<span class="keyword">const</span> vsSource = <span class="string">"#version 330 core\n"</span></span><br><span class="line">                             <span class="string">"layout (location = 0) in vec3 point;\n"</span></span><br><span class="line">                             <span class="string">"void main()\n"</span></span><br><span class="line">                             <span class="string">"&#123;\n"</span></span><br><span class="line">                             <span class="string">"   gl_Position = vec4(point, 1);\n"</span></span><br><span class="line">                             <span class="string">"&#125;\n\0"</span>;</span><br><span class="line"><span class="comment">// const char不能改内容，char * const不能改指向</span></span><br><span class="line"><span class="keyword">const</span> <span class="keyword">char</span> *<span class="keyword">const</span> fsSource = <span class="string">"#version 330 core\n"</span></span><br><span class="line">                             <span class="string">"out vec4 color;\n"</span></span><br><span class="line">                             <span class="string">"void main()\n"</span></span><br><span class="line">                             <span class="string">"&#123;\n"</span></span><br><span class="line">                             <span class="string">"   color = vec4(0, 0, 0.5, 0.3);\n"</span></span><br><span class="line">                             <span class="string">"&#125;\n\0"</span>;</span><br><span class="line"><span class="comment">// 为了方便用了命名空间，反正自己的代码，也不是在头文件里加，不会出现命名冲突</span></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> <span class="built_in">std</span>;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">frame_size_callback</span><span class="params">(GLFWwindow *window, <span class="keyword">int</span> width, <span class="keyword">int</span> height)</span></span>;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">processInput</span><span class="params">(GLFWwindow *window)</span></span>;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">draw</span><span class="params">(<span class="keyword">unsigned</span> <span class="keyword">int</span> program, <span class="keyword">unsigned</span> <span class="keyword">int</span> vao)</span></span>;</span><br><span class="line"><span class="function"><span class="keyword">unsigned</span> <span class="keyword">int</span> <span class="title">compileProgram</span><span class="params">(<span class="keyword">const</span> <span class="keyword">char</span> *fsSource, <span class="keyword">const</span> <span class="keyword">char</span> *vsSource)</span></span>;</span><br><span class="line"><span class="function"><span class="keyword">unsigned</span> <span class="keyword">int</span> <span class="title">compileShader</span><span class="params">(<span class="keyword">const</span> <span class="keyword">char</span> *shaderSource, <span class="keyword">unsigned</span> <span class="keyword">int</span> type)</span></span>;</span><br><span class="line"><span class="function"><span class="keyword">unsigned</span> <span class="keyword">int</span> <span class="title">createBuffer</span><span class="params">(<span class="keyword">float</span> data[], <span class="keyword">int</span> id, <span class="keyword">int</span> length)</span></span>;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">prepare</span><span class="params">(<span class="keyword">unsigned</span> <span class="keyword">int</span> *buffer, <span class="keyword">unsigned</span> <span class="keyword">int</span> *program, <span class="keyword">unsigned</span> <span class="keyword">int</span> *vao, <span class="keyword">int</span> id)</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">unsigned</span> <span class="keyword">int</span> buffer, program, vao;</span><br><span class="line">    glfwInit();</span><br><span class="line">    <span class="comment">// 设置3.3版本</span></span><br><span class="line">    <span class="comment">// opengl主要版本</span></span><br><span class="line">    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, <span class="number">3</span>);</span><br><span class="line">    <span class="comment">// opengl次要版本</span></span><br><span class="line">    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, <span class="number">3</span>);</span><br><span class="line">    <span class="comment">// 核心模式</span></span><br><span class="line">    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 没有装饰器，菜单、边框等</span></span><br><span class="line">    <span class="comment">// glfwWindowHint(GLFW_DECORATED, GLFW_FALSE);</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">// 透明</span></span><br><span class="line">    glfwWindowHint(GLFW_TRANSPARENT_FRAMEBUFFER, GLFW_TRUE);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 创建窗口</span></span><br><span class="line">    GLFWwindow *window = glfwCreateWindow(<span class="number">500</span>, <span class="number">500</span>, <span class="string">"hello world"</span>, <span class="literal">NULL</span>, <span class="literal">NULL</span>);</span><br><span class="line">    <span class="keyword">if</span> (window == <span class="literal">NULL</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="built_in">cout</span> &lt;&lt; <span class="string">"Failed to create GLFW window"</span> &lt;&lt; <span class="built_in">endl</span>;</span><br><span class="line">        glfwTerminate();</span><br><span class="line">        <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    glfwMakeContextCurrent(window);</span><br><span class="line">    <span class="comment">// 设置回调，每次窗口大小改变，视口大小也改变</span></span><br><span class="line">    glfwSetFramebufferSizeCallback(window, frame_size_callback);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 初始化glad</span></span><br><span class="line">    <span class="keyword">if</span> (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="built_in">cout</span> &lt;&lt; <span class="string">"Failed to initialize GLAD"</span> &lt;&lt; <span class="built_in">endl</span>;</span><br><span class="line">        <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    prepare(&amp;buffer, &amp;program, &amp;vao, <span class="number">1</span>);</span><br><span class="line">    <span class="comment">// 渲染循环</span></span><br><span class="line">    <span class="comment">// 检查是否被要求退出</span></span><br><span class="line">    <span class="keyword">while</span> (!glfwWindowShouldClose(window))</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="comment">// 轮询键盘输入</span></span><br><span class="line">        processInput(window);</span><br><span class="line"></span><br><span class="line">        draw(program, vao);</span><br><span class="line">        <span class="comment">// 交换缓冲区</span></span><br><span class="line">        glfwSwapBuffers(window);</span><br><span class="line">        <span class="comment">// 轮询事件</span></span><br><span class="line">        glfwPollEvents();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="built_in">cout</span> &lt;&lt; <span class="string">"结束"</span> &lt;&lt; <span class="built_in">endl</span>;</span><br><span class="line"></span><br><span class="line">    glDeleteBuffers(<span class="number">1</span>, &amp;buffer);</span><br><span class="line">    glDeleteVertexArrays(<span class="number">1</span>, &amp;vao);</span><br><span class="line">    glDeleteProgram(program);</span><br><span class="line">    <span class="comment">// 退出</span></span><br><span class="line">    glfwTerminate();</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 设置视口的大小</span></span><br><span class="line">    <span class="comment">// glViewPort(0, 0, 800, 600);</span></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">frame_size_callback</span><span class="params">(GLFWwindow *window, <span class="keyword">int</span> width, <span class="keyword">int</span> height)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="comment">// 设置视口位置，前两个参数为左下角坐标，后两个为宽高</span></span><br><span class="line">    glViewport(<span class="number">0</span>, <span class="number">0</span>, width - <span class="number">100</span>, height - <span class="number">100</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">processInput</span><span class="params">(GLFWwindow *window)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="comment">// 键是否被按下</span></span><br><span class="line">    <span class="keyword">if</span> (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)</span><br><span class="line">        glfwSetWindowShouldClose(window, <span class="literal">true</span>);</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">prepare</span><span class="params">(<span class="keyword">unsigned</span> <span class="keyword">int</span> *buffer, <span class="keyword">unsigned</span> <span class="keyword">int</span> *program, <span class="keyword">unsigned</span> <span class="keyword">int</span> *vao, <span class="keyword">int</span> id)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    *program = compileProgram(fsSource, vsSource);</span><br><span class="line">    <span class="keyword">if</span> (!*program)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">float</span> data[] = &#123;<span class="number">0</span>, <span class="number">0.5</span>, <span class="number">0</span>, <span class="number">-0.5</span>, <span class="number">-0.5</span>, <span class="number">0</span>, <span class="number">0.5</span>, <span class="number">-0.5</span>, <span class="number">0</span>&#125;;</span><br><span class="line">    glGenVertexArrays(id, vao);</span><br><span class="line">    glBindVertexArray(*vao);</span><br><span class="line">    *buffer = createBuffer(data, id, <span class="number">9</span>);</span><br><span class="line">    glVertexAttribPointer(<span class="number">0</span>, <span class="number">3</span>, GL_FLOAT, GL_FALSE, <span class="number">0</span>, <span class="number">0</span>);</span><br><span class="line">    glEnableVertexAttribArray(<span class="number">0</span>);</span><br><span class="line">    glBindVertexArray(<span class="number">0</span>);</span><br><span class="line">    glBindBuffer(GL_ARRAY_BUFFER, <span class="number">0</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">draw</span><span class="params">(<span class="keyword">unsigned</span> <span class="keyword">int</span> program, <span class="keyword">unsigned</span> <span class="keyword">int</span> vao)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="comment">// 设置清空颜色</span></span><br><span class="line">    glClearColor(<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>);</span><br><span class="line">    <span class="comment">// 使用预设深度和颜色清空</span></span><br><span class="line">    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);</span><br><span class="line">    glUseProgram(program);</span><br><span class="line">    glBindVertexArray(vao);</span><br><span class="line">    <span class="comment">// 线框模式</span></span><br><span class="line">    <span class="comment">// glPolygonMode(GL_FRONT_AND_BACK, GL_LINE)</span></span><br><span class="line">    glDrawArrays(GL_TRIANGLE_STRIP, <span class="number">0</span>, <span class="number">3</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">unsigned</span> <span class="keyword">int</span> <span class="title">compileProgram</span><span class="params">(<span class="keyword">const</span> <span class="keyword">char</span> *fsSource, <span class="keyword">const</span> <span class="keyword">char</span> *vsSource)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">unsigned</span> <span class="keyword">int</span> vertexShader = compileShader(vsSource, GL_VERTEX_SHADER);</span><br><span class="line">    <span class="keyword">unsigned</span> <span class="keyword">int</span> fragmentShader = compileShader(fsSource, GL_FRAGMENT_SHADER);</span><br><span class="line">    <span class="keyword">char</span> <span class="built_in">log</span>[<span class="number">512</span>];</span><br><span class="line">    <span class="keyword">if</span> (!fragmentShader || !vertexShader)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">unsigned</span> <span class="keyword">int</span> program = glCreateProgram();</span><br><span class="line">    <span class="keyword">int</span> success;</span><br><span class="line">    glAttachShader(program, vertexShader);</span><br><span class="line">    glAttachShader(program, fragmentShader);</span><br><span class="line">    glLinkProgram(program);</span><br><span class="line">    glGetProgramiv(program, GL_LINK_STATUS, &amp;success);</span><br><span class="line">    <span class="keyword">if</span> (!success)</span><br><span class="line">    &#123;</span><br><span class="line">        glGetProgramInfoLog(program, <span class="number">512</span>, <span class="literal">NULL</span>, <span class="built_in">log</span>);</span><br><span class="line">        <span class="built_in">cout</span> &lt;&lt; <span class="string">"link program failed:"</span> &lt;&lt; <span class="built_in">log</span> &lt;&lt; <span class="built_in">endl</span>;</span><br><span class="line">        <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 以后用不到的shader可以删了</span></span><br><span class="line">    glDeleteShader(vertexShader);</span><br><span class="line">    glDeleteShader(fragmentShader);</span><br><span class="line">    <span class="keyword">return</span> program;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">unsigned</span> <span class="keyword">int</span> <span class="title">compileShader</span><span class="params">(<span class="keyword">const</span> <span class="keyword">char</span> *shaderSource, <span class="keyword">unsigned</span> <span class="keyword">int</span> type)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">unsigned</span> <span class="keyword">int</span> shader = glCreateShader(type);</span><br><span class="line">    <span class="keyword">int</span> success = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">char</span> <span class="built_in">log</span>[<span class="number">512</span>];</span><br><span class="line">    <span class="comment">// 第二个参数为字符串数量</span></span><br><span class="line">    glShaderSource(shader, <span class="number">1</span>, &amp;shaderSource, <span class="literal">NULL</span>);</span><br><span class="line">    glCompileShader(shader);</span><br><span class="line">    glGetShaderiv(shader, GL_COMPILE_STATUS, &amp;success);</span><br><span class="line">    <span class="keyword">if</span> (!success)</span><br><span class="line">    &#123;</span><br><span class="line">        glGetShaderInfoLog(shader, <span class="number">512</span>, <span class="literal">NULL</span>, <span class="built_in">log</span>);</span><br><span class="line">        <span class="built_in">cout</span> &lt;&lt; <span class="string">"compile shader error:"</span> &lt;&lt; <span class="built_in">log</span> &lt;&lt; <span class="built_in">endl</span>;</span><br><span class="line">        <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> shader;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">unsigned</span> <span class="keyword">int</span> <span class="title">createBuffer</span><span class="params">(<span class="keyword">float</span> data[], <span class="keyword">int</span> id, <span class="keyword">int</span> length)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">unsigned</span> <span class="keyword">int</span> buffer;</span><br><span class="line">    <span class="comment">// id必须唯1</span></span><br><span class="line">    glGenBuffers(id, &amp;buffer);</span><br><span class="line">    glBindBuffer(GL_ARRAY_BUFFER, buffer);</span><br><span class="line">    <span class="comment">// GL_STATIC_DRAW ：数据不会或几乎不会改变。</span></span><br><span class="line">    <span class="comment">// GL_DYNAMIC_DRAW：数据会被改变很多。</span></span><br><span class="line">    <span class="comment">// GL_STREAM_DRAW ：数据每次绘制时都会改变。</span></span><br><span class="line">    glBufferData(GL_ARRAY_BUFFER, <span class="keyword">sizeof</span>(<span class="keyword">float</span>) * length, data, GL_STATIC_DRAW);</span><br><span class="line">    <span class="keyword">return</span> buffer;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h1>分步骤</h1>
+<p>为了逻辑清晰，将步骤划分一下</p>
+<h2 id="初始化-glfw，窗口，glad">初始化 glfw，窗口，glad</h2>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="keyword">int</span> OpenglWindow::initWindow(<span class="keyword">int</span> width, <span class="keyword">int</span> height, <span class="keyword">const</span> <span class="keyword">char</span> *title)</span><br><span class="line">&#123;</span><br><span class="line">    glfwInit();</span><br><span class="line">    <span class="comment">// 窗口配置</span></span><br><span class="line">    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, <span class="number">3</span>);</span><br><span class="line">    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, <span class="number">3</span>);</span><br><span class="line">    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);</span><br><span class="line">    <span class="comment">// glfwWindowHint(GLFW_DECORATED, GLFW_FALSE);</span></span><br><span class="line">    glfwWindowHint(GLFW_TRANSPARENT_FRAMEBUFFER, GLFW_TRUE);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 创建窗口</span></span><br><span class="line">    window = glfwCreateWindow(width, height, title, <span class="literal">NULL</span>, <span class="literal">NULL</span>);</span><br><span class="line">    <span class="keyword">if</span> (window == <span class="literal">NULL</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="built_in">cout</span> &lt;&lt; <span class="string">"create window failed"</span> &lt;&lt; <span class="built_in">endl</span>;</span><br><span class="line">        glfwTerminate();</span><br><span class="line">        <span class="keyword">return</span> CREATE_WINDOW_FAILED;</span><br><span class="line">    &#125;</span><br><span class="line">    glfwMakeContextCurrent(window);</span><br><span class="line">    <span class="comment">// 大小改变回调</span></span><br><span class="line">    glfwSetFramebufferSizeCallback(window, setViewport);</span><br><span class="line">    <span class="keyword">if</span> (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="built_in">cout</span> &lt;&lt; <span class="string">"glad load failed"</span> &lt;&lt; <span class="built_in">endl</span>;</span><br><span class="line">        <span class="keyword">return</span> GLAD_LOAD_FAILED;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 重设视口</span></span><br><span class="line">    glViewport(<span class="number">0</span>, <span class="number">0</span>, width, height);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>窗口所有配置参数如下</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">宏</th>
+<th style="text-align:left">默认值</th>
+<th style="text-align:left">可取值</th>
+<th style="text-align:left">作用</th>
+<th>适用范围</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">GLFW_RESIZABLE</td>
+<td style="text-align:left">GLFW_TRUE</td>
+<td style="text-align:left">GLFW_TRUE or GLFW_FALSE</td>
+<td style="text-align:left">顾名思义</td>
+<td>窗口模式;GLFW_DECORATED 为 true</td>
+</tr>
+<tr>
+<td style="text-align:left">GLFW_VISIBLE</td>
+<td style="text-align:left">GLFW_TRUE</td>
+<td style="text-align:left">GLFW_TRUE or GLFW_FALSE</td>
+<td style="text-align:left">顾名思义</td>
+<td>窗口模式;</td>
+</tr>
+<tr>
+<td style="text-align:left">GLFW_DECORATED</td>
+<td style="text-align:left">GLFW_TRUE</td>
+<td style="text-align:left">GLFW_TRUE or GLFW_FALSE</td>
+<td style="text-align:left">装饰器，关闭放大按钮，边框等是否存在，设为 GLFW_FALSE 时窗口无法被用户改变大小</td>
+<td>窗口模式;</td>
+</tr>
+<tr>
+<td style="text-align:left">GLFW_FOCUSED</td>
+<td style="text-align:left">GLFW_TRUE</td>
+<td style="text-align:left">GLFW_TRUE or GLFW_FALSE</td>
+<td style="text-align:left">创建时是否有焦点</td>
+<td>窗口模式;创建时不隐藏;</td>
+</tr>
+<tr>
+<td style="text-align:left">GLFW_AUTO_ICONIFY</td>
+<td style="text-align:left">GLFW_TRUE</td>
+<td style="text-align:left">GLFW_TRUE or GLFW_FALSE</td>
+<td style="text-align:left">全屏模式失去焦点时是否自动最小化为图标并且重置之前的 video mode(具体意思不明，详见参考<sup><a href="#%E5%8F%82%E8%80%83">[5]</a><sup>)</sup></sup></td>
+<td>全屏模式</td>
+</tr>
+<tr>
+<td style="text-align:left">GLFW_FLOATING</td>
+<td style="text-align:left">GLFW_FALSE</td>
+<td style="text-align:left">GLFW_TRUE or GLFW_FALSE</td>
+<td style="text-align:left">总是置顶</td>
+<td>窗口模式</td>
+</tr>
+<tr>
+<td style="text-align:left">GLFW_MAXIMIZED</td>
+<td style="text-align:left">GLFW_FALSE</td>
+<td style="text-align:left">GLFW_TRUE or GLFW_FALSE</td>
+<td style="text-align:left">创建时最大化</td>
+<td>窗口模式</td>
+</tr>
+<tr>
+<td style="text-align:left">GLFW_CENTER_CURSOR</td>
+<td style="text-align:left">GLFW_TRUE</td>
+<td style="text-align:left">GLFW_TRUE or GLFW_FALSE</td>
+<td style="text-align:left">鼠标指针是否跳至新建窗口中央</td>
+<td>全屏模式</td>
+</tr>
+<tr>
+<td style="text-align:left">GLFW_TRANSPARENT_FRAMEBUFFER</td>
+<td style="text-align:left">GLFW_FALSE</td>
+<td style="text-align:left">GLFW_TRUE or GLFW_FALSE</td>
+<td style="text-align:left">透明，这个设为 true 时，在 windows 下，无论颜色透明度设为几，洋红色都是透明的，解决办法查看参考链接<sup><a href="#%E5%8F%82%E8%80%83">[5]</a><sup></sup></sup></td>
+<td>无法作用在窗口装饰器上</td>
+</tr>
+<tr>
+<td style="text-align:left">GLFW_FOCUS_ON_SHOW</td>
+<td style="text-align:left">GLFW_TRUE</td>
+<td style="text-align:left">GLFW_TRUE or GLFW_FALSE</td>
+<td style="text-align:left">glfwShowWindow 调用时是否获得焦点</td>
+<td>未限制</td>
+</tr>
+<tr>
+<td style="text-align:left">GLFW_SCALE_TO_MONITOR</td>
+<td style="text-align:left">GLFW_FALSE</td>
+<td style="text-align:left">GLFW_TRUE or GLFW_FALSE</td>
+<td style="text-align:left">窗口内容区域大小是否根据显示器内容缩放而调整，窗口初始化时就开始生效</td>
+<td>仅对屏幕像素和坐标映射比例为 1:1 的平台生效，如 windows 和 x11,macos 不生效</td>
+</tr>
+<tr>
+<td style="text-align:left">GLFW_RED_BITS</td>
+<td style="text-align:left">8</td>
+<td style="text-align:left">0 to INT_MAX or GLFW_DONT_CARE</td>
+<td style="text-align:left"></td>
+<td></td>
+</tr>
+<tr>
+<td style="text-align:left">GLFW_GREEN_BITS</td>
+<td style="text-align:left">8</td>
+<td style="text-align:left">0 to INT_MAX or GLFW_DONT_CARE</td>
+<td style="text-align:left"></td>
+<td></td>
+</tr>
+<tr>
+<td style="text-align:left">GLFW_BLUE_BITS</td>
+<td style="text-align:left">8</td>
+<td style="text-align:left">0 to INT_MAX or GLFW_DONT_CARE</td>
+<td style="text-align:left"></td>
+<td></td>
+</tr>
+<tr>
+<td style="text-align:left">GLFW_ALPHA_BITS</td>
+<td style="text-align:left">8</td>
+<td style="text-align:left">0 to INT_MAX or GLFW_DONT_CARE</td>
+<td style="text-align:left"></td>
+<td></td>
+</tr>
+<tr>
+<td style="text-align:left">GLFW_DEPTH_BITS</td>
+<td style="text-align:left">24</td>
+<td style="text-align:left">0 to INT_MAX or GLFW_DONT_CARE</td>
+<td style="text-align:left"></td>
+<td></td>
+</tr>
+<tr>
+<td style="text-align:left">GLFW_STENCIL_BITS</td>
+<td style="text-align:left">8</td>
+<td style="text-align:left">0 to INT_MAX or GLFW_DONT_CARE</td>
+<td style="text-align:left"></td>
+<td></td>
+</tr>
+<tr>
+<td style="text-align:left">GLFW_ACCUM_RED_BITS</td>
+<td style="text-align:left">0</td>
+<td style="text-align:left">0 to INT_MAX or GLFW_DONT_CARE</td>
+<td style="text-align:left">不应当用于新代码</td>
+<td></td>
+</tr>
+<tr>
+<td style="text-align:left">GLFW_ACCUM_GREEN_BITS</td>
+<td style="text-align:left">0</td>
+<td style="text-align:left">0 to INT_MAX or GLFW_DONT_CARE</td>
+<td style="text-align:left">不应当用于新代码</td>
+<td></td>
+</tr>
+<tr>
+<td style="text-align:left">GLFW_ACCUM_BLUE_BITS</td>
+<td style="text-align:left">0</td>
+<td style="text-align:left">0 to INT_MAX or GLFW_DONT_CARE</td>
+<td style="text-align:left">不应当用于新代码</td>
+<td></td>
+</tr>
+<tr>
+<td style="text-align:left">GLFW_ACCUM_ALPHA_BITS</td>
+<td style="text-align:left">0</td>
+<td style="text-align:left">0 to INT_MAX or GLFW_DONT_CARE</td>
+<td style="text-align:left">不应当用于新代码</td>
+<td></td>
+</tr>
+<tr>
+<td style="text-align:left">GLFW_AUX_BUFFERS</td>
+<td style="text-align:left">0</td>
+<td style="text-align:left">0 to INT_MAX or GLFW_DONT_CARE</td>
+<td style="text-align:left">不应当用于新代码</td>
+<td></td>
+</tr>
+<tr>
+<td style="text-align:left">GLFW_SAMPLES</td>
+<td style="text-align:left">0</td>
+<td style="text-align:left">0 to INT_MAX or GLFW_DONT_CARE</td>
+<td style="text-align:left">多重采样样本数</td>
+<td></td>
+</tr>
+<tr>
+<td style="text-align:left">GLFW_REFRESH_RATE</td>
+<td style="text-align:left">GLFW_DONT_CARE</td>
+<td style="text-align:left">0 to INT_MAX or GLFW_DONT_CARE</td>
+<td style="text-align:left"></td>
+<td></td>
+</tr>
+<tr>
+<td style="text-align:left">GLFW_STEREO</td>
+<td style="text-align:left">GLFW_FALSE</td>
+<td style="text-align:left">GLFW_TRUE or GLFW_FALSE</td>
+<td style="text-align:left"></td>
+<td></td>
+</tr>
+<tr>
+<td style="text-align:left">GLFW_SRGB_CAPABLE</td>
+<td style="text-align:left">GLFW_FALSE</td>
+<td style="text-align:left">GLFW_TRUE or GLFW_FALSE</td>
+<td style="text-align:left"></td>
+<td></td>
+</tr>
+<tr>
+<td style="text-align:left">GLFW_DOUBLEBUFFER</td>
+<td style="text-align:left">GLFW_TRUE</td>
+<td style="text-align:left">GLFW_TRUE or GLFW_FALSE</td>
+<td style="text-align:left">双缓冲绘图</td>
+<td>强制为 true</td>
+</tr>
+<tr>
+<td style="text-align:left">GLFW_REFRESH_RATE</td>
+<td style="text-align:left">最高可达刷新率</td>
+<td style="text-align:left">0 to INT_MAX or GLFW_DONT_CARE</td>
+<td style="text-align:left">刷新率，GLFW_DONT_CARE 代表采用最高</td>
+<td>全屏模式</td>
+</tr>
+<tr>
+<td style="text-align:left">GLFW_CLIENT_API</td>
+<td style="text-align:left">GLFW_OPENGL_API</td>
+<td style="text-align:left">GLFW_OPENGL_API, GLFW_OPENGL_ES_API or GLFW_NO_API</td>
+<td style="text-align:left">指定为哪个 api 创建窗口上下文，详见参考<sup><a href="#%E5%8F%82%E8%80%83">[5]</a></sup></td>
+<td></td>
+</tr>
+<tr>
+<td style="text-align:left">GLFW_CONTEXT_CREATION_API</td>
+<td style="text-align:left">GLFW_NATIVE_CONTEXT_API</td>
+<td style="text-align:left">GLFW_NATIVE_CONTEXT_API, GLFW_EGL_CONTEXT_API or GLFW_OSMESA_CONTEXT_API</td>
+<td style="text-align:left">指定用于创建窗口上下文的 api，详见参考<sup><a href="#%E5%8F%82%E8%80%83">[5]</a></sup></td>
+<td></td>
+</tr>
+<tr>
+<td style="text-align:left">GLFW_CONTEXT_VERSION_MAJOR</td>
+<td style="text-align:left">1</td>
+<td style="text-align:left">Any valid major version number of the chosen client API</td>
+<td style="text-align:left">主版本号，若指定不当窗口可能创建失败，详见参考<sup><a href="#%E5%8F%82%E8%80%83">[5]</a></sup></td>
+<td></td>
+</tr>
+<tr>
+<td style="text-align:left">GLFW_CONTEXT_VERSION_MINOR</td>
+<td style="text-align:left">0</td>
+<td style="text-align:left">Any valid minor version number of the chosen client API</td>
+<td style="text-align:left">次版本号，若指定不当窗口可能创建失败，详见参考<sup><a href="#%E5%8F%82%E8%80%83">[5]</a></sup></td>
+<td></td>
+</tr>
+<tr>
+<td style="text-align:left">GLFW_CONTEXT_ROBUSTNESS</td>
+<td style="text-align:left">GLFW_NO_ROBUSTNESS</td>
+<td style="text-align:left">GLFW_NO_ROBUSTNESS, GLFW_NO_RESET_NOTIFICATION or GLFW_LOSE_CONTEXT_ON_RESET</td>
+<td style="text-align:left">指定健壮性策略</td>
+<td></td>
+</tr>
+<tr>
+<td style="text-align:left">GLFW_CONTEXT_RELEASE_BEHAVIOR</td>
+<td style="text-align:left">GLFW_ANY_RELEASE_BEHAVIOR</td>
+<td style="text-align:left">GLFW_ANY_RELEASE_BEHAVIOR, GLFW_RELEASE_BEHAVIOR_FLUSH or GLFW_RELEASE_BEHAVIOR_NONE</td>
+<td style="text-align:left">窗口上下文被释放时的行为，详见参考<sup><a href="#%E5%8F%82%E8%80%83">[5]</a>和<a href="https://www.opengl.org/registry/specs/KHR/context_flush_control.txt" target="_blank" rel="noopener">GL_KHR_context_flush_control</a></sup></td>
+<td></td>
+</tr>
+<tr>
+<td style="text-align:left">GLFW_OPENGL_FORWARD_COMPAT</td>
+<td style="text-align:left">GLFW_FALSE</td>
+<td style="text-align:left">GLFW_TRUE or GLFW_FALSE</td>
+<td style="text-align:left">向前兼容，详见<a href="https://www.opengl.org/registry/" target="_blank" rel="noopener">OpenGL Reference Manual.</a></td>
+<td>不使用 opengles 的情况下</td>
+</tr>
+<tr>
+<td style="text-align:left">GLFW_OPENGL_DEBUG_CONTEXT</td>
+<td style="text-align:left">GLFW_FALSE</td>
+<td style="text-align:left">GLFW_TRUE or GLFW_FALSE</td>
+<td style="text-align:left">是否开启 debug 模式，debug 模式有额外的错误报告和诊断报告,详见<a href="https://www.khronos.org/registry/OpenGL/extensions/KHR/KHR_debug.txt" target="_blank" rel="noopener">GL_KHR_debug </a></td>
+<td></td>
+</tr>
+<tr>
+<td style="text-align:left">GLFW_OPENGL_PROFILE</td>
+<td style="text-align:left">GLFW_OPENGL_ANY_PROFILE</td>
+<td style="text-align:left">GLFW_OPENGL_ANY_PROFILE, GLFW_OPENGL_COMPAT_PROFILE or GLFW_OPENGL_CORE_PROFILE</td>
+<td style="text-align:left">opengl 模式，详见<a href="https://www.opengl.org/registry/" target="_blank" rel="noopener">OpenGL Reference Manual.</a></td>
+<td></td>
+</tr>
+<tr>
+<td style="text-align:left">GLFW_COCOA_RETINA_FRAMEBUFFER</td>
+<td style="text-align:left">GLFW_TRUE</td>
+<td style="text-align:left">GLFW_TRUE or GLFW_FALSE</td>
+<td style="text-align:left"></td>
+<td>macOs</td>
+</tr>
+<tr>
+<td style="text-align:left">GLFW_COCOA_FRAME_NAME</td>
+<td style="text-align:left">“”</td>
+<td style="text-align:left">A UTF-8 encoded frame autosave name</td>
+<td style="text-align:left"></td>
+<td>macOS</td>
+</tr>
+<tr>
+<td style="text-align:left">GLFW_COCOA_GRAPHICS_SWITCHING</td>
+<td style="text-align:left">GLFW_FALSE</td>
+<td style="text-align:left">GLFW_TRUE or GLFW_FALSE</td>
+<td style="text-align:left"></td>
+<td>macOs</td>
+</tr>
+<tr>
+<td style="text-align:left">GLFW_X11_CLASS_NAME</td>
+<td style="text-align:left">“”</td>
+<td style="text-align:left">An ASCII encoded WM_CLASS class name</td>
+<td style="text-align:left"></td>
+<td>x11</td>
+</tr>
+<tr>
+<td style="text-align:left">GLFW_X11_INSTANCE_NAME</td>
+<td style="text-align:left">“”</td>
+<td style="text-align:left">An ASCII encoded WM_CLASS instance name</td>
+<td style="text-align:left"></td>
+<td>x11</td>
+</tr>
+</tbody>
+</table>
+<h2 id="编译链接着色器程序">编译链接着色器程序</h2>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> OpenglWindow::compileShader(<span class="keyword">const</span> <span class="keyword">char</span> *shaderSource, <span class="keyword">unsigned</span> <span class="keyword">int</span> type, <span class="keyword">unsigned</span> <span class="keyword">int</span> *result)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">unsigned</span> <span class="keyword">int</span> shader = glCreateShader(type);</span><br><span class="line">    <span class="keyword">int</span> success;</span><br><span class="line">    <span class="keyword">char</span> <span class="built_in">log</span>[<span class="number">512</span>];</span><br><span class="line">    glShaderSource(shader, <span class="number">1</span>, &amp;shaderSource, <span class="literal">NULL</span>);</span><br><span class="line">    glCompileShader(shader);</span><br><span class="line">    <span class="comment">// 检查是否编译成功</span></span><br><span class="line">    glGetShaderiv(shader, GL_COMPILE_STATUS, &amp;success);</span><br><span class="line">    <span class="keyword">if</span> (!success)</span><br><span class="line">    &#123;</span><br><span class="line">        glGetShaderInfoLog(shader, <span class="number">512</span>, <span class="literal">NULL</span>, <span class="built_in">log</span>);</span><br><span class="line">        <span class="built_in">cout</span> &lt;&lt; <span class="string">"compile shader failed:"</span> &lt;&lt; <span class="built_in">log</span> &lt;&lt; <span class="built_in">endl</span>;</span><br><span class="line">        <span class="comment">// 自定义的静态变量</span></span><br><span class="line">        <span class="keyword">return</span> COMPILE_SHADER_FAILED;</span><br><span class="line">    &#125;</span><br><span class="line">    *result = shader;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">int</span> OpenglWindow::linkProgram(<span class="keyword">const</span> <span class="keyword">char</span> *fsSource, <span class="keyword">const</span> <span class="keyword">char</span> *vsSource)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">unsigned</span> <span class="keyword">int</span> fragmentShader, vertexShader;</span><br><span class="line">    <span class="keyword">int</span> success;</span><br><span class="line">    <span class="keyword">char</span> <span class="built_in">log</span>[<span class="number">512</span>];</span><br><span class="line">    program = glCreateProgram();</span><br><span class="line">    <span class="keyword">if</span> (compileShader(fsSource, GL_FRAGMENT_SHADER, &amp;fragmentShader))</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">return</span> COMPILE_SHADER_FAILED;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (compileShader(vsSource, GL_VERTEX_SHADER, &amp;vertexShader))</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">return</span> COMPILE_SHADER_FAILED;</span><br><span class="line">    &#125;</span><br><span class="line">    glAttachShader(program, fragmentShader);</span><br><span class="line">    glAttachShader(program, vertexShader);</span><br><span class="line">    glLinkProgram(program);</span><br><span class="line">    <span class="comment">// 检查是否链接成功</span></span><br><span class="line">    glGetProgramiv(program, GL_LINK_STATUS, &amp;success);</span><br><span class="line">    <span class="keyword">if</span> (!success)</span><br><span class="line">    &#123;</span><br><span class="line">        glGetProgramInfoLog(program, <span class="number">512</span>, <span class="literal">NULL</span>, <span class="built_in">log</span>);</span><br><span class="line">        <span class="built_in">cout</span> &lt;&lt; <span class="string">"link program failed:"</span> &lt;&lt; <span class="built_in">log</span> &lt;&lt; <span class="built_in">endl</span>;</span><br><span class="line">        <span class="keyword">return</span> LINK_PROGRAM_FAILED;</span><br><span class="line">    &#125;</span><br><span class="line">    glDeleteShader(fragmentShader);</span><br><span class="line">    glDeleteShader(vertexShader);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="创建顶点缓存">创建顶点缓存</h2>
+<blockquote>
+<p>VBO(vertex buffer object) 顶点缓冲对象，存放顶点数据等<br>
+EBO(element buffer object) 索引缓冲对象，存放顶点的索引数据等<br>
+VAO(vertex array object) 顶点数组对象，记录 EBO 和 VBO 的绑定状态</p>
+</blockquote>
+<p>解绑的时候需要注意一下,EBO 不要在 VAO 之前解绑</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 顶点缓存</span></span><br><span class="line"><span class="keyword">void</span> OpenglWindow::createVao(<span class="keyword">float</span> data[], <span class="keyword">int</span> length, <span class="keyword">int</span> id, <span class="keyword">int</span> location)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">unsigned</span> <span class="keyword">int</span> VBO, VAO;</span><br><span class="line">    glGenVertexArrays(id, &amp;VAO);</span><br><span class="line">    <span class="comment">// 生成存</span></span><br><span class="line">    glGenBuffers(id, &amp;VBO);</span><br><span class="line">    <span class="comment">// 绑定缓存为当前缓存</span></span><br><span class="line">    glBindBuffer(GL_ARRAY_BUFFER, VBO);</span><br><span class="line">    <span class="comment">// 把数据存入当前缓存</span></span><br><span class="line">    glBufferData(GL_ARRAY_BUFFER, length, data, GL_STATIC_DRAW);</span><br><span class="line">    <span class="comment">// 绑定VAO开始记录状态</span></span><br><span class="line">    glBindVertexArray(VAO);</span><br><span class="line">    <span class="comment">// 设置顶点属性遍历缓存的及方法和下一个函数可以互换</span></span><br><span class="line">    glVertexAttribPointer(location, <span class="number">3</span>, GL_FLOAT, GL_FALSE, <span class="number">0</span>, <span class="number">0</span>);</span><br><span class="line">    <span class="comment">// 启用顶点属性</span></span><br><span class="line">    glEnableVertexAttribArray(location);</span><br><span class="line">    <span class="comment">// 解绑</span></span><br><span class="line">    glBindVertexArray(<span class="number">0</span>);</span><br><span class="line">    glBindBuffer(GL_ARRAY_BUFFER, <span class="number">0</span>);</span><br><span class="line">    vao = VAO;</span><br><span class="line">    vbo = VBO;</span><br><span class="line">    id = id;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 加上索引缓冲</span></span><br><span class="line"><span class="keyword">void</span> Square::createVao(<span class="keyword">float</span> data[], <span class="keyword">unsigned</span> <span class="keyword">int</span> data2[], <span class="keyword">int</span> length, <span class="keyword">int</span> length2, <span class="keyword">int</span> id, <span class="keyword">int</span> location)</span><br><span class="line">&#123;</span><br><span class="line">    glGenBuffers(id, &amp;EBO);</span><br><span class="line">    glGenBuffers(id, &amp;vbo);</span><br><span class="line">    glGenVertexArrays(id, &amp;vao);</span><br><span class="line">    glBindVertexArray(vao);</span><br><span class="line">    glBindBuffer(GL_ARRAY_BUFFER, vbo);</span><br><span class="line">    glBufferData(GL_ARRAY_BUFFER, length, data, GL_STATIC_DRAW);</span><br><span class="line">    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);</span><br><span class="line">    glBufferData(GL_ELEMENT_ARRAY_BUFFER, length2, data2, GL_STATIC_DRAW);</span><br><span class="line">    glVertexAttribPointer(location, <span class="number">3</span>, GL_FLOAT, GL_FALSE, <span class="number">0</span>, (<span class="keyword">void</span> *)<span class="number">0</span>);</span><br><span class="line">    glEnableVertexAttribArray(location);</span><br><span class="line">    glBindVertexArray(<span class="number">0</span>);</span><br><span class="line">    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, <span class="number">0</span>);</span><br><span class="line">    glBindBuffer(GL_ARRAY_BUFFER, <span class="number">0</span>);</span><br><span class="line">    <span class="keyword">this</span>-&gt;id = id;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="绘制">绘制</h2>
+<p>以上三步准备就绪后就可以开始绘制</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">void</span> Square::draw()</span><br><span class="line">&#123;</span><br><span class="line">    glClearColor(<span class="number">0.4</span>, <span class="number">0.5</span>, <span class="number">0.3</span>, <span class="number">1</span>);</span><br><span class="line">    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);</span><br><span class="line">    glUseProgram(program);</span><br><span class="line">    <span class="comment">// 绑定VAO相当于绑定了之前准备的顶点缓冲等</span></span><br><span class="line">    glBindVertexArray(vao);</span><br><span class="line">    glDrawElements(GL_TRIANGLES, <span class="number">6</span>, GL_UNSIGNED_INT, <span class="number">0</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="主循环">主循环</h2>
+<p>需要不断地循环绘制，刷新</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">void</span> Square::mainLoop()</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">while</span> (!glfwWindowShouldClose(window))</span><br><span class="line">    &#123;</span><br><span class="line">        getKeyInput();</span><br><span class="line">        draw();</span><br><span class="line">        glfwSwapBuffers(window);</span><br><span class="line">        glfwPollEvents();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="main-函数">main 函数</h2>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    Square square;</span><br><span class="line">    <span class="keyword">const</span> <span class="keyword">char</span> *<span class="keyword">const</span> vsSource = <span class="string">"#version 330 core\n"</span></span><br><span class="line">                                 <span class="string">"layout (location = 0) in vec3 point;\n"</span></span><br><span class="line">                                 <span class="string">"void main()\n"</span></span><br><span class="line">                                 <span class="string">"&#123;\n"</span></span><br><span class="line">                                 <span class="string">"   gl_Position = vec4(point, 1);\n"</span></span><br><span class="line">                                 <span class="string">"&#125;\n\0"</span>;</span><br><span class="line">    <span class="comment">// const char不能改内容，char * const不能改指向</span></span><br><span class="line">    <span class="keyword">const</span> <span class="keyword">char</span> *<span class="keyword">const</span> fsSource = <span class="string">"#version 330 core\n"</span></span><br><span class="line">                                 <span class="string">"out vec4 color;\n"</span></span><br><span class="line">                                 <span class="string">"void main()\n"</span></span><br><span class="line">                                 <span class="string">"&#123;\n"</span></span><br><span class="line">                                 <span class="string">"   color = vec4(1, 0.4, 0.5, 1);\n"</span></span><br><span class="line">                                 <span class="string">"&#125;\n\0"</span>;</span><br><span class="line">    <span class="keyword">float</span> vertices[] = &#123;</span><br><span class="line">        <span class="number">0.5f</span>, <span class="number">0.5f</span>, <span class="number">0.0f</span>,   <span class="comment">// 右上角</span></span><br><span class="line">        <span class="number">0.5f</span>, <span class="number">-0.5f</span>, <span class="number">0.0f</span>,  <span class="comment">// 右下角</span></span><br><span class="line">        <span class="number">-0.5f</span>, <span class="number">-0.5f</span>, <span class="number">0.0f</span>, <span class="comment">// 左下角</span></span><br><span class="line">        <span class="number">-0.5f</span>, <span class="number">0.5f</span>, <span class="number">0.0f</span>   <span class="comment">// 左上角</span></span><br><span class="line">    &#125;;</span><br><span class="line">    <span class="keyword">unsigned</span> <span class="keyword">int</span> indices[] = &#123;</span><br><span class="line">        <span class="comment">// 注意索引从0开始!</span></span><br><span class="line">        <span class="number">0</span>, <span class="number">1</span>, <span class="number">3</span>, <span class="comment">// 第一个三角形</span></span><br><span class="line">        <span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>  <span class="comment">// 第二个三角形</span></span><br><span class="line">    &#125;;</span><br><span class="line">    square.initWindow(<span class="number">500</span>, <span class="number">500</span>, <span class="string">"hello world"</span>);</span><br><span class="line">    square.linkProgram(fsSource, vsSource);</span><br><span class="line">    square.createVao(vertices, indices, <span class="keyword">sizeof</span>(vertices), <span class="keyword">sizeof</span>(indices), <span class="number">1</span>, <span class="number">0</span>);</span><br><span class="line">    square.mainLoop();</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="几个函数及对象说明">几个函数及对象说明</h2>
+<p>函数的详细文档可以参考<a href="https://docs.microsoft.com/en-us/windows/win32/opengl/gldrawelements" target="_blank" rel="noopener">此处</a></p>
+<h3 id="glEnable">glEnable</h3>
+<p><a href="https://docs.microsoft.com/en-us/windows/win32/opengl/glenable" target="_blank" rel="noopener">参考</a></p>
+<p>可以用来开启深度测试</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">glEnable(GL_DEPTH_TEST);</span><br></pre></td></tr></table></figure>
+<h3 id="glShaderSource">glShaderSource</h3>
+<p><code>typedef void (APIENTRYP PFNGLSHADERSOURCEPROC)(GLuint shader, GLsizei count, const GLchar *const*string, const GLint *length);</code></p>
+<p>参数列表</p>
+<ul>
+<li>shader:创建的 shader id</li>
+<li>count:shader 字符串数量</li>
+<li>string:字符串数组</li>
+<li>length:每个字符串的长度,可以是 NULL</li>
+</ul>
+<h3 id="glGetShaderInfoLog">glGetShaderInfoLog</h3>
+<p><code>typedef void (APIENTRYP PFNGLGETSHADERINFOLOGPROC)(GLuint shader, GLsizei bufSize, GLsizei *length, GLchar *infoLog);</code></p>
+<p>参数列表</p>
+<ul>
+<li>shader:创建的 shader id</li>
+<li>bufSize:infoLog 的长度</li>
+<li>length:用于获取读取到的 log 信息的字符串长度，可以是 NULL</li>
+<li>infoLog:用于获取 log 信息的数组</li>
+</ul>
+<h3 id="glfwSetFramebufferSizeCallback">glfwSetFramebufferSizeCallback</h3>
+<p>设置窗口大小改变时的回调函数</p>
+<p><strong>定义</strong></p>
+<p><code>GLFWAPI GLFWframebuffersizefun glfwSetFramebufferSizeCallback(GLFWwindow* window, GLFWframebuffersizefun callback);</code></p>
+<p>这个函数的第二个参数是回调函数指针，无法使用类的成员作为参数（编译会报错，类型转换错误，强转的话编译会有警告但程序能运行）</p>
+<h3 id="glDrawArrays">glDrawArrays</h3>
+<p>绘制缓冲数组中存放的顶点</p>
+<p><strong>定义</strong></p>
+<p><code>void glDrawArrays(GLenum mode, GLint first, GLsizei count);</code></p>
+<p>第一个参数是图元类型，有 GL_POINTS, GL_LINE_STRIP, GL_LINE_LOOP, GL_LINES, GL_TRIANGLE_STRIP, GL_TRIANGLE_FAN, GL_TRIANGLES, GL_QUAD_STRIP, GL_QUADS, and GL_POLYGON.<br>
+第二个参数是起点</p>
+<p>第三个参数是点个数</p>
+<h3 id="glDrawElements">glDrawElements</h3>
+<p>绘制一个元素</p>
+<p><strong>定义</strong></p>
+<p><code>void glDrawElements(GLenum mode, GLsizei count, GLenum type, const void *indices);</code></p>
+<ul>
+<li>第一个参数是图元类型，可取:GL_POINTS, GL_LINE_STRIP, GL_LINE_LOOP, GL_LINES, GL_TRIANGLE_STRIP, GL_TRIANGLE_FAN, GL_TRIANGLES, GL_QUAD_STRIP, GL_QUADS, and GL_POLYGON</li>
+<li>第二个参数是点的个数</li>
+<li>第三个参数是数据类型，可取 GL_UNSIGNED_BYTE, GL_UNSIGNED_SHORT, or GL_UNSIGNED_INT</li>
+<li>第四个参数可以是起点位置，也可以是索引数组（不使用索引缓存时）</li>
+</ul>
+<h3 id="glVertexAttribPointer">glVertexAttribPointer;</h3>
+<p>用于设置顶点属性指针遍历顶点缓冲的规则</p>
+<p><strong>定义</strong></p>
+<p><code>void glVertexAttribPointer(GLuint index, GLint size, GLenum type, GLboolean normalized, GLsizei stride, const void *pointer);</code></p>
+<ul>
+<li>第一个参数为输入变量的位置，可以直接在着色器代码中定义<code>location = 数字</code>,然后此- 处使用，也可以用<code>glGetAttribLocation</code>获取</li>
+<li>第二个参数为每个点的分量个数，可取 2、3、4，即二维还是三维还是四维</li>
+<li>第三个参数为分量数据类型 GL_SHORT, GL_INT, GL_FLOAT, and GL_DOUBLE.</li>
+<li>第四个为是否标准化</li>
+<li>第五个为步长，设为 0 时根据第二、三个参数的值计算（如第二个参数为 3，第三个参数为 GL_FLOAT，结果就是 3*sizeof(FLOAT)）</li>
+<li>第六个为首地址偏移量，即从第几个数据开始</li>
+</ul>
+<h3 id="glBufferData">glBufferData</h3>
+<p>用于往缓冲中填入数据</p>
+<ul>
+<li>第一个参数为缓冲类型，可以是
+<ul>
+<li>GL_ARRAY_BUFFER</li>
+<li>GL_ELEMENT_ARRAY_BUFFER</li>
+</ul>
+</li>
+<li>第二个参数为数据长度（字节）</li>
+<li>第三个参数为数据</li>
+<li>第四个参数有三种取值
+<ul>
+<li>GL_STATIC_DRAW ：数据不会或几乎不会改变。</li>
+<li>GL_DYNAMIC_DRAW：数据会被改变很多。</li>
+<li>GL_STREAM_DRAW ：数据每次绘制时都会改变。</li>
+</ul>
+</li>
+</ul>
+<h3 id="glGen">glGen*</h3>
+<p>提一下，注意第一个参数 id 不能为 0</p>
+<h1>附:imgui 使用</h1>
+<p>一个较有用的库，可以较为简单地实现绘制一些交互框，方便实时控制绘制过程中的一些参数。(学到模型加载才看到评论区推荐的，可见评论区还是蛮有用的)</p>
+<p>在 github 上下载<a href="https://github.com/ocornut/imgui" target="_blank" rel="noopener">imgui</a>源码，然后可以选择直接在工程中引入或者将之编译成动态库。</p>
+<h2 id="编译成动态库">编译成动态库</h2>
+<p>程序中需要依赖的是 backends 文件夹中和根目录中的文件，根目录所有文件都需要，backends 文件夹根据环境选择需要的文件，比如本文用的是 opengl3 和 glfw，那么需要的文件就是<code>imgui_impl_opengl3</code>和<code>imgui_impl_glfw</code></p>
+<p>makefile 文件如下</p>
+<figure class="highlight makefile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># ...</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 列举文件</span></span><br><span class="line"><span class="comment"># CUSTOM_LIBS_PATH为自定义的环境变量</span></span><br><span class="line">IMGUI_OBJS := <span class="variable">$(<span class="built_in">wildcard</span> <span class="variable">$(CUSTOM_LIBS_PATH)</span>/imgui/*.cpp)</span></span><br><span class="line">IMGUI_OBJS := <span class="variable">$(IMGUI_OBJS)</span> <span class="variable">$(CUSTOM_LIBS_PATH)</span>/imgui/backends/imgui_impl_glfw.cpp <span class="variable">$(CUSTOM_LIBS_PATH)</span>/imgui/backends/imgui_impl_opengl3.cpp</span><br><span class="line"></span><br><span class="line"><span class="comment"># 头文件列表</span></span><br><span class="line">INCLUDE_PATH = -I <span class="variable">$(CUSTOM_LIBS_PATH)</span>/<span class="keyword">include</span> -I <span class="variable">$(CUSTOM_LIBS_PATH)</span>/imgui -I  <span class="variable">$(CUSTOM_LIBS_PATH)</span>/imgui/backends -I c/libs/<span class="keyword">include</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># dist是输出文件夹</span></span><br><span class="line"><span class="comment"># libmyopengl.dll是把glfw，glad等所有基本依赖放在一起输出的动态库</span></span><br><span class="line"><span class="section">dist/libimgui.dll: <span class="variable">$(IMGUI_OBJS)</span> dist/libmyopengl.dll</span></span><br><span class="line">	<span class="variable">$(CXX)</span> -shared -fPIC -O3 <span class="variable">$(IMGUI_OBJS)</span> -o dist/libimgui.dll <span class="variable">$(INCLUDE_PATH)</span> -Ldist -lmyopengl</span><br></pre></td></tr></table></figure>
+<h2 id="程序中使用">程序中使用</h2>
+<p>代码示例如下</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * ...</span></span><br><span class="line"><span class="comment"> * 头文件中需要额外引入</span></span><br><span class="line"><span class="comment"> * #include &lt;imgui.h&gt;</span></span><br><span class="line"><span class="comment"> * #include &lt;imgui_impl_glfw.h&gt;</span></span><br><span class="line"><span class="comment"> * #include &lt;imgui_impl_opengl3.h&gt;</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// ...</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 然后需要在glfw，glad等全部初始化后初始化imgui</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">initWindow</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="comment">// ...</span></span><br><span class="line">    IMGUI_CHECKVERSION();</span><br><span class="line">    ImGui::CreateContext();</span><br><span class="line">    ImGuiIO &amp;io = ImGui::GetIO();</span><br><span class="line">    ImGui_ImplGlfw_InitForOpenGL(window, <span class="literal">true</span>);</span><br><span class="line">    ImGui_ImplOpenGL3_Init(<span class="string">"#version 330 core"</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">draw</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="comment">// ...</span></span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 绘制函数添加如下代码即可</span></span><br><span class="line">    ImGui_ImplOpenGL3_NewFrame();</span><br><span class="line">    ImGui_ImplGlfw_NewFrame();</span><br><span class="line">    ImGui::NewFrame();</span><br><span class="line"></span><br><span class="line">    <span class="comment">// imgui库自带的绘制示例demo的方法，参数用于控制窗口是否显示</span></span><br><span class="line">    ImGui::ShowDemoWindow(<span class="literal">NULL</span>);</span><br><span class="line"></span><br><span class="line">    ImGui::Render();</span><br><span class="line">    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// ...</span></span><br></pre></td></tr></table></figure>
+<h1>参考</h1>
+<ol>
+<li><a href="https://www.cnblogs.com/zhxmdefj/category/1502112.html" target="_blank" rel="noopener">随笔分类 - OpenGL</a> authored by <a href="https://www.cnblogs.com/zhxmdefj/" target="_blank" rel="noopener">zhxmdefj</a>@<a href="https://www.cnblogs.com/" target="_blank" rel="noopener">博客园</a></li>
+<li><a href="https://stackoverflow.com/questions/27753604/c-opengl-undefined-reference-to-imp-choosepixelformat8-and-more" target="_blank" rel="noopener">C++ / OpenGL | “undefined reference to `_imp__ChoosePixelFormat@8`” and more</a>@<a href="https://stackoverflow.com/" target="_blank" rel="noopener">stackoverflow</a></li>
+<li><a href="https://www.zhihu.com/question/40576087/answer/775033162" target="_blank" rel="noopener">OpenGL 管线中的深度测试和模板测试为什么在片段着色器之后而非</a>@<a href="https://www.zhihu.com/" target="_blank" rel="noopener">知乎</a></li>
+<li><a href="https://learnopengl-cn.github.io/01%20Getting%20started/03%20Hello%20Window/" target="_blank" rel="noopener">LearnOpenGL CN</a></li>
+<li><a href="https://www.glfw.org/docs/latest/window.html#window_hints" target="_blank" rel="noopener">GLFW:window guide</a></li>
+<li><a href="https://www.zhihu.com/question/264132001/answer/729626917" target="_blank" rel="noopener">醉里挑灯看剑的回答</a>@<a href="https://www.zhihu.com" target="_blank" rel="noopener">知乎</a></li>
+</ol>
+
+    </section>
+    <footer class="post-footer">
+      <section class="author">
+    <h4>flyingfisherman</h4>
+    <p>前端工程师，热爱技术，坚信知识技术改变生活。最高兴的场合莫过于学到的技术为自己、亲友或他人提供了些许的便利、帮助。</p>
+</section>
+      <section class="share">
+    <h4>Share this post</h4>
+    <a class="icon-twitter" href="http://twitter.com/share?url=https://github.flyingfishman.io/hexo/2020/12/18/opengl/"
+       onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+        <span class="hidden">Twitter</span>
+    </a>
+    <a class="icon-facebook" href="https://www.facebook.com/sharer/sharer.php?u=https://github.flyingfishman.io/hexo/2020/12/18/opengl/"
+       onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+        <span class="hidden">Facebook</span>
+    </a>
+    <a class="icon-google-plus" href="https://plus.google.com/share?url=https://github.flyingfishman.io/hexo/2020/12/18/opengl/"
+       onclick="window.open(this.href, 'google-plus-share', 'width=490,height=530');return false;">
+        <span class="hidden">Google+</span>
+    </a>
+</section>
+    </footer>
+  </article>
+  <nav class="pagination" role="pagination">
+    
+    <a class="newer-posts" href="/hexo/2020/12/28/opengl2/">
+        ← opengl(2):着色器和纹理
+    </a>
+    
+    <span class="page-number">•</span>
+    
+    <a class="older-posts" href="/hexo/2020/12/15/emcc/">
+        windows上安装Emscripten →
+    </a>
+    
+</nav>
+  <div id="comment" class="comments-area">
+    <h1 class="title"><a href="#disqus_comments" name="disqus_comments">Comments</a></h1>
+
+    
+</div>
+</main>
+
+
+  
+<footer class="site-footer">
+  
+  <a class="subscribe icon-feed" href="/rss.xml"><span class="tooltip">Subscribe!</span></a>
+  
+  <div class="inner">
+     <section class="copyright">All content copyright <a href="/hexo/">日常点滴</a> &copy; 2014 &bull; All rights reserved.</section>
+     <section class="poweredby">Proudly published with <a class="icon-ghost" href="http://zespia.tw/hexo/">Hexo</a></section>
+  </div>
+</footer>
+
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+<script type="text/javascript" src="/hexo/js/jquery.fitvids.js"></script>
+<script type="text/javascript" src="/hexo/js/index.js"></script>
+
+
+
+
+
+
+</body>
+</html>

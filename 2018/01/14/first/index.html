@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html" charset="UTF-8" >
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+  <title>注册表 | 日常点滴</title>
+  <meta name="description" content="" />
+  <meta name="HandheldFriendly" content="True" />
+  <meta name="MobileOptimized" content="320" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <link rel="stylesheet" type="text/css" href="/hexo/css/screen.css" />
+  <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Noto+Serif:400,700,400italic|Open+Sans:700,400" />
+
+  <meta name="generator" content="日常点滴">
+
+  
+  <link rel="alternate" type="application/rss+xml" title="RSS" href="/rss.xml">
+  
+  
+  <link rel="alternate" type="application/atom+xml" title="Atom 0.3" href="rss.xml">
+  
+  
+
+  
+</head>
+
+
+<body class="post-template">
+
+  <header class="site-head"  style="background-image: url(/image/cover.png)" >
+    <div class="vertical">
+        <div class="site-head-content inner">
+             <a class="blog-logo" href="/hexo/"><img src="https://avatars.githubusercontent.com/u/26755276" alt="Blog Logo"/></a> 
+            <h1 class="blog-title">日常点滴</h1>
+            <h2 class="blog-description"></h2>
+        </div>
+    </div>
+</header>
+  
+
+<main class="content" role="main">
+  <article class="post">
+    <span class="post-meta">
+      <time datetime="2018-01-14T10:10:34.000Z" itemprop="datePublished">
+          2018-01-14
+      </time>
+    
+    
+    | 
+    <a href='/hexo/tags/windows/'>windows</a>,
+    
+    <a href='/hexo/tags/注册表/'>注册表</a>
+    
+    
+</span>
+    <h1 class="post-title">注册表</h1>
+    <section class="post-content">
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.12.0/katex.min.css" /><h1>注册表</h1>
+<h2 id="引言">引言</h2>
+<p>对于写惯了代码的人来说，命令操作要比图形界面方便不少，并且学习中不少配置工作是没有图形操作程序的，因而在windows系统中命令行也是时常要用的功能，然而windows每次打开命令行一般是win+R后输入cmd，还要cd转到路径,十分不便。<a id="more"></a></p>
+<h2 id="右键菜单修改">右键菜单修改</h2>
+<p>此处参考了<a href="https://jingyan.baidu.com/article/6c67b1d6ea3fd02787bb1eea.html" target="_blank" rel="noopener">这篇百度经验</a></p>
+<h3 id="1-打开注册表编辑器">1.打开注册表编辑器</h3>
+<p>win+r打开运行，输入regedit，运行注册表编辑器。<br>
+找到</p>
+<blockquote>
+<p>计算机\HKEY_CLASSES_ROOT\Directory\</p>
+</blockquote>
+<h3 id="2-修改内容">2.修改内容</h3>
+<p>进入directory后可看到四个子目录（如图background,defaulticon,shell,sehllex)。</p>
+<p><img src="/hexo/image/1.png" alt="图片无法显示"></p>
+<p>上面那篇百度经验的指示是</p>
+<blockquote>
+<p>在shell目录下新建项CommandPrompt，并为CommandPrompt添加子项Command并设置commad数值为</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cmd.exe /k <span class="built_in">cd</span> <span class="string">"%1"</span></span><br></pre></td></tr></table></figure>
+<p>就全部搞定了</p>
+<h2 id="拓展">拓展</h2>
+<h3 id="1-shell目录">1.shell目录</h3>
+<p>通过注册表目录结构结构得出</p>
+<blockquote>
+<p>shell目录下每项代表右键菜单下一项，该项的默认值代表该项在右键菜单下的名称（经测试，如果默认值为空，该项的右键菜单菜单项名为该项的名称），该项下的command子项的值代表该项要执行的指令</p>
+</blockquote>
+<p>添加其他程序的右键执行也是同理，在shell目录下添加自定义子项，在自定义子项下添加command子项，把command项的值改为对应的可执行程序的路径即可(或要执行的指令)，如改为D://英雄联盟/lol.exe(可以不加.exe后缀)</p>
+<h3 id="2-shellex目录">2.shellex目录</h3>
+<p>未知</p>
+<h3 id="3-background目录">3.background目录</h3>
+<p>我们知道在文件管理器中有三种右键菜单，右击空白部分,右击文件，右击文件夹，经测试，background文件夹决定的是右击空白时的右键菜单，上面提到的百度经验指导添加的是右击文件夹与文件时的右键菜单。<br>
+background目录下也有两个子目录shell,shellex,添加项目的方式同上。</p>
+<h3 id="4-项目图标">4.项目图标</h3>
+<p>在右键菜单中看到有的项目有图标，如图，</p>
+<p><img src="/hexo/image/7.png" alt="图片无法显示"></p>
+<p>若想要添加，照葫芦画瓢，找到图中有图标的右键菜单项对应的注册表目录，如图git_gui,发现该项还有一个Icon数据，值为图标路径</p>
+<p><img src="/hexo/image/5.png" alt="图片无法显示"></p>
+<p>找到要添加图标的菜单项对应的注册表项，如图，为其添加数据Icon,值为你准备好的ico路径</p>
+<p><img src="/hexo/image/4.png" alt="图片无法显示"></p>
+<p>最终效果如图</p>
+<p><img src="/hexo/image/6.jpg" alt="图片无法显示"></p>
+<h3 id="5-用。。。打开">5.用。。。打开</h3>
+<p>文件上右击菜单项添加<br>
+路径位于</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">HKEY_CLASSES_ROOT\*\shell\</span><br></pre></td></tr></table></figure>
+<p>添加方法同上述，但要注意此处添加的命令不同</p>
+<h3 id="6-注册表项总结">6.注册表项总结</h3>
+<p><a href="https://blog.csdn.net/liyun123gx/article/details/22199151" target="_blank" rel="noopener">正好搜各个路径的作用时搜到这篇</a></p>
+<p><strong>不同的注册表根路径</strong></p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">根键</th>
+<th style="text-align:left">描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">HKEY_CLASSES_ROOT</td>
+<td style="text-align:left">当前<code>classes</code>配置，对应的是<code>HKEY_LOCAL_MACHINE\Software\Classes</code>、<code>HKEY_CURRENT_USER\Software\Classes</code>，内容为前述两个<code>Classes</code>合并，修改<code>HKEY_LOCAL_MACHINE\Software\Classes</code>、<code>HKEY_CURRENT_USER\Software\Classes</code>，<code>HKEY_CLASSES_ROOT</code>的内容也会被改变，修改<code>HKEY_CLASSES_ROOT</code>会改变<code>HKEY_LOCAL_MACHINE\Software\Classes</code></td>
+</tr>
+<tr>
+<td style="text-align:left">HKEY_CURRENT_USER</td>
+<td style="text-align:left">当前用户配置，修改后作用范围是当前用户，修改时同时被更新到<code>HKEY_USERS</code>对应的分支下</td>
+</tr>
+<tr>
+<td style="text-align:left">HKEY_LOCAL_MACHINE</td>
+<td style="text-align:left">机器配置，内容结构和<code>HKEY_CURRENT_USER</code>相同，作用范围是当前机器</td>
+</tr>
+<tr>
+<td style="text-align:left">HKEY_USERS</td>
+<td style="text-align:left">所有用户的预配置，用代表用户的一串id作为分支，每个分支的内容结构与<code>HKEY_CURRENT_USER</code>内容结构相同，若修改的是当前用户的分支，修改会被立即更新到<code>HKEY_CURRENT_USER</code>。<code>HKEY_USERS\.Default</code>是新用户默认配置，<code>HKEY_USERS\{id}</code>是用户的配置，<code>HKEY_USERS\{id}_classes</code>是<code>HKEY_USERS\{id}\Software\Classes</code>的内容拷贝</td>
+</tr>
+<tr>
+<td style="text-align:left">HKEY_CURRENT_CONFIG</td>
+<td style="text-align:left">见上文引用的外链</td>
+</tr>
+</tbody>
+</table>
+<p><strong>常用注册表路径</strong></p>
+<p>下述列表为<code>HKEY_LOCAL_MACHINE</code>中的路径，可类推到其他根路径下，对当前用户生效，或对其他用户生效。</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">路径</th>
+<th style="text-align:left">作用</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><code>HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced\Folder</code></td>
+<td style="text-align:left">文件夹选项</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>HKEY_LOCAL_MACHINE\SOFTWARE\Classes\*\shell\</code></td>
+<td style="text-align:left">文件的右键菜单</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>HKEY_LOCAL_MACHINE\SOFTWARE\Classes\Directory\shell\</code></td>
+<td style="text-align:left">文件夹的右键菜单</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>HKEY_LOCAL_MACHINE\SOFTWARE\Classes\Directory\background\shell\</code></td>
+<td style="text-align:left">文件资源管理器空白部分的右键菜单</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>HKEY_CURRENT_USER\Volatile Environment</code></td>
+<td style="text-align:left">用户变量</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Session Manager\Environment</code></td>
+<td style="text-align:left">本机变量</td>
+</tr>
+</tbody>
+</table>
+<p>待补充</p>
+<h2 id="结语">结语</h2>
+<p>如有错误欢迎指教</p>
+
+    </section>
+    <footer class="post-footer">
+      <section class="author">
+    <h4>flyingfisherman</h4>
+    <p>前端工程师，热爱技术，坚信知识技术改变生活。最高兴的场合莫过于学到的技术为自己、亲友或他人提供了些许的便利、帮助。</p>
+</section>
+      <section class="share">
+    <h4>Share this post</h4>
+    <a class="icon-twitter" href="http://twitter.com/share?url=https://github.flyingfishman.io/hexo/2018/01/14/first/"
+       onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+        <span class="hidden">Twitter</span>
+    </a>
+    <a class="icon-facebook" href="https://www.facebook.com/sharer/sharer.php?u=https://github.flyingfishman.io/hexo/2018/01/14/first/"
+       onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+        <span class="hidden">Facebook</span>
+    </a>
+    <a class="icon-google-plus" href="https://plus.google.com/share?url=https://github.flyingfishman.io/hexo/2018/01/14/first/"
+       onclick="window.open(this.href, 'google-plus-share', 'width=490,height=530');return false;">
+        <span class="hidden">Google+</span>
+    </a>
+</section>
+    </footer>
+  </article>
+  <nav class="pagination" role="pagination">
+    
+    <a class="newer-posts" href="/hexo/2018/04/02/use/">
+        ← hexo的使用技巧
+    </a>
+    
+    <span class="page-number">•</span>
+    
+</nav>
+  <div id="comment" class="comments-area">
+    <h1 class="title"><a href="#disqus_comments" name="disqus_comments">Comments</a></h1>
+
+    
+</div>
+</main>
+
+
+  
+<footer class="site-footer">
+  
+  <a class="subscribe icon-feed" href="/rss.xml"><span class="tooltip">Subscribe!</span></a>
+  
+  <div class="inner">
+     <section class="copyright">All content copyright <a href="/hexo/">日常点滴</a> &copy; 2014 &bull; All rights reserved.</section>
+     <section class="poweredby">Proudly published with <a class="icon-ghost" href="http://zespia.tw/hexo/">Hexo</a></section>
+  </div>
+</footer>
+
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+<script type="text/javascript" src="/hexo/js/jquery.fitvids.js"></script>
+<script type="text/javascript" src="/hexo/js/index.js"></script>
+
+
+
+
+
+
+</body>
+</html>

@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html" charset="UTF-8" >
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+  <title>esint、prettier、jest | 日常点滴</title>
+  <meta name="description" content="" />
+  <meta name="HandheldFriendly" content="True" />
+  <meta name="MobileOptimized" content="320" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <link rel="stylesheet" type="text/css" href="/hexo/css/screen.css" />
+  <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Noto+Serif:400,700,400italic|Open+Sans:700,400" />
+
+  <meta name="generator" content="日常点滴">
+
+  
+  <link rel="alternate" type="application/rss+xml" title="RSS" href="/rss.xml">
+  
+  
+  <link rel="alternate" type="application/atom+xml" title="Atom 0.3" href="rss.xml">
+  
+  
+
+  
+</head>
+
+
+<body class="post-template">
+
+  <header class="site-head"  style="background-image: url(/image/cover.png)" >
+    <div class="vertical">
+        <div class="site-head-content inner">
+             <a class="blog-logo" href="/hexo/"><img src="https://avatars.githubusercontent.com/u/26755276" alt="Blog Logo"/></a> 
+            <h1 class="blog-title">日常点滴</h1>
+            <h2 class="blog-description"></h2>
+        </div>
+    </div>
+</header>
+  
+
+<main class="content" role="main">
+  <article class="post">
+    <span class="post-meta">
+      <time datetime="2020-03-19T16:00:00.000Z" itemprop="datePublished">
+          2020-03-20
+      </time>
+    
+    
+    | 
+    <a href='/hexo/tags/eslint/'>eslint</a>,
+    
+    <a href='/hexo/tags/prettier/'>prettier</a>,
+    
+    <a href='/hexo/tags/jest/'>jest</a>
+    
+    
+</span>
+    <h1 class="post-title">esint、prettier、jest</h1>
+    <section class="post-content">
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.12.0/katex.min.css" /><h1>eslint</h1>
+<p>代码规范工具，本文使用版本 6，其他版本可能表现不同</p>
+<a id="more"></a>
+<h2 id="安装">安装</h2>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm i -D eslint</span><br></pre></td></tr></table></figure>
+<h2 id="配置">配置</h2>
+<p>可以在文件中通过配置规则，也可以在配置文件中配置。</p>
+<h3 id="配置文件应用规则及优先级">配置文件应用规则及优先级</h3>
+<ol>
+<li>eslint 配置文件格式可以是<code>javascript</code>、<code>yaml</code>、<code>json</code>、<code>package.json</code>,优先级是<code>.eslintrc.js</code>&gt;<code>.eslintrc.yaml</code>&gt;<code>.eslintrc.yml</code>&gt;<code>.eslintrc.json</code>&gt;<code>.eslintrc</code>&gt;<code>package.json</code>，同级配置优先级高的取代优先级低的,可在命令行用<code>-c</code>指定额外配置文件。</li>
+<li>eslint 优先查找需要检测格式的文件的同级配置文件，再逐级向上查找父目录，直到文件系统的根目录。</li>
+<li>在层级的配置中与要检测的文件同目录的优先级最高，再逐层往上到根目录，层级的配置中，优先级高的会覆盖优先级低的冲突配置，不同的配置会被合并。</li>
+<li>设置可以设置<code>root:true</code>，当 eslint 搜索到此配置时不会再向父目录搜索。</li>
+<li>行内配置的优先级<code>/*eslint-disable*/|/*eslint-enable*/</code>&gt;<code>/*global*/</code>&gt;<code>/*eslint*/</code>&gt;<code>/*eslint-env*/</code>。</li>
+<li>命令行配置的优先级<code>--global</code>&gt;<code>--rule</code>&gt;<code>--env</code>&gt;<code>-c</code>。</li>
+<li>在上述所有位置都没有规则配置时，eslint 会使用用户主目录的<code>.eslintrc</code>文件，用户主目录 linux 下是<code>~/</code>（如 root 用户为<code>/root</code>下），window 下为<code>%userprofile%</code>指向的目录。</li>
+<li>总优先级<strong>行内配置</strong>&gt;<strong>命令行配置</strong>&gt;<strong>配置文件</strong>&gt;<strong>用户主目录</strong></li>
+</ol>
+<h3 id="插件">插件</h3>
+<p>提供处理器从非 Js 文件中提取 js 代码</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="attr">"plugins"</span>: [<span class="string">"a-plugin"</span>],</span><br><span class="line">  // 格式为"插件名/处理器名"</span><br><span class="line">  "processor": "a-plugin/a-processor"</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="解析器和环境设置">解析器和环境设置</h3>
+<p><code>parserOptions</code>配置解析器设置，<code>parser</code>指定解析器，<code>parser</code>指定别的解析器后，<code>parserOptions</code>不一定有效，由解析器决定。</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="attr">"parserOptions"</span>: &#123;</span><br><span class="line">    // 默认为5，可指定6,7,8,9,10</span><br><span class="line">    "ecmaVersion": 6,</span><br><span class="line">    // script或module(ecmascript模块)</span><br><span class="line">    "sourceType": "module",</span><br><span class="line">    // globalReturn允许全局作用域的return语句，impliedStruct全局严格模式，jsx启用jsx语法，experimentalObjectRestScript启用实验性质的object rest/spread properties支持，可同时设置多个</span><br><span class="line">    "ecmaFeatures": &#123; "jsx": true &#125;</span><br><span class="line">  &#125;,</span><br><span class="line">  "parser": "babel-eslint"</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>可通过<code>env</code>选项指定环境，<a href="https://eslint.bootcss.com/docs/user-guide/configuring" target="_blank" rel="noopener">环境列表及各自特点具体见官方文档</a>，可通过<code>globals</code>选项指定全局变量，以防止调用未声明的变量时报错。</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="attr">"env"</span>: &#123;</span><br><span class="line">    <span class="attr">"node"</span>: <span class="literal">true</span>,</span><br><span class="line">    <span class="attr">"es6"</span>: <span class="literal">true</span>,</span><br><span class="line">    <span class="attr">"browser"</span>: <span class="literal">true</span>,</span><br><span class="line">    // 针对插件启用环境</span><br><span class="line">    "a-plugin/node": true</span><br><span class="line">  &#125;,</span><br><span class="line">  "globals": &#123;</span><br><span class="line">    // readonly只读，writable可写，off关闭禁用</span><br><span class="line">    "mycustomVariables": "readonly",</span><br><span class="line">    "Promise": "off"</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="规则">规则</h3>
+<p>配置格式<code>&quot;ruleName&quot;: [0, option]</code>，数组第一项为级别，第二项为规则选项</p>
+<p>错误级别</p>
+<ol>
+<li><code>0</code>或<code>off</code>，关闭规则。</li>
+<li><code>1</code>或<code>warn</code>，开启规则，警告。</li>
+<li><code>2</code>或<code>error</code>，开启规则，错误</li>
+</ol>
+<p><a href="https://eslint.bootcss.com/docs/rules/" target="_blank" rel="noopener">建议的规则列表见官方文档</a></p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="attr">"rules"</span>: &#123;</span><br><span class="line">    // 关闭规则</span><br><span class="line">    "eqeqeq": "off",</span><br><span class="line">    "strict": 0,</span><br><span class="line">    "quote": [1, "single"],</span><br><span class="line">    // 插件的规则，格式是"插件名/规则名"</span><br><span class="line">    "a-plugin/ruleName": "warn"</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="继承规则">继承规则</h3>
+<p>从其他地方继承规则</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="attr">"extends"</span>: [</span><br><span class="line">    <span class="string">"eslint:recommended"</span>,</span><br><span class="line">    // 从插件继承规则</span><br><span class="line">    <span class="string">"plugin:a-plugin/rulesName"</span></span><br><span class="line">  ],</span><br><span class="line">  <span class="attr">"plugins"</span>: [<span class="string">"a-plugin"</span>]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="overrides">overrides</h3>
+<p>针对单个文件，或匹配到的一组文件覆盖配置。</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="attr">"plugins"</span>: [<span class="string">"a-plugin"</span>],</span><br><span class="line">  <span class="attr">"overrides"</span>: [</span><br><span class="line">    &#123;</span><br><span class="line">      <span class="attr">"files"</span>: [<span class="string">"**/*.md"</span>],</span><br><span class="line">      <span class="attr">"rules"</span>: &#123;</span><br><span class="line">        //   ...</span><br><span class="line">      &#125;,</span><br><span class="line">      "processor": "a-plugin/processor",</span><br><span class="line">      "excludeFIles": "*.test.js"</span><br><span class="line">    &#125;</span><br><span class="line">  ]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="使用注释配置">使用注释配置</h3>
+<p>可以使用注释注释针对某个特定的文件覆盖<code>eslint</code>配置</p>
+<p><strong>设置环境</strong></p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* eslint-env node, mocha */</span></span><br></pre></td></tr></table></figure>
+<p><strong>全局变量</strong></p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* global var1, var2 */</span></span><br><span class="line"><span class="comment">/* global var1:writable, var2:readonly */</span></span><br></pre></td></tr></table></figure>
+<p><strong>规则</strong></p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* eslint eqeqeq: 0, quotes: ["error", "double"] */</span></span><br></pre></td></tr></table></figure>
+<p><strong>禁用和启用 eslint 规则</strong></p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* eslint-disable */</span></span><br><span class="line"><span class="built_in">console</span>.log(<span class="string">"test"</span>);</span><br><span class="line"><span class="comment">/* eslint-enable */</span></span><br><span class="line"><span class="comment">// 可以禁用指定的规则</span></span><br><span class="line"><span class="comment">/* eslint-disable no-alert, plugin/rulesName*/</span></span><br></pre></td></tr></table></figure>
+<p><strong>单行禁用</strong></p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">console</span>.log(<span class="string">"test"</span>); <span class="comment">// eslint-disable-line</span></span><br><span class="line"><span class="comment">// eslint-disable-next-line</span></span><br><span class="line"><span class="built_in">console</span>.log(<span class="string">"test"</span>);</span><br><span class="line"><span class="comment">// eslint-disable-next-line no-console, no-alert</span></span><br><span class="line"><span class="built_in">console</span>.log(<span class="string">"test"</span>);</span><br><span class="line"><span class="built_in">console</span>.log(<span class="string">"test"</span>); <span class="comment">/* eslint-disable-line no-console, no-alert */</span></span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>注意: 禁用整个文件的规则,eslint 仍会解析代码，故仍需要代码可解析</p>
+</blockquote>
+<h3 id="集成到-webpack">集成到 webpack</h3>
+<p><a href="https://www.npmjs.com/package/eslint-loader" target="_blank" rel="noopener">使用 eslint-loader</a></p>
+<h3 id="集成到-vscode">集成到 vscode</h3>
+<p><a href="https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint" target="_blank" rel="noopener">安装 eslint 扩展</a></p>
+<p>集成到 vscode 和集成到 webpack 可以相互配合，<code>eslint-loader</code>和 vscode eslint 扩展的配置文件搜索方式是相同的，因此配置好配置后可以相互配合，vscode 中的集成主要用于实时提示 eslint 检测到的问题，webpack 项目中的集成则用于统一项目中的代码规范。</p>
+<h1>prettier</h1>
+<p><a href="https://prettier.io/docs/en/options.html" target="_blank" rel="noopener">prettier 设置</a></p>
+<p>prettier 是常用的格式化工具，如果不和 eslint 配合好，就会带来麻烦，所以这两者需要放在一起学习。<br>
+vetur 默认使用的就是 prettier，eslint 有与 prettier 规则不相交的地方，但一般设置<code>extends: [&quot;eslint:recommended&quot;]</code>后不会有规则冲突。</p>
+<p>vscode上prettier插件会自动检查当前文件夹及父文件夹的<code>.editorconfig</code>和<code>.prettierrc</code>文件，若检测到这两个文件，vscode中的prettier配置不是被冲突覆盖，而是全部不再生效</p>
+<h1>jest</h1>
+<p>搁置</p>
+<p><a href="https://www.jestjs.cn/docs/getting-started" target="_blank" rel="noopener">jest 中文文档</a></p>
+
+    </section>
+    <footer class="post-footer">
+      <section class="author">
+    <h4>flyingfisherman</h4>
+    <p>前端工程师，热爱技术，坚信知识技术改变生活。最高兴的场合莫过于学到的技术为自己、亲友或他人提供了些许的便利、帮助。</p>
+</section>
+      <section class="share">
+    <h4>Share this post</h4>
+    <a class="icon-twitter" href="http://twitter.com/share?url=https://github.flyingfishman.io/hexo/2020/03/20/eslint/"
+       onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+        <span class="hidden">Twitter</span>
+    </a>
+    <a class="icon-facebook" href="https://www.facebook.com/sharer/sharer.php?u=https://github.flyingfishman.io/hexo/2020/03/20/eslint/"
+       onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+        <span class="hidden">Facebook</span>
+    </a>
+    <a class="icon-google-plus" href="https://plus.google.com/share?url=https://github.flyingfishman.io/hexo/2020/03/20/eslint/"
+       onclick="window.open(this.href, 'google-plus-share', 'width=490,height=530');return false;">
+        <span class="hidden">Google+</span>
+    </a>
+</section>
+    </footer>
+  </article>
+  <nav class="pagination" role="pagination">
+    
+    <a class="newer-posts" href="/hexo/2020/03/28/centos/">
+        ← centos各环境安装
+    </a>
+    
+    <span class="page-number">•</span>
+    
+    <a class="older-posts" href="/hexo/2020/01/05/babel/">
+        babel学习笔记 →
+    </a>
+    
+</nav>
+  <div id="comment" class="comments-area">
+    <h1 class="title"><a href="#disqus_comments" name="disqus_comments">Comments</a></h1>
+
+    
+</div>
+</main>
+
+
+  
+<footer class="site-footer">
+  
+  <a class="subscribe icon-feed" href="/rss.xml"><span class="tooltip">Subscribe!</span></a>
+  
+  <div class="inner">
+     <section class="copyright">All content copyright <a href="/hexo/">日常点滴</a> &copy; 2014 &bull; All rights reserved.</section>
+     <section class="poweredby">Proudly published with <a class="icon-ghost" href="http://zespia.tw/hexo/">Hexo</a></section>
+  </div>
+</footer>
+
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+<script type="text/javascript" src="/hexo/js/jquery.fitvids.js"></script>
+<script type="text/javascript" src="/hexo/js/index.js"></script>
+
+
+
+
+
+
+</body>
+</html>

@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html" charset="UTF-8" >
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+  <title>rainmeter美化工具使用 | 日常点滴</title>
+  <meta name="description" content="" />
+  <meta name="HandheldFriendly" content="True" />
+  <meta name="MobileOptimized" content="320" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <link rel="stylesheet" type="text/css" href="/hexo/css/screen.css" />
+  <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Noto+Serif:400,700,400italic|Open+Sans:700,400" />
+
+  <meta name="generator" content="日常点滴">
+
+  
+  <link rel="alternate" type="application/rss+xml" title="RSS" href="/rss.xml">
+  
+  
+  <link rel="alternate" type="application/atom+xml" title="Atom 0.3" href="rss.xml">
+  
+  
+
+  
+</head>
+
+
+<body class="post-template">
+
+  <header class="site-head"  style="background-image: url(/image/cover.png)" >
+    <div class="vertical">
+        <div class="site-head-content inner">
+             <a class="blog-logo" href="/hexo/"><img src="https://avatars.githubusercontent.com/u/26755276" alt="Blog Logo"/></a> 
+            <h1 class="blog-title">日常点滴</h1>
+            <h2 class="blog-description"></h2>
+        </div>
+    </div>
+</header>
+  
+
+<main class="content" role="main">
+  <article class="post">
+    <span class="post-meta">
+      <time datetime="2018-05-30T16:00:00.000Z" itemprop="datePublished">
+          2018-05-31
+      </time>
+    
+    
+    | 
+    <a href='/hexo/tags/rainmeter/'>rainmeter</a>
+    
+    
+</span>
+    <h1 class="post-title">rainmeter美化工具使用</h1>
+    <section class="post-content">
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.12.0/katex.min.css" /><h1>前言</h1>
+<p>rainmeter本来是一款用于监测电脑状况的工具，但由于器强大的扩展功能，被许多人用于美化桌面</p>
+<a id="more"></a>
+<h1>开始</h1>
+<h2 id="官方文档">官方文档</h2>
+<p><a href="https://docs.rainmeter.net/manual/" target="_blank" rel="noopener">这里是官方文档</a>,养成先看官方文档，官方文档没有帮助再看他人经验的好习惯</p>
+<h2 id="起步">起步</h2>
+<p>rainmeter是一款软件，运行时会在你的桌面显示监控你电脑状况的挂件，并且可以通过编辑.ini文件进行挂件及挂件皮肤的自定义，并且挂件可以任意载入卸载，因而可以十分方便的用来美化你的桌面，rainmeter的.ini配置文件可以做到的事有很多。<br>
+可以调起可执行程序，播放音频文件，打开文件管路器，调起网页等。另外还可以通过载入扩展文件获得更多功能，可以调用Lua脚本等，可以说是既美观又便捷，同时还轻便</p>
+<h2 id="编写自定义皮肤">编写自定义皮肤</h2>
+<p>其他不多介绍直接从编写皮肤开始</p>
+<h3 id="section">section</h3>
+<p>rainmeter标签分为六种variables,Rainmeter,measure,meter,metadata,style</p>
+<ol>
+<li>
+<p>Rainmeter标签名是固定的，只能有一个，用于声明皮肤的一些整体属性，如更新时间间隔，update等</p>
+<figure class="highlight lua"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">;例</span><br><span class="line">[Rainmeter]</span><br><span class="line">Update=<span class="number">1000</span></span><br><span class="line">;<span class="number">1</span>秒更新一次</span><br></pre></td></tr></table></figure>
+</li>
+<li>
+<p>Metadata标签名也是固定的，用于声明皮肤的作者，名称，版本,描述，证书信息</p>
+<figure class="highlight lua"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">;例</span><br><span class="line">[Metadata]</span><br><span class="line">Author=me</span><br><span class="line">Version=<span class="number">1.0</span><span class="number">.0</span></span><br><span class="line">Name=skin</span><br><span class="line">License=无</span><br><span class="line">Information=第一个皮肤</span><br></pre></td></tr></table></figure>
+</li>
+<li>
+<p>Variables标签只能有一个，多出的无效，名称固定，用于声明一些变量，声明的变量可以用在其他标签里</p>
+<figure class="highlight lua"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">;例</span><br><span class="line">[Variables]</span><br><span class="line">var1=<span class="number">100</span></span><br><span class="line">var2=<span class="number">200</span></span><br><span class="line">other_var=<span class="built_in">string</span></span><br></pre></td></tr></table></figure>
+</li>
+<li>
+<p>measure标签的名字可以自定，不唯一，类似于数据对象，用于定义一些特殊的数据，自动更新的数据等<br>
+一般格式如下</p>
+<figure class="highlight lua"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">;例</span><br><span class="line">[Mymeasure]</span><br><span class="line">Measure=Calc</span><br><span class="line">formula=<span class="number">1</span></span><br></pre></td></tr></table></figure>
+<p>注：Measure值代表Measure的类型，有plugin,loop(较新版本),Calc等<br>
+formula为Calc类型measure的求值公式，在每次皮肤更新时会根据公式自动更新measure值<br>
+如下例</p>
+<figure class="highlight lua"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">;每隔一个更新周期measure值加一</span><br><span class="line">[Mymeasure]</span><br><span class="line">Measure=Calc</span><br><span class="line">formula=Mymeasure+<span class="number">1</span></span><br></pre></td></tr></table></figure>
+<p>其中Mymeasure在第一次更新时在公式中取值为0，该measure会从1开始递增</p>
+</li>
+<li>
+<p>meter标签名字可以自定，不唯一，类似于视图对象，用于定义皮肤要展示的内容<br>
+meter也有多种种类，如String,Image等<br>
+String类型的meter显示的是文本，可以text来定义文本内容，也可用MeasureName来引用measure标签的文本值作为内容，两种内容声明不互容</p>
+<figure class="highlight lua"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">;从<span class="number">1</span>开始显示一个数值，每个一个更新时间数值加一</span><br><span class="line">[Mymeasure]</span><br><span class="line">Measure=Calc</span><br><span class="line">formula=Mymeasure+<span class="number">1</span></span><br><span class="line"></span><br><span class="line">[Mymeter]</span><br><span class="line">Meter=String</span><br><span class="line">MeasureName=Mymeasure</span><br></pre></td></tr></table></figure>
+<p>图片示例</p>
+<figure class="highlight lua"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[Mymeter]</span><br><span class="line">Meter=Image</span><br><span class="line">ImageName=/<span class="built_in">path</span>/of/image/myimagefilename</span><br></pre></td></tr></table></figure>
+</li>
+<li>
+<p>style标签用于声明meter样式，类似于css文件，名称自定，可不唯一</p>
+<figure class="highlight lua"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">;样式示例</span><br><span class="line">[mystyle]</span><br><span class="line">X=<span class="number">100</span>;位置横坐标</span><br><span class="line">Y=<span class="number">100</span>;位置纵坐标</span><br><span class="line">W=<span class="number">100</span>;宽</span><br><span class="line">H=<span class="number">100</span>;高</span><br><span class="line">FontFace=华文行楷;字体</span><br><span class="line">fontsize=<span class="number">20</span>;字号</span><br><span class="line">fontcolor=<span class="number">255</span>,<span class="number">255</span>,<span class="number">255</span>,<span class="number">255</span>;字体颜色及透明度</span><br><span class="line">AntiAlis=<span class="number">1</span>;<span class="number">1</span>|<span class="number">0</span>是否抗锯齿</span><br><span class="line">TextAlign=Center;(Center|Left|Right)[Top|Center|Bottom]</span><br><span class="line">ClipString=<span class="number">1</span>;自动换行</span><br><span class="line">SolidColor=<span class="number">255</span>,<span class="number">255</span>,<span class="number">255</span>,<span class="number">255</span>;填充色</span><br><span class="line">SolidColor2=<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>;若设置则为两填充色渐变</span><br><span class="line">GradientAngle=<span class="number">45</span>;渐变角度</span><br><span class="line"></span><br><span class="line">[Mymeter]</span><br><span class="line">Meter=String</span><br><span class="line">text=mytext</span><br><span class="line">Hidden=<span class="number">1</span>;也可以直接在meter中声明样式</span><br><span class="line">MeterStlye=mystyle</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<h3 id="常用属性或语句">常用属性或语句</h3>
+<ol>
+<li>
+<p>hidden,updatedivider<br>
+hidden用于meter是否显示，hidden=1时meter不显示。<br>
+updatedivider可用在meter和measure中，updatedivider的值乘以rainmeter标签中的update值，即为当前Meter或measure的更新时间间隔，当updatedivider=-1时当前measure或meter只在皮肤加载时更新</p>
+<figure class="highlight lua"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">    [MeasureMy]</span><br><span class="line">    Measure=Calc</span><br><span class="line">    formula=MeasureMy+<span class="number">1</span></span><br><span class="line">    Updatedivider=<span class="number">-1</span></span><br><span class="line">    ;以上Measure的值永远为<span class="number">1</span></span><br><span class="line"></span><br><span class="line"><span class="number">2.</span>  引用其他的变量，measure</span><br><span class="line">    可以引用变量或measure来为其他属性赋值应用方法为</span><br><span class="line">    [measureName],#variableName#</span><br><span class="line">    rainmeter4<span class="number">.1</span>以后可以这样</span><br><span class="line">    [#variableName],[&amp;measureName],</span><br><span class="line">    若在表达式中引用需要在外面套括号</span><br><span class="line">    例如:</span><br><span class="line">    ```lua</span><br><span class="line">    ;显示一个文本，该文本一直从上往下运动，又回到开头,一直往复</span><br><span class="line">    [variables]</span><br><span class="line">    <span class="built_in">max</span>=<span class="number">10</span></span><br><span class="line"></span><br><span class="line">    [measure1]</span><br><span class="line">    Measure=Calc</span><br><span class="line">    formula=(measure1+<span class="number">1</span>)%(#<span class="built_in">max</span>#)</span><br><span class="line"></span><br><span class="line">    [meter1]</span><br><span class="line">    Meter=String</span><br><span class="line">    text=action</span><br><span class="line">    Y=[measure1]</span><br></pre></td></tr></table></figure>
+</li>
+<li>
+<p>X,Y样式<br>
+X,Y的样式为数字，可加后缀r,当添加后缀r时,坐标为相对前一个meter的，不加后缀r是相对皮肤左上角而言的<br>
+例：若X=1<br>
+Y=1<br>
+此时如皮肤左上角位于桌面坐标为（100，100），则meter再桌面上的坐标为（101，101）<br>
+若X=1r<br>
+Y=1r<br>
+此时若其前一个meter X=100<br>
+Y=100<br>
+则当前meter实际 X=101<br>
+Y=101<br>
+若X=1R<br>
+Y=1R<br>
+此时若其前一个meter X=100,W=10<br>
+Y=100,H=10<br>
+则当前meter实际 X=111<br>
+Y=111</p>
+</li>
+<li>
+<p>update时间<br>
+update时间长度会随cpu使用率自动调整，若CPU使用率太高，update时间会自动拉长，因而即使定义了update=1000更新时间间隔也不一定是1s</p>
+</li>
+<li>
+<p>条件语句<br>
+If(Above/Equal/Under)Value(似乎是)<br>
+If(Above/Eaual/Under)Action(与上面对应)<br>
+用于measure中，根据值触发事件</p>
+<figure class="highlight lua"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">;例</span><br><span class="line">[measure1]</span><br><span class="line">Measure=Calc</span><br><span class="line">formula=measure1+<span class="number">1</span></span><br><span class="line">IfAboveValue=<span class="number">10</span></span><br><span class="line">IfAboveAction=measure值大于<span class="number">10</span>时执行的动作</span><br></pre></td></tr></table></figure>
+</li>
+<li>
+<p>group<br>
+定义组方便进行组操作</p>
+<figure class="highlight lua"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">[Meter1]</span><br><span class="line">Meter=String</span><br><span class="line">text=<span class="number">1</span></span><br><span class="line">group=mygroup;将Meter1归于mygroup</span><br></pre></td></tr></table></figure>
+</li>
+<li>
+<p>事件<br>
+常用事件有<br>
+LeftMouseUpAction,LeftMouseDownAction,MouseOverAction等,这些事件都用于meter中</p>
+<figure class="highlight lua"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">LeftMouseUpAction=鼠标事件要执行的动作</span><br></pre></td></tr></table></figure>
+</li>
+<li>
+<p>bangs<br>
+事件发生时执行的指令<br>
+常用的有，!SetOption,!Update,!UpdateMeterGroup,!UpdateMeasureGroup,!UpdateMeter,!UpdateMeasure</p>
+<figure class="highlight lua"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">;over事件，更新meter标签的设置</span><br><span class="line">[meter1]</span><br><span class="line">Meter=Image</span><br><span class="line">ImageName=<span class="number">1.</span>png</span><br><span class="line">MouseOverAction=[!SetOption meter1 ImageName <span class="string">"2.png"</span>][!UpdateMeter <span class="string">"meter1"</span>]</span><br><span class="line">;此处若不Updatemeter则需要等更新周期到后才看到更改结果</span><br></pre></td></tr></table></figure>
+<p>注：!Update指令用于立刻更新所有内容，原理是是暂时覆盖rainmeter中的update属性，对设置了updatedivider=-1的meter或measure无效</p>
+</li>
+</ol>
+
+    </section>
+    <footer class="post-footer">
+      <section class="author">
+    <h4>flyingfisherman</h4>
+    <p>前端工程师，热爱技术，坚信知识技术改变生活。最高兴的场合莫过于学到的技术为自己、亲友或他人提供了些许的便利、帮助。</p>
+</section>
+      <section class="share">
+    <h4>Share this post</h4>
+    <a class="icon-twitter" href="http://twitter.com/share?url=https://github.flyingfishman.io/hexo/2018/05/31/rainmeter/"
+       onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+        <span class="hidden">Twitter</span>
+    </a>
+    <a class="icon-facebook" href="https://www.facebook.com/sharer/sharer.php?u=https://github.flyingfishman.io/hexo/2018/05/31/rainmeter/"
+       onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+        <span class="hidden">Facebook</span>
+    </a>
+    <a class="icon-google-plus" href="https://plus.google.com/share?url=https://github.flyingfishman.io/hexo/2018/05/31/rainmeter/"
+       onclick="window.open(this.href, 'google-plus-share', 'width=490,height=530');return false;">
+        <span class="hidden">Google+</span>
+    </a>
+</section>
+    </footer>
+  </article>
+  <nav class="pagination" role="pagination">
+    
+    <a class="newer-posts" href="/hexo/2018/06/12/asm/">
+        ← x8086汇编语言基础
+    </a>
+    
+    <span class="page-number">•</span>
+    
+    <a class="older-posts" href="/hexo/2018/05/19/webpack/">
+        webpack的使用 →
+    </a>
+    
+</nav>
+  <div id="comment" class="comments-area">
+    <h1 class="title"><a href="#disqus_comments" name="disqus_comments">Comments</a></h1>
+
+    
+</div>
+</main>
+
+
+  
+<footer class="site-footer">
+  
+  <a class="subscribe icon-feed" href="/rss.xml"><span class="tooltip">Subscribe!</span></a>
+  
+  <div class="inner">
+     <section class="copyright">All content copyright <a href="/hexo/">日常点滴</a> &copy; 2014 &bull; All rights reserved.</section>
+     <section class="poweredby">Proudly published with <a class="icon-ghost" href="http://zespia.tw/hexo/">Hexo</a></section>
+  </div>
+</footer>
+
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+<script type="text/javascript" src="/hexo/js/jquery.fitvids.js"></script>
+<script type="text/javascript" src="/hexo/js/index.js"></script>
+
+
+
+
+
+
+</body>
+</html>

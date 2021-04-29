@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html" charset="UTF-8" >
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+  <title>opengl(8):高级数据、高级glsl、几何着色器、实例化、抗锯齿 | 日常点滴</title>
+  <meta name="description" content="" />
+  <meta name="HandheldFriendly" content="True" />
+  <meta name="MobileOptimized" content="320" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <link rel="stylesheet" type="text/css" href="/hexo/css/screen.css" />
+  <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Noto+Serif:400,700,400italic|Open+Sans:700,400" />
+
+  <meta name="generator" content="日常点滴">
+
+  
+  <link rel="alternate" type="application/rss+xml" title="RSS" href="/rss.xml">
+  
+  
+  <link rel="alternate" type="application/atom+xml" title="Atom 0.3" href="rss.xml">
+  
+  
+
+  
+</head>
+
+
+<body class="post-template">
+
+  <header class="site-head"  style="background-image: url(/image/cover.png)" >
+    <div class="vertical">
+        <div class="site-head-content inner">
+             <a class="blog-logo" href="/hexo/"><img src="https://avatars.githubusercontent.com/u/26755276" alt="Blog Logo"/></a> 
+            <h1 class="blog-title">日常点滴</h1>
+            <h2 class="blog-description"></h2>
+        </div>
+    </div>
+</header>
+  
+
+<main class="content" role="main">
+  <article class="post">
+    <span class="post-meta">
+      <time datetime="2021-02-25T08:46:00.000Z" itemprop="datePublished">
+          2021-02-25
+      </time>
+    
+    
+    | 
+    <a href='/hexo/tags/opengl/'>opengl</a>
+    
+    
+</span>
+    <h1 class="post-title">opengl(8):高级数据、高级glsl、几何着色器、实例化、抗锯齿</h1>
+    <section class="post-content">
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.12.0/katex.min.css" /><p>以下内容主要来自<a href="https://learnopengl-cn.github.io/" target="_blank" rel="noopener">LearnOpenGL CN</a>文档，另外<a href="https://learnopengl-cn.github.io/" target="_blank" rel="noopener">LearnOpenGL CN</a>每一节都是有讨论区的，用的 disqus，disqus 很早就被墙了，想要在评论区寻求帮助需要翻墙，不要像我，学到模型加载才看到讨论区</p>
+<p>你也可以在<a href="https://www.khronos.org/opengl/wiki/Getting_Started" target="_blank" rel="noopener">此处</a>找到其他 opengl 官方推荐的资料、教程网站，推荐先用<a href="https://learnopengl-cn.github.io/" target="_blank" rel="noopener">LearnOpenGL CN</a>入门，再去看其他的</p>
+<h1>高级数据</h1>
+<p>这部分比较简单，只是介绍了几个简单的数据操作函数</p>
+<p><code>void glBufferSubData(GLenum target, GLintptr offset, GLsizeiptr size, const void *data)</code><br>
+用于分块填入数据，使用之前必须通过<code>glBufferData</code>创建了内存区域。</p>
+<ul>
+<li>target: 目标缓冲区类型</li>
+<li>offset: 起始位置</li>
+<li>size: 填入数据大小</li>
+<li>data: 数据列表指针</li>
+</ul>
+<p><code>void * glMapBuffer(GLenum target, GLenum access)</code><br>
+用于生成缓冲区的指针</p>
+<ul>
+<li>target: 目标缓冲区类型</li>
+<li>access: 读写权限，可取<code>GL_READ_ONLY,GL_WRITE_ONLY,GL_READ_WRITE</code></li>
+<li>@return: 生成的首地址指针</li>
+</ul>
+<p><code>void * glUnmapBuffer(GLenum target, GLenum access)</code><br>
+用于无效<code>glMapBuffer</code>生成的指针</p>
+<ul>
+<li>target: 目标缓冲区类型</li>
+</ul>
+<p><code>void glCopyBufferSubData(GLenum readTarget, GLenum writeTarget, GLintptr readOffset, GLintptr writeOffset, GLsizeiptr size)</code><br>
+用于缓冲区间复制数据，使用前可先用<code>glBindBuffer(GL_COPY_WRITE_BUFFER, vbo1),glBindBuffer(GL_COPY_READ_BUFFER, vbo2)</code>等操作绑定缓冲区</p>
+<ul>
+<li>readTarget: 源缓冲区类型</li>
+<li>writeTarget: 目标缓冲区类型</li>
+<li>readOffset: 源起始位置</li>
+<li>writeOffset: 目标起始位置</li>
+<li>size: 复制数据大小</li>
+</ul>
+<h2 id="示例">示例</h2>
+<p>可以修改之前 mesh 的处理方式，省去大量的遍历操作</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br></pre></td><td class="code"><pre><span class="line">Mesh::Mesh(aiMesh *mesh, <span class="built_in">vector</span>&lt;mesh::Texture&gt; &amp;textures, mesh::Material &amp;material, <span class="keyword">bool</span> has_texture)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">this</span>-&gt;mesh = mesh;</span><br><span class="line">    <span class="keyword">this</span>-&gt;textures = textures;</span><br><span class="line">    <span class="keyword">this</span>-&gt;material = material;</span><br><span class="line">    <span class="keyword">this</span>-&gt;has_texture = has_texture;</span><br><span class="line"></span><br><span class="line">    setupMesh();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">void</span> Mesh::setupMesh()</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">bool</span> hasNormals = mesh-&gt;HasNormals();</span><br><span class="line">	<span class="comment">// 点数据大小</span></span><br><span class="line">    <span class="keyword">long</span> <span class="keyword">long</span> verticesSize = mesh-&gt;mNumVertices * <span class="keyword">sizeof</span>(C_STRUCT aiVector3D);</span><br><span class="line">	<span class="comment">// 法线数据大小</span></span><br><span class="line">    <span class="keyword">long</span> <span class="keyword">long</span> normalsSize = hasNormals ? verticesSize : <span class="number">0</span>;</span><br><span class="line">	<span class="comment">// 纹理坐标数据大小</span></span><br><span class="line">    <span class="keyword">long</span> <span class="keyword">long</span> texturesSize = mesh-&gt;mTextureCoords[<span class="number">0</span>] == <span class="literal">nullptr</span> ? mesh-&gt;mNumVertices * <span class="number">2</span> * <span class="keyword">sizeof</span>(<span class="keyword">float</span>) : verticesSize;</span><br><span class="line">    <span class="keyword">long</span> <span class="keyword">long</span> facesSize = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">	<span class="comment">// 绑定</span></span><br><span class="line">    glGenVertexArrays(<span class="number">1</span>, &amp;VAO);</span><br><span class="line">    glGenBuffers(<span class="number">1</span>, &amp;VBO);</span><br><span class="line">    glGenBuffers(<span class="number">1</span>, &amp;EBO);</span><br><span class="line">    glBindVertexArray(VAO);</span><br><span class="line">    glBindBuffer(GL_ARRAY_BUFFER, VBO);</span><br><span class="line">    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);</span><br><span class="line"></span><br><span class="line">	<span class="comment">// 申请特定大小的空缓冲区域</span></span><br><span class="line">    glBufferData(GL_ARRAY_BUFFER, verticesSize + normalsSize + texturesSize, <span class="literal">nullptr</span>, GL_STATIC_DRAW);</span><br><span class="line"></span><br><span class="line">    glBufferSubData(GL_ARRAY_BUFFER, <span class="number">0</span>, verticesSize, mesh-&gt;mVertices);</span><br><span class="line"></span><br><span class="line">	<span class="comment">// 填入顶点数据</span></span><br><span class="line">    glEnableVertexAttribArray(<span class="number">0</span>);</span><br><span class="line">    glVertexAttribPointer(<span class="number">0</span>, <span class="number">3</span>, GL_FLOAT, GL_FALSE, <span class="keyword">sizeof</span>(C_STRUCT aiVector3D), (<span class="keyword">void</span> *)<span class="number">0</span>);</span><br><span class="line"></span><br><span class="line">	<span class="comment">// 存在法线时才启用顶点属性数组</span></span><br><span class="line">    <span class="keyword">if</span> (hasNormals)</span><br><span class="line">    &#123;</span><br><span class="line">        glBufferSubData(GL_ARRAY_BUFFER, verticesSize, normalsSize, mesh-&gt;mNormals);</span><br><span class="line">        glEnableVertexAttribArray(<span class="number">1</span>);</span><br><span class="line">        glVertexAttribPointer(<span class="number">1</span>, <span class="number">3</span>, GL_FLOAT, GL_FALSE, <span class="keyword">sizeof</span>(C_STRUCT aiVector3D), (<span class="keyword">void</span> *)verticesSize);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    glEnableVertexAttribArray(<span class="number">2</span>);</span><br><span class="line">	<span class="comment">// 判断第一组纹理坐标是否存在，不存在时把每个顶点的纹理坐标设为(0.0f, 0.0f)</span></span><br><span class="line">    <span class="keyword">if</span> (mesh-&gt;mTextureCoords[<span class="number">0</span>] == <span class="literal">nullptr</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">char</span> *ptr = (<span class="keyword">char</span> *)glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);</span><br><span class="line">        <span class="built_in">memset</span>(ptr + verticesSize + normalsSize, <span class="number">0</span>, <span class="keyword">sizeof</span>(texturesSize));</span><br><span class="line">        glUnmapBuffer(GL_ARRAY_BUFFER);</span><br><span class="line">        glVertexAttribPointer(<span class="number">2</span>, <span class="number">2</span>, GL_FLOAT, GL_FALSE, <span class="number">0</span>, (<span class="keyword">void</span> *)(verticesSize + normalsSize));</span><br><span class="line">    &#125;</span><br><span class="line">	<span class="comment">// 存在直接填入</span></span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">    &#123;</span><br><span class="line">        glBufferSubData(GL_ARRAY_BUFFER, verticesSize + normalsSize, texturesSize, mesh-&gt;mTextureCoords[<span class="number">0</span>]);</span><br><span class="line">        glVertexAttribPointer(<span class="number">2</span>, <span class="number">2</span>, GL_FLOAT, GL_FALSE, <span class="keyword">sizeof</span>(C_STRUCT aiVector3D), (<span class="keyword">void</span> *)(verticesSize + normalsSize));</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">	<span class="comment">// 计算索引数，并保存供drawElements使用</span></span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; mesh-&gt;mNumFaces; i++)</span><br><span class="line">    &#123;</span><br><span class="line">        indicesNum += mesh-&gt;mFaces[i].mNumIndices;</span><br><span class="line">    &#125;</span><br><span class="line">	<span class="comment">// 索引数据尺寸</span></span><br><span class="line">    facesSize = indicesNum * <span class="keyword">sizeof</span>(<span class="keyword">unsigned</span> <span class="keyword">int</span>);</span><br><span class="line">	<span class="comment">// 申请空内存</span></span><br><span class="line">    glBufferData(GL_ELEMENT_ARRAY_BUFFER, facesSize, <span class="literal">nullptr</span>, GL_STATIC_DRAW);</span><br><span class="line"></span><br><span class="line">	<span class="comment">// 将所有索引数据填入缓冲</span></span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> j = mesh-&gt;mNumFaces - <span class="number">1</span>; j &gt; <span class="number">-1</span>; j--)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">long</span> <span class="keyword">long</span> indicesSize = mesh-&gt;mFaces[j].mNumIndices * <span class="keyword">sizeof</span>(<span class="keyword">unsigned</span> <span class="keyword">int</span>);</span><br><span class="line">        facesSize -= indicesSize;</span><br><span class="line">        glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, facesSize, indicesSize, mesh-&gt;mFaces[j].mIndices);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    glBindVertexArray(<span class="number">0</span>);</span><br><span class="line">    glBindBuffer(GL_ARRAY_BUFFER, <span class="number">0</span>);</span><br><span class="line">    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, <span class="number">0</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// ...</span></span><br></pre></td></tr></table></figure>
+<h1>高级 glsl</h1>
+<h2 id="内建变量">内建变量</h2>
+<p><strong>顶点着色器</strong></p>
+<p><code>gl_PointSize</code><br>
+顶点着色器中控制顶点大小，需要用<code>glEnable(GL_PROGRAM_POINT_SIZE);</code>启用</p>
+<p>要看到效果，绘制的类型选择<code>GL_POINTS</code></p>
+<p><code>gl_VertexID</code></p>
+<blockquote>
+<p>整型变量 gl_VertexID 储存了正在绘制顶点的当前 ID。当（使用 glDrawElements）进行索引渲染的时候，这个变量会存储正在绘制顶点的当前索引。当（使用 glDrawArrays）不使用索引进行绘制的时候，这个变量会储存从渲染调用开始的已处理顶点数量。</p>
+</blockquote>
+<p><strong>片段着色器</strong></p>
+<p><code>gl_FragCoord</code></p>
+<p>点的屏幕坐标，三维向量，xy 范围根据<code>glViewport</code>设置的值决定，<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>z</mi><mo>∈</mo><mo stretchy="false">[</mo><mn>0</mn><mo separator="true">,</mo><mn>1</mn><mo stretchy="false">]</mo></mrow><annotation encoding="application/x-tex">z \in [0, 1]</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.5782em;vertical-align:-0.0391em;"></span><span class="mord mathnormal" style="margin-right:0.04398em;">z</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">∈</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">[</span><span class="mord">0</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord">1</span><span class="mclose">]</span></span></span></span></p>
+<p>可以用来根据这个值给窗左右两半部分设置不同的效果进行对比</p>
+<p><code>gl_FrontFacing</code></p>
+<p>用来判断当前面是正向面还是负向面</p>
+<p><code>gl_FragDepth</code></p>
+<p>用来在片段着色器中写入深度，但是可能对性能有较大影响，因为对这个变量写入会导致禁用提前深度测试。</p>
+<p>opengl4.2 后可以重新声明这个变量给其限定条件</p>
+<figure class="highlight glsl"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">layout</span> (depth_&lt;condition&gt;) <span class="keyword">out</span> <span class="type">float</span> <span class="built_in">gl_FragDepth</span>;</span><br></pre></td></tr></table></figure>
+<p>其中<code>condition</code>可取值如下</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">条件</th>
+<th style="text-align:left">描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">any</td>
+<td style="text-align:left">默认值。提前深度测试是禁用的，你会损失很多性能</td>
+</tr>
+<tr>
+<td style="text-align:left">greater</td>
+<td style="text-align:left">你只能让深度值比 gl_FragCoord.z 更大</td>
+</tr>
+<tr>
+<td style="text-align:left">less</td>
+<td style="text-align:left">你只能让深度值比 gl_FragCoord.z 更小</td>
+</tr>
+<tr>
+<td style="text-align:left">unchanged</td>
+<td style="text-align:left">如果你要写入 gl_FragDepth，你将只能写入 gl_FragCoord.z 的值</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>通过将深度条件设置为 greater 或者 less，OpenGL 就能假设你只会写入比当前片段深度值更大或者更小的值了。这样子的话，当深度值比片段的深度值要小的时候，OpenGL 仍是能够进行提前深度测试的。</p>
+</blockquote>
+<h2 id="接口块">接口块</h2>
+<p>简单地说就是把一组数据合并在一起，方便管理数据</p>
+<p>举例：<br>
+顶点着色器定义输出时如下</p>
+<figure class="highlight glsl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#version 330 core</span></span><br><span class="line"><span class="comment">// ...</span></span><br><span class="line"><span class="keyword">layout</span> (<span class="keyword">location</span> = <span class="number">2</span>) <span class="keyword">in</span> <span class="type">vec2</span> aTexCoords;</span><br><span class="line"></span><br><span class="line"><span class="keyword">out</span> VS_OUT</span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">vec2</span> TexCoords;</span><br><span class="line">&#125; fs_out;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span> main()</span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">// ...</span></span><br><span class="line">    fs_out.TexCoords = aTexCoords;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>那么片段着色器中申明输入如下</p>
+<figure class="highlight glsl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 接口块的声明需要一致</span></span><br><span class="line"><span class="keyword">in</span> VS_OUT</span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">vec2</span> TexCoords;</span><br><span class="line"><span class="comment">// 接口块的变量名不许呀一致</span></span><br><span class="line">&#125; fs_in;</span><br></pre></td></tr></table></figure>
+<h2 id="uniform-缓冲对象">uniform 缓冲对象</h2>
+<p>将一个缓冲内的数据作为<code>uniform</code>的数据，这个<code>uniform</code>是一组数据的组合。</p>
+<p><code>uniform</code>在着色器中声明示例如下</p>
+<figure class="highlight glsl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#version 330 core</span></span><br><span class="line"><span class="comment">// ...</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">layout</span> (<span class="keyword">std140</span>) <span class="keyword">uniform</span> Matrices</span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">mat4</span> projection;</span><br><span class="line">    <span class="type">mat4</span> view;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">uniform</span> <span class="type">mat4</span> model;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span> main()</span><br><span class="line">&#123;</span><br><span class="line">    <span class="built_in">gl_Position</span> = projection * view * model * <span class="type">vec4</span>(aPos, <span class="number">1.0</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="uniform-块布局">uniform 块布局</h3>
+<p>uniform 块分配内存和 c 一样也需要字节对齐。不同 uniform 块在不同的硬件上分配的内存可能不同，有的硬件上会对 uniform 的数据大小进行补齐达到字节对齐的目的，有的硬件上会调整 Uniform 中变量的结构来达到字节对齐的目的。</p>
+<p>默认情况下着色器使用的是叫共享布局的内存布局，每种数据的对齐量由硬件规定，并且设定对齐量后在硬件上运行的着色器共享这个对齐量规定。并且这种布局允许调整变量位置，来达到对齐的目的。</p>
+<p>因此我们无法确切知道一个变量在 uniform 块中的确切位置。</p>
+<p>其中一个办法是用<code>glGetUniformIndices</code>查询</p>
+<p><code>void glGetUniformIndices( GLuint program, GLsizei uniformCount, const GLchar **uniformNames, GLuint *uniformIndices);</code></p>
+<ul>
+<li>program:着色器程序</li>
+<li>uniformCount:变量个数</li>
+<li>uniformName:变量名列表</li>
+<li>uniformIndices:用来存放获取到的索引的数组</li>
+</ul>
+<p>也有通过规定布局的方法，如下，layout 后括号内跟的就是使用 std140 布局的声明</p>
+<figure class="highlight glsl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">layout</span> (<span class="keyword">std140</span>) <span class="keyword">uniform</span> ExampleBlock</span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">float</span> value;</span><br><span class="line">    <span class="type">vec3</span>  vector;</span><br><span class="line">    <span class="type">mat4</span>  matrix;</span><br><span class="line">    <span class="type">float</span> values[<span class="number">3</span>];</span><br><span class="line">    <span class="type">bool</span>  boolean;</span><br><span class="line">    <span class="type">int</span>   integer;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>std140 布局下常用变量的对齐量如下其中，(也可在[OpenGL 的 Uniform 缓冲规范]中查看(<a href="https://www.khronos.org/registry/OpenGL/extensions/ARB/ARB_uniform_buffer_object.txt" target="_blank" rel="noopener">https://www.khronos.org/registry/OpenGL/extensions/ARB/ARB_uniform_buffer_object.txt</a>)，在大概中间的位置，搜索 Examples 可以找到)，<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>N</mi><mo>=</mo><mn>4</mn></mrow><annotation encoding="application/x-tex">N = 4</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathnormal" style="margin-right:0.10903em;">N</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.64444em;vertical-align:0em;"></span><span class="mord">4</span></span></span></span></p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">类型</th>
+<th style="text-align:left">布局规则</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">标量，比如 int 和 bool</td>
+<td style="text-align:left">每个标量的基准对齐量为 N。</td>
+</tr>
+<tr>
+<td style="text-align:left">向量</td>
+<td style="text-align:left">2N 或者 4N。这意味着 vec3 的基准对齐量为 4N。</td>
+</tr>
+<tr>
+<td style="text-align:left">标量或向量的数组</td>
+<td style="text-align:left">每个元素的基准对齐量与 vec4 的相同。</td>
+</tr>
+<tr>
+<td style="text-align:left">矩阵</td>
+<td style="text-align:left">储存为列向量的数组，每个向量的基准对齐量与 vec4 的相同。</td>
+</tr>
+<tr>
+<td style="text-align:left">结构体</td>
+<td style="text-align:left">等于所有元素根据规则计算后的大小，但会填充到 vec4 大小的倍数。</td>
+</tr>
+</tbody>
+</table>
+<h3 id="使用-uniform-缓冲">使用 uniform 缓冲</h3>
+<p>创建缓冲时相同</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">glGenBuffers(<span class="number">1</span>, &amp;ubo);</span><br><span class="line">glBindBuffer(GL_UNIFORM_BUFFER, ubo);</span><br><span class="line">glBufferData(GL_UNIFORM_BUFFER, <span class="number">2</span> * <span class="keyword">sizeof</span>(glm::mat4), <span class="literal">NULL</span>, GL_STATIC_DRAW);</span><br><span class="line">glBindBuffer(GL_UNIFORM_BUFFER, <span class="number">0</span>);</span><br></pre></td></tr></table></figure>
+<p>不同的是缓冲创建后不用设置顶点属性指针之类的，而是设置这个缓冲的绑定点</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">glBindBufferRange(GL_UNIFORM_BUFFER, <span class="number">0</span>, ubo, <span class="number">0</span>, <span class="number">2</span> * <span class="keyword">sizeof</span>(glm::mat4));</span><br></pre></td></tr></table></figure>
+<p>此时 uniform 数据不是通过<code>glUniform</code>填入，而是设置绑定点</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">glUniformBlockBinding(program, glGetUniformBlockIndex(program, name), bind_point);</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>Uniform 缓冲对象比起独立的 uniform 有很多好处。</p>
+<ol>
+<li>一次设置很多 uniform 会比一个一个设置多个 uniform 要快很多。</li>
+<li>比起在多个着色器中修改同样的 uniform，在 Uniform 缓冲中修改一次会更容易一些。</li>
+<li>最后一个好处可能不会立即显现，如果使用 Uniform 缓冲对象的话，你可以在着色器中使用更多的 uniform。OpenGL 限制了它能够处理的 uniform 数量，这可以通过 GL_MAX_VERTEX_UNIFORM_COMPONENTS 来查询。当使用 Uniform 缓冲对象时，最大的数量会更高。所以，当你达到了 uniform 的最大数量时（比如再做骨骼动画(Skeletal Animation)的时候），你总是可以选择使用 Uniform 缓冲对象。</li>
+</ol>
+</blockquote>
+<h1>几何着色器</h1>
+<p>在顶点和片段着色器之间有一个可选的几何着色器(Geometry Shader)，几何着色器的输入是一个图元（如点或三角形）的一组顶点。几何着色器可以在顶点发送到下一着色器阶段之前对它们随意变换。然而，几何着色器最有趣的地方在于，它能够将（这一组）顶点变换为完全不同的图元，并且还能生成比原来更多的顶点。</p>
+<p>例：</p>
+<figure class="highlight glsl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#version 330 core</span></span><br><span class="line"><span class="keyword">layout</span> (<span class="keyword">points</span>) <span class="keyword">in</span>;</span><br><span class="line"><span class="keyword">layout</span> (<span class="keyword">line_strip</span>, <span class="keyword">max_vertices</span> = <span class="number">2</span>) <span class="keyword">out</span>;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span> main() &#123;</span><br><span class="line">    <span class="built_in">gl_Position</span> = <span class="built_in">gl_in</span>[<span class="number">0</span>].<span class="built_in">gl_Position</span> + <span class="type">vec4</span>(<span class="number">-0.1</span>, <span class="number">0.0</span>, <span class="number">0.0</span>, <span class="number">0.0</span>);</span><br><span class="line">    <span class="built_in">EmitVertex</span>();</span><br><span class="line"></span><br><span class="line">    <span class="built_in">gl_Position</span> = <span class="built_in">gl_in</span>[<span class="number">0</span>].<span class="built_in">gl_Position</span> + <span class="type">vec4</span>( <span class="number">0.1</span>, <span class="number">0.0</span>, <span class="number">0.0</span>, <span class="number">0.0</span>);</span><br><span class="line">    <span class="built_in">EmitVertex</span>();</span><br><span class="line"></span><br><span class="line">    <span class="built_in">EndPrimitive</span>();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>如上例，片段着色器可选输入图元如下</p>
+<ul>
+<li>points：绘制<code>GL_POINTS</code>图元时。</li>
+<li>lines：绘制<code>GL_LINES</code>或<code>GL_LINE_STRIP</code>时</li>
+<li>lines_adjacency：<code>GL_LINES_ADJACENCY</code>或<code>GL_LINE_STRIP_ADJACENCY</code></li>
+<li>triangles：<code>GL_TRIANGLES</code>、<code>GL_TRIANGLE_STRIP</code>或<code>GL_TRIANGLE_FAN</code></li>
+<li>triangles_adjacency：<code>GL_TRIANGLES_ADJACENCY</code>或<code>GL_TRIANGLE_STRIP_ADJACENCY</code></li>
+</ul>
+<p>可选输出图元如下：</p>
+<ul>
+<li>points</li>
+<li>line_strip</li>
+<li>triangle_strip</li>
+</ul>
+<p>line_strip 将一组点按次序前后相连形成的线段组，即假如有顺序为 1,2,3 的三个点，那么形成 1-2,2-3 两条线段<br>
+triangle_strip 类似 line_strip，新的点与前两个点组成三角形，即假如有顺序为 1,2,3,4 的四个点，会形成 1-2-3,2-3-4 两个三角形</p>
+<p>上一个着色器传入的顶点通过如下结构体接收</p>
+<figure class="highlight glsl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">in</span> <span class="built_in">gl_Vertex</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">vec4</span>  <span class="built_in">gl_Position</span>;</span><br><span class="line">    <span class="type">float</span> <span class="built_in">gl_PointSize</span>;</span><br><span class="line">    <span class="type">float</span> <span class="built_in">gl_ClipDistance</span>[];</span><br><span class="line">&#125; <span class="built_in">gl_in</span>[];</span><br></pre></td></tr></table></figure>
+<p>通过<code>EmitVertex()</code> <code>EndPrimitive()</code>两个指令决定输出的图元，<code>EmitVertex()</code>为提交顶点，<code>EndPrimitive()</code>为结束当前图元绘制（如果继续输出下一个点，该点作为新图元的起点。例如输出为 line_strip 时，绘制完 1,2 两点后<code>EndPrimitive()</code>，再绘制 3,4 两点后<code>EndPrimitive()</code>输出的就是 1-2,3-4 两条线段，而不是 1-2,2-3,3-4 三条相接线段）</p>
+<p>由此可以看出上例的代码是输出了两个点决定的一条线段。</p>
+<p>因此实现将三角形按其所在面的法线平移一段距离的集合着色器如下</p>
+<figure class="highlight glsl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#version 330 core</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">layout</span> (<span class="keyword">triangles</span>) <span class="keyword">in</span>;</span><br><span class="line"><span class="keyword">layout</span> (<span class="keyword">triangle_strip</span>, <span class="keyword">max_vertices</span> = <span class="number">3</span>) <span class="keyword">out</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">in</span> VS_OUT &#123;</span><br><span class="line">    <span class="type">vec2</span> texCoords;</span><br><span class="line">    <span class="comment">// 顶点的法线不是三角形的法线，不能用</span></span><br><span class="line">    <span class="type">vec4</span> normal;</span><br><span class="line">&#125; gs_in[];</span><br><span class="line"></span><br><span class="line"><span class="keyword">out</span> <span class="type">vec2</span> TexCoords;</span><br><span class="line"><span class="keyword">out</span> <span class="type">vec4</span> Normal;</span><br><span class="line"><span class="keyword">uniform</span> <span class="type">float</span> time;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 通过三角形边向量叉乘获取法向量，需要注意向量方向</span></span><br><span class="line"><span class="type">vec3</span> GetNormal()</span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">vec3</span> vector1 = <span class="type">vec3</span>(<span class="built_in">gl_in</span>[<span class="number">0</span>].<span class="built_in">gl_Position</span>) - <span class="type">vec3</span>(<span class="built_in">gl_in</span>[<span class="number">1</span>].<span class="built_in">gl_Position</span>);</span><br><span class="line">    <span class="type">vec3</span> vector2 = <span class="type">vec3</span>(<span class="built_in">gl_in</span>[<span class="number">2</span>].<span class="built_in">gl_Position</span>) - <span class="type">vec3</span>(<span class="built_in">gl_in</span>[<span class="number">1</span>].<span class="built_in">gl_Position</span>);</span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">normalize</span>(<span class="built_in">cross</span>(vector1, vector2));</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 位移</span></span><br><span class="line"><span class="type">vec4</span> explode(<span class="type">vec4</span> position, <span class="type">vec3</span> normal)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">float</span> magnitude = <span class="number">0.3</span>;</span><br><span class="line">    <span class="type">vec3</span> direction = normal * ((<span class="built_in">sin</span>(time) + <span class="number">1.0</span>) / <span class="number">2.0</span>) * magnitude;</span><br><span class="line">    <span class="keyword">return</span> position + <span class="type">vec4</span>(direction, <span class="number">0.0</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span> main()</span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">vec3</span> normal = GetNormal();</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 三个点沿着三角形面法向量位移并提交</span></span><br><span class="line">    <span class="built_in">gl_Position</span> = explode(<span class="built_in">gl_in</span>[<span class="number">0</span>].<span class="built_in">gl_Position</span>, normal);</span><br><span class="line">    TexCoords = gs_in[<span class="number">0</span>].texCoords;</span><br><span class="line">    Normal = gs_in[<span class="number">0</span>].normal;</span><br><span class="line">    <span class="built_in">EmitVertex</span>();</span><br><span class="line">    <span class="built_in">gl_Position</span> = explode(<span class="built_in">gl_in</span>[<span class="number">1</span>].<span class="built_in">gl_Position</span>, normal);</span><br><span class="line">    TexCoords = gs_in[<span class="number">1</span>].texCoords;</span><br><span class="line">    Normal = gs_in[<span class="number">1</span>].normal;</span><br><span class="line">    <span class="built_in">EmitVertex</span>();</span><br><span class="line">    <span class="built_in">gl_Position</span> = explode(<span class="built_in">gl_in</span>[<span class="number">2</span>].<span class="built_in">gl_Position</span>, normal);</span><br><span class="line">    TexCoords = gs_in[<span class="number">2</span>].texCoords;</span><br><span class="line">    Normal = gs_in[<span class="number">2</span>].normal;</span><br><span class="line">    <span class="built_in">EmitVertex</span>();</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 结束图元绘制</span></span><br><span class="line">    <span class="built_in">EndPrimitive</span>();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>显示法线的几何着色器如下</p>
+<figure class="highlight glsl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#version 330 core</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">layout</span> (<span class="keyword">triangles</span>) <span class="keyword">in</span>;</span><br><span class="line"><span class="keyword">layout</span> (<span class="keyword">line_strip</span>, <span class="keyword">max_vertices</span> = <span class="number">6</span>) <span class="keyword">out</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">in</span> VS_OUT &#123;</span><br><span class="line">    <span class="type">vec2</span> texCoords;</span><br><span class="line">    <span class="type">vec4</span> normal;</span><br><span class="line">&#125; gs_in[];</span><br><span class="line"></span><br><span class="line"><span class="keyword">out</span> <span class="type">vec2</span> TexCoords;</span><br><span class="line"><span class="keyword">out</span> <span class="type">vec4</span> Normal;</span><br><span class="line"><span class="keyword">uniform</span> <span class="type">float</span> time;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span> GenerateLine(<span class="type">int</span> <span class="keyword">index</span>)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">// 选取过顶点并且和该点法向量平行的直线上的两点</span></span><br><span class="line">    <span class="built_in">gl_Position</span> = <span class="built_in">gl_in</span>[<span class="keyword">index</span>].<span class="built_in">gl_Position</span>;</span><br><span class="line">    <span class="built_in">EmitVertex</span>();</span><br><span class="line">    <span class="built_in">gl_Position</span> = <span class="built_in">gl_in</span>[<span class="keyword">index</span>].<span class="built_in">gl_Position</span> + <span class="type">vec4</span>(gs_in[<span class="keyword">index</span>].normal.xyz, <span class="number">0.0</span>) * <span class="number">0.05</span>;</span><br><span class="line">    <span class="built_in">EmitVertex</span>();</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 结束单个图元绘制</span></span><br><span class="line">    <span class="built_in">EndPrimitive</span>();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span> main()</span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">// 三个顶点的法线都要绘制</span></span><br><span class="line">    GenerateLine(<span class="number">0</span>);</span><br><span class="line">    GenerateLine(<span class="number">1</span>);</span><br><span class="line">    GenerateLine(<span class="number">2</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>效果图如下</p>
+<p><img src="/hexo/image/opengl/show_normal.png" alt="图片无法显示"><br>
+<img src="/hexo/image/opengl/object_blast.png" alt="图片无法显示"></p>
+<h1>实例化</h1>
+<p>使用<code>glDrawArraysInstanced</code>和<code>glDrawElementsInstanced</code>能有效减少 cpu 和 gpu 间的通信，此时顶点着色器中可以读取到名为 gl_InstanceID 的变量，该变量的值为当前实例序号，从 0 开始。</p>
+<p>两函数定义如下</p>
+<p><code>void glDrawElementsInstanced(GLenum mode, GLsizei count, GLenum type, const void *indices, GLsizei instancecount)</code></p>
+<ul>
+<li>根据索引缓冲对象绘制多个实例</li>
+<li>mode:图元类型，<code>GL_POINTS</code>, <code>GL_LINE_STRIP</code>, <code>GL_LINE_LOOP</code>, <code>GL_LINES</code>, <code>GL_TRIANGLE_STRIP</code>, <code>GL_TRIANGLE_FAN</code>, <code>GL_TRIANGLES</code>, <code>GL_QUAD_STRIP</code>, <code>GL_QUADS</code>, <code>GL_POLYGON</code></li>
+<li>type:索引数据类型，<code>GL_UNSIGNED_BYTE</code>, <code>GL_UNSIGNED_SHORT</code>, or <code>GL_UNSIGNED_INT</code>.</li>
+<li>indices: 索引数组的指针，或者设为 0（绑定了 EBO 的前提下）</li>
+<li>instancecount: 实例数量</li>
+</ul>
+<p><code>void glDrawArraysInstanced(GLenum mode, GLint first, GLsizei count, GLsizei instancecount)</code></p>
+<ul>
+<li>根据顶点缓冲对象绘制多个实例</li>
+<li>mode:图元类型，<code>GL_POINTS</code>, <code>GL_LINE_STRIP</code>, <code>GL_LINE_LOOP</code>, <code>GL_LINES</code>, <code>GL_TRIANGLE_STRIP</code>, <code>GL_TRIANGLE_FAN</code>, <code>GL_TRIANGLES</code>, <code>GL_QUAD_STRIP</code>, <code>GL_QUADS</code>, <code>GL_POLYGON</code>.</li>
+<li>first:第一个点索引</li>
+<li>count:点个数</li>
+</ul>
+<p>有了这两个函数可以将每个实例的模型矩阵存放在一个 uniform 数组中，在代码中逐个设置好后，在顶点着色器中通过<code>gl_InstanceID</code>来获取对应的矩阵。</p>
+<p><strong>顶点着色器中</strong></p>
+<figure class="highlight glsl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#version 330 core</span></span><br><span class="line"><span class="keyword">layout</span> (<span class="keyword">location</span> = <span class="number">0</span>) <span class="keyword">in</span> <span class="type">vec2</span> aPos;</span><br><span class="line"><span class="keyword">layout</span> (<span class="keyword">location</span> = <span class="number">1</span>) <span class="keyword">in</span> <span class="type">vec3</span> aColor;</span><br><span class="line"></span><br><span class="line"><span class="keyword">out</span> <span class="type">vec3</span> fColor;</span><br><span class="line"></span><br><span class="line"><span class="keyword">uniform</span> <span class="type">vec2</span> offsets[<span class="number">100</span>];</span><br><span class="line"></span><br><span class="line"><span class="type">void</span> main()</span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">vec2</span> <span class="keyword">offset</span> = offsets[<span class="built_in">gl_InstanceID</span>];</span><br><span class="line">    <span class="built_in">gl_Position</span> = <span class="type">vec4</span>(aPos + <span class="keyword">offset</span>, <span class="number">0.0</span>, <span class="number">1.0</span>);</span><br><span class="line">    fColor = aColor;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><strong>程序代码中</strong></p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// ...</span></span><br><span class="line"><span class="comment">// 生成偏移量数据</span></span><br><span class="line">glm::vec2 translations[<span class="number">100</span>];</span><br><span class="line"><span class="keyword">int</span> index = <span class="number">0</span>;</span><br><span class="line"><span class="keyword">float</span> offset = <span class="number">0.1f</span>;</span><br><span class="line"><span class="keyword">for</span>(<span class="keyword">int</span> y = <span class="number">-10</span>; y &lt; <span class="number">10</span>; y += <span class="number">2</span>)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">for</span>(<span class="keyword">int</span> x = <span class="number">-10</span>; x &lt; <span class="number">10</span>; x += <span class="number">2</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        glm::vec2 translation;</span><br><span class="line">        translation.x = (<span class="keyword">float</span>)x / <span class="number">10.0f</span> + offset;</span><br><span class="line">        translation.y = (<span class="keyword">float</span>)y / <span class="number">10.0f</span> + offset;</span><br><span class="line">        translations[index++] = translation;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// ...</span></span><br><span class="line"><span class="comment">// 设置uniform数组</span></span><br><span class="line">shader.use();</span><br><span class="line"><span class="keyword">for</span>(<span class="keyword">unsigned</span> <span class="keyword">int</span> i = <span class="number">0</span>; i &lt; <span class="number">100</span>; i++)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="built_in">stringstream</span> ss;</span><br><span class="line">    <span class="built_in">string</span> index;</span><br><span class="line">    ss &lt;&lt; i;</span><br><span class="line">    index = ss.str();</span><br><span class="line">    shader.setVec2((<span class="string">"offsets["</span> + index + <span class="string">"]"</span>).c_str(), translations[i]);</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// ...</span></span><br></pre></td></tr></table></figure>
+<h2 id="实例化数组">实例化数组</h2>
+<p>但是 uniform 存在数量限制，因此当需要绘制的实例个数较多时，uniform 就没办法解决，因此可以使用实例化数组，涉及的函数如下</p>
+<p><code>void glVertexAttribDivisor(GLuint index, GLuint divisor)</code></p>
+<ul>
+<li>index: 顶点属性的索引</li>
+<li>divisor: 决定 index 指定的顶点属性更新一次需要经过几次实例绘制</li>
+</ul>
+<p>此时可以不需要设置 uniform 而是绑定顶点缓冲对象，并设置顶点属性指针</p>
+<p><strong>顶点着色器中改为如下</strong></p>
+<figure class="highlight glsl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#version 330 core</span></span><br><span class="line"><span class="keyword">layout</span> (<span class="keyword">location</span> = <span class="number">0</span>) <span class="keyword">in</span> <span class="type">vec2</span> aPos;</span><br><span class="line"><span class="keyword">layout</span> (<span class="keyword">location</span> = <span class="number">1</span>) <span class="keyword">in</span> <span class="type">vec3</span> aColor;</span><br><span class="line"><span class="keyword">layout</span> (<span class="keyword">location</span> = <span class="number">2</span>) <span class="keyword">in</span> <span class="type">vec2</span> aOffset;</span><br><span class="line"></span><br><span class="line"><span class="keyword">out</span> <span class="type">vec3</span> fColor;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span> main()</span><br><span class="line">&#123;</span><br><span class="line">    <span class="built_in">gl_Position</span> = <span class="type">vec4</span>(aPos + aOffset, <span class="number">0.0</span>, <span class="number">1.0</span>);</span><br><span class="line">    fColor = aColor;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><strong>程序代码改为如下</strong></p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// ...</span></span><br><span class="line"><span class="comment">// 生成偏移量数据</span></span><br><span class="line">glm::vec2 translations[<span class="number">100</span>];</span><br><span class="line"><span class="keyword">int</span> index = <span class="number">0</span>;</span><br><span class="line"><span class="keyword">float</span> offset = <span class="number">0.1f</span>;</span><br><span class="line"><span class="keyword">for</span>(<span class="keyword">int</span> y = <span class="number">-10</span>; y &lt; <span class="number">10</span>; y += <span class="number">2</span>)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">for</span>(<span class="keyword">int</span> x = <span class="number">-10</span>; x &lt; <span class="number">10</span>; x += <span class="number">2</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        glm::vec2 translation;</span><br><span class="line">        translation.x = (<span class="keyword">float</span>)x / <span class="number">10.0f</span> + offset;</span><br><span class="line">        translation.y = (<span class="keyword">float</span>)y / <span class="number">10.0f</span> + offset;</span><br><span class="line">        translations[index++] = translation;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// ...</span></span><br><span class="line">glGenVertexArrays(<span class="number">1</span>, &amp;vao);</span><br><span class="line">glGenBuffers(<span class="number">1</span>, &amp;vbo);</span><br><span class="line">glGenBuffers(<span class="number">1</span>, &amp;vbo2);</span><br><span class="line">glBindVertexArray(vao);</span><br><span class="line">glBindBuffer(GL_ARRAY_BUFFER, vbo);</span><br><span class="line">glBufferData(GL_ARRAY_BUFFER, <span class="keyword">sizeof</span>(glm::vec2) * <span class="number">100</span>, translations,GL_STATIC_DRAW);</span><br><span class="line">glEnableVertexAttribArray(<span class="number">2</span>);</span><br><span class="line">glVertexAttribPointer(<span class="number">2</span>, <span class="number">2</span>, GL_FLOAT, GL_FALSE, <span class="number">0</span>, (<span class="keyword">void</span> *)<span class="number">0</span>);</span><br><span class="line">glVertexAttribDivisor(<span class="number">2</span>, <span class="number">1</span>);</span><br><span class="line"><span class="comment">// ...</span></span><br></pre></td></tr></table></figure>
+<h2 id="实现小行星的示例程序效果">实现小行星的示例程序效果</h2>
+<p><img src="/hexo/image/opengl/instancing.png" alt="图片无法显示"></p>
+<p>没有使用实例化的情况下，绘制 70000 个小行星较明显卡顿</p>
+<p><img src="/hexo/image/opengl/instancing2.png" alt="图片无法显示"></p>
+<p>使用实例化的情况下，绘制 1400000 个小行星较明显卡顿，但还是比没有使用实例化绘制 70000 个时的情况要好</p>
+<p><img src="/hexo/image/opengl/instancing3.png" alt="图片无法显示"></p>
+<blockquote>
+<p>glBufferData 多次调用时后一次会释放前一次的内存，并创建新的内存，因此可以放心重复调用来改变缓冲对象内存区大小</p>
+</blockquote>
+<h1>抗锯齿</h1>
+<h2 id="锯齿产生原因">锯齿产生原因</h2>
+<p>由于屏幕像素实际上是一格格的固定宽高的方格，因此斜线映射到屏幕上时实际上无法将屏幕像素与斜线上的点准确地对应。</p>
+<p>光栅器采用的办法简化一下很像小学教的估算三角形面积的方法（占方格超过一半的也计一个方格，少于一半的不计），过像素中心点的着色，不过的着色，这种做法就会如下图一样</p>
+<p><img src="/hexo/image/opengl/anti_aliasing_rasterization.png" alt="图片无法显示"><br>
+<img src="/hexo/image/opengl/anti_aliasing_rasterization_filled.png" alt="图片无法显示"></p>
+<h2 id="抗锯齿">抗锯齿</h2>
+<p>为了解决上面的问题需要抗锯齿技术</p>
+<h3 id="SSAA">SSAA</h3>
+<p>超采样抗锯齿(Super Sample Anti-aliasing, SSAA）</p>
+<p>先绘制分辨率更大的图像（例如：将上面的同样宽度的区域，划分为更多的网格，就能相对更准确表示三角形），再下采样(Downsample)（用线性插值来缩放什么的）到低分辨率</p>
+<ul>
+<li>优点：简单易操作，效果最好</li>
+<li>缺点：性能消耗大</li>
+</ul>
+<h3 id="MSAA">MSAA</h3>
+<p>多重采样抗锯齿（Multisample Anti-aliasing, MSAA）<br>
+这玩意没一个人能讲明白的，反而一堆脑瘫装逼犯，中英文切换不累吗？用一大堆乱七八糟的词，什么都说不清楚，就是将同一个模糊的说法换个花样重复，其间还夹杂着一堆鸟语单词，不好翻译的术语用鸟语也就罢了，简单的&quot;能工作&quot;，“样本”，“覆盖”，用 nm 的鸟语呢？看着就不爽。</p>
+<p>暂时简单理解成：</p>
+<ol>
+<li>每个像素多个子样本。</li>
+<li>对于要绘制的如三角形之类的某个图形，其边缘不管包含某个像素的几个样本都会导致这个像素在光栅化阶段后作为片段进入片段着色器进行一次着色。</li>
+<li>说法 1：然后被三角形覆盖的子样本会取着色器输出的颜色；说法 2：该像素内所有样本都取着色器输出的颜色，但深度不同（如被三角形覆盖的子样本深度取三角形上顶点的深度，其余取最大深度）。</li>
+<li>对子样本单独深度测试。</li>
+<li>最终某像素颜色由所有子样本均值决定。</li>
+<li>也就是说 MSAA 相对于 SSAA 区别在于省了片段着色器对每个子样本单独着色的操作。</li>
+</ol>
+<h2 id="glfw-启用多重采样抗锯齿">glfw 启用多重采样抗锯齿</h2>
+<p>很简单，</p>
+<ul>
+<li>设置多重采样样本数<code>glfwWindowHint(GLFW_SAMPLES, 4)</code></li>
+<li>启用多重采样<code>glEnable(GL_MULTISAMPLE)</code></li>
+</ul>
+<h2 id="使用自己的多重采样缓冲">使用自己的多重采样缓冲</h2>
+<h3 id="创建步骤">创建步骤</h3>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">void</span> AntiAliasing::createMultisampleFramebuffer()</span><br><span class="line">&#123;</span><br><span class="line">    glGenFramebuffers(<span class="number">1</span>, &amp;fbo);</span><br><span class="line">    glBindFramebuffer(GL_FRAMEBUFFER, fbo);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 创建多重采样纹理</span></span><br><span class="line">    glGenTextures(<span class="number">1</span>, &amp;texture);</span><br><span class="line">    glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, texture);</span><br><span class="line">    glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, <span class="number">4</span>, GL_RGB, WIDTH, HEIGHT, GL_TRUE);</span><br><span class="line">    glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, <span class="number">0</span>);</span><br><span class="line">    <span class="comment">// 绑定多重采样纹理为颜色附件</span></span><br><span class="line">    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D_MULTISAMPLE, texture, <span class="number">0</span>);</span><br><span class="line">    <span class="comment">// 创建多重采样渲染缓冲</span></span><br><span class="line">    glGenRenderbuffers(<span class="number">1</span>, &amp;rbo);</span><br><span class="line">    glBindRenderbuffer(GL_RENDERBUFFER, rbo);</span><br><span class="line">    glRenderbufferStorageMultisample(GL_RENDERBUFFER, <span class="number">4</span>, GL_DEPTH24_STENCIL8, WIDTH, HEIGHT);</span><br><span class="line">    glBindRenderbuffer(GL_RENDERBUFFER, <span class="number">0</span>);</span><br><span class="line">    <span class="comment">// 绑定渲染缓冲为深度和模板缓冲</span></span><br><span class="line">    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="built_in">std</span>::<span class="built_in">cout</span> &lt;&lt; <span class="string">"framebuffer create error"</span> &lt;&lt; <span class="built_in">std</span>::<span class="built_in">endl</span>;</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    glBindFramebuffer(GL_FRAMEBUFFER, <span class="number">0</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="还原到默认帧缓冲">还原到默认帧缓冲</h3>
+<p><strong>涉及函数</strong></p>
+<p><code>void glBlitFramebuffer(GLint srcX0,GLint srcY0,GLint srcX1,GLint srcY1,GLint dstX0,GLint dstY0,GLint dstX1,GLint dstY1,GLbitfield mask,GLenum filter)</code></p>
+<ul>
+<li>src[x|y][0|1]: 源帧缓冲的左上和右下坐标</li>
+<li>dst[x|y][0|1]: 目标帧缓冲的左上和右下坐标</li>
+<li>mask:要被复制的缓冲，<code>GL_COLOR_BUFFER_BIT</code>, <code>GL_DEPTH_BUFFER_BIT</code> 和 <code>GL_STENCIL_BUFFER_BIT</code>.</li>
+<li>filter: 插值方式，取<code>GL_NEAREST</code> 或 <code>GL_LINEAR</code>，含义参见纹理的插值方式</li>
+</ul>
+<p>用<code>glBlitFramebuffer</code>将图像数据冲多重采样帧缓冲到默认的帧缓冲，并采用线性插值来缩放就实现了将多重采样帧缓冲的内容还原并绘制到默认帧缓冲的过程</p>
+<h3 id="抗锯齿-添加特效">抗锯齿+添加特效</h3>
+<ul>
+<li>创建一个中间帧缓冲，和一个多级采样纹理缓冲</li>
+<li>图形绘制到多级采样纹理缓冲中，还原到中间帧缓冲中</li>
+<li>再将中间帧缓冲的绑定的颜色附件纹理直接绘制到一个全屏矩形上，这次绘制时添加特效。</li>
+</ul>
+<h3 id="自定义多重采样抗锯齿方式">自定义多重采样抗锯齿方式</h3>
+<p>可以直接将多重采样缓冲绑定的多级采样纹理绘制到默认帧缓冲上，此时做的修改如下</p>
+<p><strong>c++代码中</strong></p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 绑定多级采样纹理</span></span><br><span class="line">glActiveTexture(GL_TEXTURE0);</span><br><span class="line">glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, texture);</span><br><span class="line">square_shader.setUniform1i(<span class="string">"texms"</span>, <span class="number">0</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 绘制全屏矩形    </span></span><br><span class="line">glDrawArrays(GL_TRIANGLES, <span class="number">0</span>, <span class="number">6</span>);</span><br><span class="line"><span class="comment">// 一定要解绑，否则似乎会出问题</span></span><br><span class="line">glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, <span class="number">0</span>);</span><br></pre></td></tr></table></figure>
+<p><strong>片段着色器中</strong></p>
+<p>注意<code>texelFetch</code>和<code>texture</code>坐标参数的不同之处</p>
+<figure class="highlight glsl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 获取纹理尺寸</span></span><br><span class="line"><span class="type">ivec2</span> texSize = <span class="built_in">textureSize</span>(texms);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 取均值</span></span><br><span class="line">FragColor = <span class="type">vec4</span>(<span class="number">0.0</span>f);</span><br><span class="line">FragColor += <span class="built_in">texelFetch</span>(texms, <span class="type">ivec2</span>(TexCoords * texSize), <span class="number">0</span>)/<span class="number">4</span>;</span><br><span class="line">FragColor += <span class="built_in">texelFetch</span>(texms, <span class="type">ivec2</span>(TexCoords * texSize), <span class="number">1</span>)/<span class="number">4</span>;</span><br><span class="line">FragColor += <span class="built_in">texelFetch</span>(texms, <span class="type">ivec2</span>(TexCoords * texSize), <span class="number">2</span>)/<span class="number">4</span>;</span><br><span class="line">FragColor += <span class="built_in">texelFetch</span>(texms, <span class="type">ivec2</span>(TexCoords * texSize), <span class="number">3</span>)/<span class="number">4</span>;</span><br></pre></td></tr></table></figure>
+<p><code>ivec textureSize(gsampler sampler​, int lod​)</code></p>
+<ul>
+<li>用来获取特定细节级别（lod，level-of-detail:指的是多级渐远纹理的级别下文同）的纹理尺寸</li>
+<li>sampler:纹理对应的<code>sampler</code>变量，可取类型参考<a href="https://www.khronos.org/opengl/wiki/Sampler_(GLSL)" target="_blank" rel="noopener">Opengl Wiki:Sampler (GLSL)</a></li>
+<li>lod:多级渐远纹理的级别，没有多级渐远纹理的sampler不可用</li>
+<li>@return:返回向量的维数取决于sampler类型</li>
+</ul>
+<p><code>gvec texture(gsampler sampler​, vec texCoord​[, float bias​])</code></p>
+<ul>
+<li>用标准化后（横纵坐标除以向量模）的纹理坐标从纹理中取样</li>
+<li>sampler:纹理对应的<code>sampler</code>变量，可取类型参考<a href="https://www.khronos.org/opengl/wiki/Sampler_(GLSL)" target="_blank" rel="noopener">Opengl Wiki:Sampler (GLSL)</a></li>
+<li>textCoord:标准化后的纹理坐标</li>
+<li>bias:多级渐远纹理偏移量（LOD bias）,没有多级渐远纹理的sampler不可用</li>
+<li>@return: 如果sampler的类型是Shadow samplers的类型，那么返回值是一个代表对比度（comparison）结果的浮点型。其余情况返回值是向量，维度取决于sampler类型。</li>
+</ul>
+<p><code>gvec texelFetch(gsampler sampler​, ivec texCoord​[, int lod​] [, int sample​])</code></p>
+<ul>
+<li>用未标准化的坐标从纹理中取样</li>
+<li>sampler: 纹理对应的<code>sampler</code>变量，可取类型参考<a href="https://www.khronos.org/opengl/wiki/Sampler_(GLSL)" target="_blank" rel="noopener">Opengl Wiki:Sampler (GLSL)</a></li>
+<li>textCoord: 像素坐标，这个坐标是整形组成的二维向量，代表纹理图像某个像素的坐标，和<code>texture</code>的<code>texCoord</code>不同，<code>texture</code>的<code>texCoord</code>是标准化后的浮点型坐标</li>
+<li>lod: 多级渐远纹理级别，对于没有多级渐远纹理的纹理类型来说，这个参数不存在</li>
+<li>sampler: 第几个样本，对于不是多重采样的纹理，此参数不存在</li>
+<li>@return: 返回值的向量维数取决于纹理的类型</li>
+</ul>
+<h3 id="最终效果">最终效果</h3>
+<p>自定义抗锯齿的效果和抗锯齿是一样的</p>
+<p><strong>无抗锯齿</strong></p>
+<p><img src="/hexo/image/opengl/msaa_off.png" alt="图片无法显示"></p>
+<p><strong>抗锯齿</strong></p>
+<p><img src="/hexo/image/opengl/msaa_on.png" alt="图片无法显示"></p>
+<p><strong>抗锯齿+模糊</strong></p>
+<p><img src="/hexo/image/opengl/msaa_blur.png" alt="图片无法显示"></p>
+<p><strong>自定义抗锯齿</strong></p>
+<p><img src="/hexo/image/opengl/msaa_custom.png" alt="图片无法显示"></p>
+<h1>参考</h1>
+<ol>
+<li><a href="https://blog.csdn.net/msk1111/article/details/103796757" target="_blank" rel="noopener">《GLES3.0 中文 API-glGetUniformIndices》</a> authored by <a href="https://blog.csdn.net/MSK1111" target="_blank" rel="noopener">MSK1111</a>@<a href="https://www.csdn.net/" target="_blank" rel="noopener">csdn</a></li>
+<li><a href="https://www.khronos.org/registry/OpenGL-Refpages/gl4/html/glVertexAttribDivisor.xhtml" target="_blank" rel="noopener">glVertexAttribDivisor</a></li>
+<li><a href="https://www.khronos.org/opengl/wiki/Sampler_(GLSL)" target="_blank" rel="noopener">Opengl Wiki:Sampler (GLSL)</a></li>
+</ol>
+
+    </section>
+    <footer class="post-footer">
+      <section class="author">
+    <h4>flyingfisherman</h4>
+    <p>前端工程师，热爱技术，坚信知识技术改变生活。最高兴的场合莫过于学到的技术为自己、亲友或他人提供了些许的便利、帮助。</p>
+</section>
+      <section class="share">
+    <h4>Share this post</h4>
+    <a class="icon-twitter" href="http://twitter.com/share?url=https://github.flyingfishman.io/hexo/2021/02/25/opengl8/"
+       onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+        <span class="hidden">Twitter</span>
+    </a>
+    <a class="icon-facebook" href="https://www.facebook.com/sharer/sharer.php?u=https://github.flyingfishman.io/hexo/2021/02/25/opengl8/"
+       onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+        <span class="hidden">Facebook</span>
+    </a>
+    <a class="icon-google-plus" href="https://plus.google.com/share?url=https://github.flyingfishman.io/hexo/2021/02/25/opengl8/"
+       onclick="window.open(this.href, 'google-plus-share', 'width=490,height=530');return false;">
+        <span class="hidden">Google+</span>
+    </a>
+</section>
+    </footer>
+  </article>
+  <nav class="pagination" role="pagination">
+    
+    <a class="newer-posts" href="/hexo/2021/03/30/opengl9/">
+        ← opengl(9):高级光照，gamma校正，阴影
+    </a>
+    
+    <span class="page-number">•</span>
+    
+    <a class="older-posts" href="/hexo/2021/02/12/opengl7/">
+        opengl(7):深度测试、模板测试、混合、面剔除、帧缓冲、立方体贴图 →
+    </a>
+    
+</nav>
+  <div id="comment" class="comments-area">
+    <h1 class="title"><a href="#disqus_comments" name="disqus_comments">Comments</a></h1>
+
+    
+</div>
+</main>
+
+
+  
+<footer class="site-footer">
+  
+  <a class="subscribe icon-feed" href="/rss.xml"><span class="tooltip">Subscribe!</span></a>
+  
+  <div class="inner">
+     <section class="copyright">All content copyright <a href="/hexo/">日常点滴</a> &copy; 2014 &bull; All rights reserved.</section>
+     <section class="poweredby">Proudly published with <a class="icon-ghost" href="http://zespia.tw/hexo/">Hexo</a></section>
+  </div>
+</footer>
+
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+<script type="text/javascript" src="/hexo/js/jquery.fitvids.js"></script>
+<script type="text/javascript" src="/hexo/js/index.js"></script>
+
+
+
+
+
+
+</body>
+</html>

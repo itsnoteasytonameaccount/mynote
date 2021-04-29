@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html" charset="UTF-8" >
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+  <title>百夫长统计 | 日常点滴</title>
+  <meta name="description" content="" />
+  <meta name="HandheldFriendly" content="True" />
+  <meta name="MobileOptimized" content="320" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <link rel="stylesheet" type="text/css" href="/hexo/css/screen.css" />
+  <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Noto+Serif:400,700,400italic|Open+Sans:700,400" />
+
+  <meta name="generator" content="日常点滴">
+
+  
+  <link rel="alternate" type="application/rss+xml" title="RSS" href="/rss.xml">
+  
+  
+  <link rel="alternate" type="application/atom+xml" title="Atom 0.3" href="rss.xml">
+  
+  
+
+  
+</head>
+
+
+<body class="post-template">
+
+  <header class="site-head"  style="background-image: url(/image/cover.png)" >
+    <div class="vertical">
+        <div class="site-head-content inner">
+             <a class="blog-logo" href="/hexo/"><img src="https://avatars.githubusercontent.com/u/26755276" alt="Blog Logo"/></a> 
+            <h1 class="blog-title">日常点滴</h1>
+            <h2 class="blog-description"></h2>
+        </div>
+    </div>
+</header>
+  
+
+<main class="content" role="main">
+  <article class="post">
+    <span class="post-meta">
+      <time datetime="2018-04-28T16:00:00.000Z" itemprop="datePublished">
+          2018-04-29
+      </time>
+    
+    
+    | 
+    <a href='/hexo/tags/linux/'>linux</a>,
+    
+    <a href='/hexo/tags/php/'>php</a>,
+    
+    <a href='/hexo/tags/mysql/'>mysql</a>
+    
+    
+</span>
+    <h1 class="post-title">百夫长统计</h1>
+    <section class="post-content">
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.12.0/katex.min.css" /><h1>前言</h1>
+<p>前天看到的新鲜东西，统计网站访问量的，本着试一试玩一玩的心态，记录过程<br>
+<a href="https://cn.centcount.com/doc.php?doc=%E7%99%BE%E5%A4%AB%E9%95%BF%E7%BB%9F%E8%AE%A1&amp;article=%E5%AE%89%E8%A3%85%E7%99%BE%E5%A4%AB%E9%95%BF%E7%BB%9F%E8%AE%A1" target="_blank" rel="noopener">官方文档</a></p>
+<a id="more"></a>
+<h1>内容</h1>
+<h2 id="准备工作">准备工作</h2>
+<p><em><strong>以下内容在centos上测试成功</strong></em></p>
+<p>百夫长统计需要php+mysql+redis+nginx+php-fpm环境<br>
+并且需要php装了mysqli,redis,mbstring,gd,curl等扩展</p>
+<p>并且需要为百夫长统计准备一位mysql用户，该用户需要有创建数据库权限，对创建的数据库拥有所有权限。<br>
+否则安装时会出现代码运行错误,当然，你可以直接用root用户(不建议)</p>
+<h3 id="mysql相关">mysql相关</h3>
+<p>安装数据库方法请自行百度</p>
+<p>可能用到的命令有</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 创建用户</span></span><br><span class="line">CREATE USER <span class="string">'username'</span>@<span class="string">'host'</span> IDENTIFIED BY <span class="string">'password'</span>;</span><br><span class="line"><span class="comment"># 查看用户信息（一般只需要知道host,user,password)</span></span><br><span class="line"><span class="comment"># 其中password是通过mysql自带password函数加密后的</span></span><br><span class="line"><span class="comment"># host:%代表可远程，127.0.0.1本地</span></span><br><span class="line">USE mysql;</span><br><span class="line">SELECT host,user,password FROM user;</span><br><span class="line"><span class="comment"># 显示用户所有权限</span></span><br><span class="line">SHOW GRTANS FOR username@host;</span><br><span class="line"><span class="comment"># 分配用户权限（权限有all,create,select...其余不记得）</span></span><br><span class="line">GRANT privileges ON database_name.table TO user@host;</span><br><span class="line"><span class="comment"># 收回用户权限</span></span><br><span class="line">REVOKE privileges ON ON database_name.table FROM user@host;</span><br><span class="line"><span class="comment"># 收回所有权限(此处可能不对，记不清了)</span></span><br><span class="line">REVOKE ALL PRIVILEGES,GRANT OPTION FROM user@host;</span><br><span class="line"><span class="comment"># 权限修改立即生效</span></span><br><span class="line">flush privileges;</span><br></pre></td></tr></table></figure>
+<p>百夫长统计对mysql字符集也有要求，需要通过配置文件修改<br>
+mysql的配置文件是my.cnf<br>
+位置可能不确定，mysql help输出信息中有一段显示默认配置文件的位置<br>
+若实在找不到，通过以下命令全局搜索</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">find / -name my.cnf</span><br></pre></td></tr></table></figure>
+<p>配置文件修改完成后需要重启服务，有如下方法</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 找到pid</span></span><br><span class="line">netstat -napt|grep mysqld</span><br><span class="line"><span class="comment"># 平滑重启</span></span><br><span class="line"><span class="built_in">kill</span> -USR2 pid</span><br><span class="line"><span class="comment"># 或者</span></span><br><span class="line">service mysqld restart</span><br><span class="line"><span class="comment"># 或者</span></span><br><span class="line">systemctl restart mysqld.service</span><br></pre></td></tr></table></figure>
+<h3 id="redis安装">redis安装</h3>
+<p>cnetos安装redis只需要用以下指令</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 不加-y,以便确认是否选择了对的安装包</span></span><br><span class="line"><span class="comment"># yum install -y packagename表示不确认安装包，总是yes</span></span><br><span class="line">yum install redis-server*</span><br></pre></td></tr></table></figure>
+<p>redis常用操作如下</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 后面可以没有配置文件路径，此时采用默认配置，不会后台运行</span></span><br><span class="line">redis-server start /path/of/config</span><br><span class="line"><span class="comment"># 一般安装完redis,会有样板配置文件，通过find查找</span></span><br><span class="line">find / -name redis.conf</span><br><span class="line"></span><br><span class="line"><span class="comment"># vim中搜索daemonize(似乎是这样拼)</span></span><br><span class="line"><span class="comment"># 将redis.conf文件中的daemonize no改为daemonize yes,此时再载入配置文件启动，就是后台运行了</span></span><br><span class="line"><span class="comment"># 当然也可以直接用参数进行后台启动</span></span><br><span class="line">vim redis</span><br><span class="line">redis-server start /path/of/config</span><br><span class="line"></span><br><span class="line"><span class="comment"># 连接数据库</span></span><br><span class="line"><span class="comment"># 默认hostname是localhost,port是6379</span></span><br><span class="line">redis-cli -h hostname -p port</span><br><span class="line"></span><br><span class="line"><span class="comment"># 注意redis数据库操作不需要加';'</span></span><br><span class="line"><span class="comment"># 清库</span></span><br><span class="line">flushall</span><br><span class="line"></span><br><span class="line"><span class="comment"># 查看key统计</span></span><br><span class="line">info keyspace</span><br><span class="line"></span><br><span class="line"><span class="comment"># 选中index为1的database</span></span><br><span class="line">select 1</span><br><span class="line"></span><br><span class="line"><span class="comment"># 显示当前库所有key</span></span><br><span class="line">keys *</span><br><span class="line"></span><br><span class="line"><span class="comment"># 显示key的数据类型</span></span><br><span class="line"><span class="built_in">type</span> keyname</span><br><span class="line"></span><br><span class="line"><span class="comment"># 其余操作自行百度</span></span><br></pre></td></tr></table></figure>
+<h3 id="php配置">php配置</h3>
+<p>以下方法适用于centos上配置 php7扩展</p>
+<ol start="0">
+<li>
+<p>网上搜索都说可以直接通过yum install php-扩展名*<br>
+一键安装，但我试过了没有用，在尝试下面方法前，先试试yum安装，以下属无奈之举</p>
+</li>
+<li>
+<p>添加mysqli扩展</p>
+<p>mysqli扩展我是通过重新编译安装添加的<br>
+编译前你需要确认已安装了mysql-devel<br>
+没安装的用以下命令安装</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">yum install mysql-devel*</span><br></pre></td></tr></table></figure>
+<p>安装后会多出一个mysql_config,用find查找</p>
+<p>编译安装php方法如下</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 如果正在运行php-fpm,先kill</span></span><br><span class="line">./configure --<span class="built_in">enable</span>-fpm --with-mysqli=/path/of/mysql_config --<span class="built_in">disable</span>-fileinfo</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># 1G以下内存不附带--disable-fileinfo参数会报错</span></span><br><span class="line"><span class="comment"># 如果make出错，可能是缺少某些库支持</span></span><br><span class="line">make &amp;&amp; make install</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># 安装完毕后需要修改配置文件</span></span><br><span class="line"><span class="comment"># 可以自定义一个配置文件，例如</span></span><br><span class="line">vim php.ini</span><br><span class="line"><span class="comment"># 在php.ini中加一行extension=mysqli.so</span></span><br><span class="line">php-fpm -c php.ini</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># 大功告成，在浏览器postinfo界面ctrl+f搜索mysqli,应该会有一块独立的详细信息</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 如果还是没有mysqli，推荐以下方法检查</span></span><br><span class="line"><span class="comment"># 在浏览器postinfo界面ctrl+f搜索extension_dir</span></span><br><span class="line"><span class="comment"># 系统转到extension_dir路径下查看是否有mysqli.so</span></span><br><span class="line"><span class="comment"># 或</span></span><br><span class="line">php -m</span><br><span class="line"><span class="comment"># 查看是否加载了mysqli</span></span><br><span class="line"><span class="comment"># 若有，可能是php-fpm的问题</span></span><br></pre></td></tr></table></figure>
+</li>
+<li>
+<p>添加gd扩展<br>
+如果你是用源码安装的php，<br>
+转到php源码目录，cd至ext目录，里面有你需要的一切扩展的源码，<br>
+例如安装gd</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 先安装支持，缺一不可</span></span><br><span class="line">yum install freetype*</span><br><span class="line">yum install libjpeg*</span><br><span class="line">yum install libpng*</span><br><span class="line"></span><br><span class="line"><span class="built_in">cd</span> php源码目录/ext/gd</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># 创建configure</span></span><br><span class="line"><span class="comment"># phpize一般是安装php时自动添加在/usr/local/bin里的</span></span><br><span class="line">phpize</span><br><span class="line"><span class="comment"># 如果提示phpize not found</span></span><br><span class="line">find / -name phpize</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># 再执行</span></span><br><span class="line">path/of/phpize</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># 接着如下,php-config的路径自行查找</span></span><br><span class="line"><span class="comment"># --with-freetype-dir,--with-jpeg-dir可以不加等号及路径采用系统默认,如果提示缺少文件，再加也不迟</span></span><br><span class="line"><span class="comment"># --with-freetype-dir,--with-jpeg-dir路径值请自行查找</span></span><br><span class="line">./configure --with-freetype-dir=path  --with-jpeg-dir=path   --with-php-config=/usr/<span class="built_in">local</span>/php/bin/php-config</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># 如果make出错，一般是需要某些支持库，自行上网百度</span></span><br><span class="line">make &amp;&amp; make install</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># 安装完后，同样需要修改配置文件，</span></span><br><span class="line"><span class="comment"># 添加一行extension=gd.so,并重启php-fpm</span></span><br></pre></td></tr></table></figure>
+</li>
+<li>
+<p>添加curl扩展</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 需要安装支持</span></span><br><span class="line">yum install libcurl*</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># config配置</span></span><br><span class="line">./configure --with-php-config=path --with-curl-path=path</span><br><span class="line"><span class="comment"># 其余同gd</span></span><br></pre></td></tr></table></figure>
+</li>
+<li>
+<p>其余mdstring,redis扩展同上述方法</p>
+</li>
+</ol>
+<h3 id="安装百夫长">安装百夫长</h3>
+<p>其他配置都可以看官方文档</p>
+<p>全部完成后进入安装界面<br>
+此处可能会有一个无法显示css等静态文件被403 forbidden的错误，原因是php-fpm默认只处理.php文件，<br>
+需要在php-fpm配置文件php-fpm.conf中或者其他被包含的配置文件中添加以下配置</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">security.limit_extensions=.php .ico .css .png .js .jpg</span><br></pre></td></tr></table></figure>
+<p>重启php-fpm</p>
+<p>还有可能出现一个样式无法显示错误<br>
+原因是静态文件都被php-fpm当text/plain处理了，response里返回的时text/plain不被认为是css文件</p>
+<p>其余按照官网步骤即可</p>
+<p><a href="https://cn.centcount.com/manager.php?id=1610190000002&amp;siteid=1610190000002001" target="_blank" rel="noopener">此处是官方示例网站</a></p>
+
+    </section>
+    <footer class="post-footer">
+      <section class="author">
+    <h4>flyingfisherman</h4>
+    <p>前端工程师，热爱技术，坚信知识技术改变生活。最高兴的场合莫过于学到的技术为自己、亲友或他人提供了些许的便利、帮助。</p>
+</section>
+      <section class="share">
+    <h4>Share this post</h4>
+    <a class="icon-twitter" href="http://twitter.com/share?url=https://github.flyingfishman.io/hexo/2018/04/29/ca/"
+       onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+        <span class="hidden">Twitter</span>
+    </a>
+    <a class="icon-facebook" href="https://www.facebook.com/sharer/sharer.php?u=https://github.flyingfishman.io/hexo/2018/04/29/ca/"
+       onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+        <span class="hidden">Facebook</span>
+    </a>
+    <a class="icon-google-plus" href="https://plus.google.com/share?url=https://github.flyingfishman.io/hexo/2018/04/29/ca/"
+       onclick="window.open(this.href, 'google-plus-share', 'width=490,height=530');return false;">
+        <span class="hidden">Google+</span>
+    </a>
+</section>
+    </footer>
+  </article>
+  <nav class="pagination" role="pagination">
+    
+    <a class="newer-posts" href="/hexo/2018/05/13/oracle/">
+        ← oracle中创建数据库
+    </a>
+    
+    <span class="page-number">•</span>
+    
+    <a class="older-posts" href="/hexo/2018/04/14/nginx_config/">
+        服务器简单的nginx配置(1) →
+    </a>
+    
+</nav>
+  <div id="comment" class="comments-area">
+    <h1 class="title"><a href="#disqus_comments" name="disqus_comments">Comments</a></h1>
+
+    
+</div>
+</main>
+
+
+  
+<footer class="site-footer">
+  
+  <a class="subscribe icon-feed" href="/rss.xml"><span class="tooltip">Subscribe!</span></a>
+  
+  <div class="inner">
+     <section class="copyright">All content copyright <a href="/hexo/">日常点滴</a> &copy; 2014 &bull; All rights reserved.</section>
+     <section class="poweredby">Proudly published with <a class="icon-ghost" href="http://zespia.tw/hexo/">Hexo</a></section>
+  </div>
+</footer>
+
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+<script type="text/javascript" src="/hexo/js/jquery.fitvids.js"></script>
+<script type="text/javascript" src="/hexo/js/index.js"></script>
+
+
+
+
+
+
+</body>
+</html>

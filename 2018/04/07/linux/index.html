@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html" charset="UTF-8" >
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+  <title>linux常用指令记录(1) | 日常点滴</title>
+  <meta name="description" content="" />
+  <meta name="HandheldFriendly" content="True" />
+  <meta name="MobileOptimized" content="320" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <link rel="stylesheet" type="text/css" href="/hexo/css/screen.css" />
+  <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Noto+Serif:400,700,400italic|Open+Sans:700,400" />
+
+  <meta name="generator" content="日常点滴">
+
+  
+  <link rel="alternate" type="application/rss+xml" title="RSS" href="/rss.xml">
+  
+  
+  <link rel="alternate" type="application/atom+xml" title="Atom 0.3" href="rss.xml">
+  
+  
+
+  
+</head>
+
+
+<body class="post-template">
+
+  <header class="site-head"  style="background-image: url(/image/cover.png)" >
+    <div class="vertical">
+        <div class="site-head-content inner">
+             <a class="blog-logo" href="/hexo/"><img src="https://avatars.githubusercontent.com/u/26755276" alt="Blog Logo"/></a> 
+            <h1 class="blog-title">日常点滴</h1>
+            <h2 class="blog-description"></h2>
+        </div>
+    </div>
+</header>
+  
+
+<main class="content" role="main">
+  <article class="post">
+    <span class="post-meta">
+      <time datetime="2018-04-07T07:51:07.000Z" itemprop="datePublished">
+          2018-04-07
+      </time>
+    
+    
+    | 
+    <a href='/hexo/tags/linux/'>linux</a>
+    
+    
+</span>
+    <h1 class="post-title">linux常用指令记录(1)</h1>
+    <section class="post-content">
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.12.0/katex.min.css" /><h2 id="前言">前言</h2>
+<p>寒假的时候租了台服务器，国内的，也算是学习到了linux的一些指令的用法了，由于最近事多许久没用，快忘的差不多了，趁全忘光前赶紧边回忆边记录下来</p>
+<a id="more"></a>
+<h2 id="基础文件操作">基础文件操作</h2>
+<h3 id="1-mv"><a href="http://1.mv" target="_blank" rel="noopener">1.mv</a></h3>
+<p>格式</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mv options <span class="built_in">source</span> directory</span><br></pre></td></tr></table></figure>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">参数</th>
+<th style="text-align:left">功能</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">-f</td>
+<td style="text-align:left">冲突时强制替换</td>
+</tr>
+</tbody>
+</table>
+<p><em>其他参数都不怎么了解</em></p>
+<p>mv可以使用的场合有：重命名文件文件夹，相较于rename我更习惯用mv来重命名，移动文件或文件夹<br>
+例</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">//将a重命名为b</span><br><span class="line">mv /a /b</span><br><span class="line">//将a移动至b</span><br><span class="line">mv /a /b/</span><br></pre></td></tr></table></figure>
+<h3 id="2-mkdir">2.mkdir</h3>
+<p>我只知道是创建文件夹的</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mkdir dirName</span><br></pre></td></tr></table></figure>
+<h3 id="3-rm">3.rm</h3>
+<p>格式</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">rm option file</span><br></pre></td></tr></table></figure>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">参数</th>
+<th style="text-align:left">功能</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">-f</td>
+<td style="text-align:left">强制删除无需确认</td>
+</tr>
+<tr>
+<td style="text-align:left">-r</td>
+<td style="text-align:left">删除文件夹及其子文件</td>
+</tr>
+<tr>
+<td style="text-align:left">-d</td>
+<td style="text-align:left">删除空文件夹</td>
+</tr>
+</tbody>
+</table>
+<h3 id="4-rename">4.rename</h3>
+<p>rename要注意的是需要传入三个必须的参数</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># replacement新名字</span></span><br><span class="line"><span class="comment"># file文件名</span></span><br><span class="line"><span class="comment"># 匹配文件名需要被替代部分的的正则表达式</span></span><br><span class="line">rename expressions repaclement file</span><br><span class="line"><span class="comment"># 例如</span></span><br><span class="line">rename name newname.txt name.txt</span><br><span class="line"><span class="comment"># 重命名结果为newname.txt.txt</span></span><br><span class="line">rename * newname.txt name.txt</span><br><span class="line"><span class="comment"># 重命名结果为newname.txt</span></span><br></pre></td></tr></table></figure>
+<h3 id="5-ls"><a href="http://5.ls" target="_blank" rel="noopener">5.ls</a></h3>
+<p>列出当前目录下文件<br>
+格式</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ls option dir</span><br></pre></td></tr></table></figure>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">参数</th>
+<th style="text-align:left">功能</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">-a</td>
+<td style="text-align:left">列出隐藏文件在内的所有文件</td>
+</tr>
+</tbody>
+</table>
+<p><em>才疏学浅，只了解这一个参数</em></p>
+<p>一般配合grep命令(文本搜索有关的都可以配合grep)</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 例找出当前文件夹名字带有python的</span></span><br><span class="line">ls|grep python</span><br></pre></td></tr></table></figure>
+<h3 id="6-find">6.find</h3>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 只知道一个,找出a文件夹下，名字带b的文件</span></span><br><span class="line">find /a/ -name b</span><br><span class="line"><span class="comment"># 或更慢的</span></span><br><span class="line">find /a/ -name *|grep b</span><br></pre></td></tr></table></figure>
+<h3 id="7-cat">7.cat</h3>
+<p>显示文本内容</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 将文本内容输出至控制台</span></span><br><span class="line">cat a.txt</span><br><span class="line"><span class="comment"># 将a文本内容输出至b</span></span><br><span class="line">cat a.html &gt;&gt; b.html</span><br></pre></td></tr></table></figure>
+<h3 id="8-whereis">8.whereis</h3>
+<p>显示文件所在位置<br>
+这个具体什么作用不清楚，我一般用来找安装的可执行程序</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 例</span></span><br><span class="line">whereis python</span><br></pre></td></tr></table></figure>
+<h3 id="9-cp">9.cp</h3>
+<p>复制文件</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">cp soucefile direct</span><br><span class="line"><span class="comment"># cp的选项我只知道-f是强制替换</span></span><br></pre></td></tr></table></figure>
+<h2 id="基础用户操作">基础用户操作</h2>
+<h3 id="1-useradd">1.useradd</h3>
+<p>作用添加用户</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">参数</th>
+<th style="text-align:left">功能</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">-s</td>
+<td style="text-align:left">指定用户shell,具体不清楚，只是之前配置sftp用户时在网上查据说用于禁止用户ssh登陆，设-s /bin/false</td>
+</tr>
+<tr>
+<td style="text-align:left">-g</td>
+<td style="text-align:left">决定用户所在的组</td>
+</tr>
+<tr>
+<td style="text-align:left">-p</td>
+<td style="text-align:left">决定用户密码</td>
+</tr>
+<tr>
+<td style="text-align:left">-d</td>
+<td style="text-align:left">家目录，用户的根目录</td>
+</tr>
+</tbody>
+</table>
+<p>以上配置也可在创建用户后用usermod添加或更改<br>
+密码还可以用passwd</p>
+<p>删除用户userdel userName</p>
+<h3 id="2-groupadd">2.groupadd</h3>
+<p>添加组<br>
+groupadd groupName<br>
+groups查看组中所有用户<br>
+groups userName查看用户所属的组名</p>
+<p>删除组groupdel groupname</p>
+<h3 id="3-chown">3.chown</h3>
+<p>更改目录所属用户<br>
+chown option user(group) file(dir)</p>
+
+    </section>
+    <footer class="post-footer">
+      <section class="author">
+    <h4>flyingfisherman</h4>
+    <p>前端工程师，热爱技术，坚信知识技术改变生活。最高兴的场合莫过于学到的技术为自己、亲友或他人提供了些许的便利、帮助。</p>
+</section>
+      <section class="share">
+    <h4>Share this post</h4>
+    <a class="icon-twitter" href="http://twitter.com/share?url=https://github.flyingfishman.io/hexo/2018/04/07/linux/"
+       onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+        <span class="hidden">Twitter</span>
+    </a>
+    <a class="icon-facebook" href="https://www.facebook.com/sharer/sharer.php?u=https://github.flyingfishman.io/hexo/2018/04/07/linux/"
+       onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+        <span class="hidden">Facebook</span>
+    </a>
+    <a class="icon-google-plus" href="https://plus.google.com/share?url=https://github.flyingfishman.io/hexo/2018/04/07/linux/"
+       onclick="window.open(this.href, 'google-plus-share', 'width=490,height=530');return false;">
+        <span class="hidden">Google+</span>
+    </a>
+</section>
+    </footer>
+  </article>
+  <nav class="pagination" role="pagination">
+    
+    <a class="newer-posts" href="/hexo/2018/04/10/linux2/">
+        ← linux常用指令记录(2)
+    </a>
+    
+    <span class="page-number">•</span>
+    
+    <a class="older-posts" href="/hexo/2018/04/06/code/">
+        代码技巧 →
+    </a>
+    
+</nav>
+  <div id="comment" class="comments-area">
+    <h1 class="title"><a href="#disqus_comments" name="disqus_comments">Comments</a></h1>
+
+    
+</div>
+</main>
+
+
+  
+<footer class="site-footer">
+  
+  <a class="subscribe icon-feed" href="/rss.xml"><span class="tooltip">Subscribe!</span></a>
+  
+  <div class="inner">
+     <section class="copyright">All content copyright <a href="/hexo/">日常点滴</a> &copy; 2014 &bull; All rights reserved.</section>
+     <section class="poweredby">Proudly published with <a class="icon-ghost" href="http://zespia.tw/hexo/">Hexo</a></section>
+  </div>
+</footer>
+
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+<script type="text/javascript" src="/hexo/js/jquery.fitvids.js"></script>
+<script type="text/javascript" src="/hexo/js/index.js"></script>
+
+
+
+
+
+
+</body>
+</html>

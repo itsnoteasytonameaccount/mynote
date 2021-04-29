@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html" charset="UTF-8" >
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+  <title>linux常用指令记录(2) | 日常点滴</title>
+  <meta name="description" content="" />
+  <meta name="HandheldFriendly" content="True" />
+  <meta name="MobileOptimized" content="320" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <link rel="stylesheet" type="text/css" href="/hexo/css/screen.css" />
+  <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Noto+Serif:400,700,400italic|Open+Sans:700,400" />
+
+  <meta name="generator" content="日常点滴">
+
+  
+  <link rel="alternate" type="application/rss+xml" title="RSS" href="/rss.xml">
+  
+  
+  <link rel="alternate" type="application/atom+xml" title="Atom 0.3" href="rss.xml">
+  
+  
+
+  
+</head>
+
+
+<body class="post-template">
+
+  <header class="site-head"  style="background-image: url(/image/cover.png)" >
+    <div class="vertical">
+        <div class="site-head-content inner">
+             <a class="blog-logo" href="/hexo/"><img src="https://avatars.githubusercontent.com/u/26755276" alt="Blog Logo"/></a> 
+            <h1 class="blog-title">日常点滴</h1>
+            <h2 class="blog-description"></h2>
+        </div>
+    </div>
+</header>
+  
+
+<main class="content" role="main">
+  <article class="post">
+    <span class="post-meta">
+      <time datetime="2018-04-10T10:23:09.000Z" itemprop="datePublished">
+          2018-04-10
+      </time>
+    
+    
+    | 
+    <a href='/hexo/tags/linux/'>linux</a>
+    
+    
+</span>
+    <h1 class="post-title">linux常用指令记录(2)</h1>
+    <section class="post-content">
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.12.0/katex.min.css" /><p>方便下次用起来找</p>
+<a id="more"></a>
+<h1>内容</h1>
+<h2 id="进程相关操作">进程相关操作</h2>
+<h3 id="1-ps"><a href="http://1.ps" target="_blank" rel="noopener">1.ps</a></h3>
+<p>说实话不熟这个指令,只知道-u参数是显示用户名,-e全部程序<br>
+一般配合grep筛选</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 例,查找进程信息中包含python的行</span></span><br><span class="line">ps -aux|grep python</span><br><span class="line"><span class="comment"># 其余可自行查看帮助</span></span><br><span class="line">ps --<span class="built_in">help</span></span><br><span class="line">ps --<span class="built_in">help</span> a</span><br><span class="line"><span class="comment"># 配合kill pid使用可以关闭想关闭的进程</span></span><br></pre></td></tr></table></figure>
+<h3 id="2-netstat">2.netstat</h3>
+<p>查看端口监听</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">参数</th>
+<th style="text-align:left">功能</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">-a</td>
+<td style="text-align:left">显示全部端口监听</td>
+</tr>
+<tr>
+<td style="text-align:left">-p</td>
+<td style="text-align:left">显示pid,可执行文件路径</td>
+</tr>
+<tr>
+<td style="text-align:left">-t</td>
+<td style="text-align:left">筛选tcp进程</td>
+</tr>
+<tr>
+<td style="text-align:left">-e</td>
+<td style="text-align:left">显示额外信息（进程所属用户）</td>
+</tr>
+<tr>
+<td style="text-align:left">-u</td>
+<td style="text-align:left">筛选udp进程</td>
+</tr>
+<tr>
+<td style="text-align:left">-n</td>
+<td style="text-align:left">直接显示端口号而不是将其转换为对应程序的名字</td>
+</tr>
+</tbody>
+</table>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 例:显示所有tcp端口监听程序，并筛选其中名字带有nginx的,显示端口号所有用户和pid</span></span><br><span class="line">netstat -napte|grep nginx</span><br></pre></td></tr></table></figure>
+<h2 id="安装程序相关">安装程序相关</h2>
+<h3 id="1-tar">1.tar</h3>
+<p>解压程序</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">参数</th>
+<th style="text-align:left">功能</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">-v</td>
+<td style="text-align:left">列出输出的文件</td>
+</tr>
+<tr>
+<td style="text-align:left">-x</td>
+<td style="text-align:left">解压</td>
+</tr>
+<tr>
+<td style="text-align:left">-f</td>
+<td style="text-align:left">使用文件名</td>
+</tr>
+<tr>
+<td style="text-align:left">-z</td>
+<td style="text-align:left">gz格式</td>
+</tr>
+</tbody>
+</table>
+<p>tar可选项居多，我了解的就这几个</p>
+<h3 id="2-wget">2.wget</h3>
+<p>从远程路径下载文件</p>
+<p>linux安装程序的途径之一就是用wget远程下载源码,<br>
+解压后在源文件根目录运行configure文件,设置安装选项,然后，makefile<br>
+make install就好了<br>
+也算是通用途径，当然，源文件也不是一定要通过wget下载</p>
+<p>其他的安装方法在不同版本系统应该还是有区别的<br>
+像ubuntu安装是用的apt-get命令<br>
+centos系统则是yum直接安装，或用下载rpm安装包，再用rpm命令更新或安装</p>
+<h2 id="磁盘操作">磁盘操作</h2>
+<h3 id="1-fdisk">1.fdisk</h3>
+<p>fdisk这个命令了解的也不多<br>
+只知道fdisk -l显示空间信息和挂载磁盘信息</p>
+<h3 id="2-mount">2.mount</h3>
+<p>同样知之甚少，只知道如下</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 例将某磁盘挂载在某一目录下</span></span><br><span class="line">mount /dev/adb1 /</span><br></pre></td></tr></table></figure>
+<h2 id="其他">其他</h2>
+<h3 id="1-反向引号">1.反向引号</h3>
+<p>执行嵌套指令</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 例，删除当前目录所有名字以php开头的</span></span><br><span class="line">rm -rf `ls|grep ^php`</span><br><span class="line"><span class="comment"># 先执行反向引号中的命令,列出名字带有php的,再删除</span></span><br></pre></td></tr></table></figure>
+<h3 id="2-众多的shell指令">2.众多的shell指令</h3>
+<p>用shell执行脚本来进行批处理</p>
+<h3 id="3-service">3.service</h3>
+<p>这个命令我在centos上就没用成功过，每次都提示什么systemctl什么的<br>
+换用systemctl也还是失败<br>
+基本格式<br>
+service reload serviceName<br>
+service start serviceName<br>
+service stop servicecName</p>
+<h3 id="4-ln">4.ln</h3>
+<p>这个命令之前忘了，在此补充<br>
+ln [options] from to</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">选项</th>
+<th style="text-align:left">作用</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">-s</td>
+<td style="text-align:left">软连接，to的路径里存的是from的路径，类似快捷方式</td>
+</tr>
+<tr>
+<td style="text-align:left">-P</td>
+<td style="text-align:left">硬链接,不填options时默认情况为此</td>
+</tr>
+</tbody>
+</table>
+<p>硬链接相当于复制一份文件，但所有连接的文件占的空间只有一份，并且修改其中之一其余都会修改，删除其中之一，其余仍然存在，相当于链表中三个节点的指针指向同一文件，记得操作系统中学过文件信息似乎就是用链表存的</p>
+<h3 id="结语">结语</h3>
+<p>有错误请指出</p>
+
+    </section>
+    <footer class="post-footer">
+      <section class="author">
+    <h4>flyingfisherman</h4>
+    <p>前端工程师，热爱技术，坚信知识技术改变生活。最高兴的场合莫过于学到的技术为自己、亲友或他人提供了些许的便利、帮助。</p>
+</section>
+      <section class="share">
+    <h4>Share this post</h4>
+    <a class="icon-twitter" href="http://twitter.com/share?url=https://github.flyingfishman.io/hexo/2018/04/10/linux2/"
+       onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+        <span class="hidden">Twitter</span>
+    </a>
+    <a class="icon-facebook" href="https://www.facebook.com/sharer/sharer.php?u=https://github.flyingfishman.io/hexo/2018/04/10/linux2/"
+       onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+        <span class="hidden">Facebook</span>
+    </a>
+    <a class="icon-google-plus" href="https://plus.google.com/share?url=https://github.flyingfishman.io/hexo/2018/04/10/linux2/"
+       onclick="window.open(this.href, 'google-plus-share', 'width=490,height=530');return false;">
+        <span class="hidden">Google+</span>
+    </a>
+</section>
+    </footer>
+  </article>
+  <nav class="pagination" role="pagination">
+    
+    <a class="newer-posts" href="/hexo/2018/04/12/aria2(1)/">
+        ← 利用aria2下载文件
+    </a>
+    
+    <span class="page-number">•</span>
+    
+    <a class="older-posts" href="/hexo/2018/04/07/linux/">
+        linux常用指令记录(1) →
+    </a>
+    
+</nav>
+  <div id="comment" class="comments-area">
+    <h1 class="title"><a href="#disqus_comments" name="disqus_comments">Comments</a></h1>
+
+    
+</div>
+</main>
+
+
+  
+<footer class="site-footer">
+  
+  <a class="subscribe icon-feed" href="/rss.xml"><span class="tooltip">Subscribe!</span></a>
+  
+  <div class="inner">
+     <section class="copyright">All content copyright <a href="/hexo/">日常点滴</a> &copy; 2014 &bull; All rights reserved.</section>
+     <section class="poweredby">Proudly published with <a class="icon-ghost" href="http://zespia.tw/hexo/">Hexo</a></section>
+  </div>
+</footer>
+
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+<script type="text/javascript" src="/hexo/js/jquery.fitvids.js"></script>
+<script type="text/javascript" src="/hexo/js/index.js"></script>
+
+
+
+
+
+
+</body>
+</html>

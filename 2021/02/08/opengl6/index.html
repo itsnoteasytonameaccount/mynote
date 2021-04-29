@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html" charset="UTF-8" >
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+  <title>opengl(6):模型加载 | 日常点滴</title>
+  <meta name="description" content="" />
+  <meta name="HandheldFriendly" content="True" />
+  <meta name="MobileOptimized" content="320" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <link rel="stylesheet" type="text/css" href="/hexo/css/screen.css" />
+  <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Noto+Serif:400,700,400italic|Open+Sans:700,400" />
+
+  <meta name="generator" content="日常点滴">
+
+  
+  <link rel="alternate" type="application/rss+xml" title="RSS" href="/rss.xml">
+  
+  
+  <link rel="alternate" type="application/atom+xml" title="Atom 0.3" href="rss.xml">
+  
+  
+
+  
+</head>
+
+
+<body class="post-template">
+
+  <header class="site-head"  style="background-image: url(/image/cover.png)" >
+    <div class="vertical">
+        <div class="site-head-content inner">
+             <a class="blog-logo" href="/hexo/"><img src="https://avatars.githubusercontent.com/u/26755276" alt="Blog Logo"/></a> 
+            <h1 class="blog-title">日常点滴</h1>
+            <h2 class="blog-description"></h2>
+        </div>
+    </div>
+</header>
+  
+
+<main class="content" role="main">
+  <article class="post">
+    <span class="post-meta">
+      <time datetime="2021-02-07T16:00:00.000Z" itemprop="datePublished">
+          2021-02-08
+      </time>
+    
+    
+    | 
+    <a href='/hexo/tags/opengl/'>opengl</a>
+    
+    
+</span>
+    <h1 class="post-title">opengl(6):模型加载</h1>
+    <section class="post-content">
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.12.0/katex.min.css" /><p>以下内容主要来自<a href="https://learnopengl-cn.github.io/" target="_blank" rel="noopener">LearnOpenGL CN</a>文档，另外<a href="https://learnopengl-cn.github.io/" target="_blank" rel="noopener">LearnOpenGL CN</a>每一节都是有讨论区的，用的disqus，disqus很早就被墙了，想要在评论区寻求帮助需要翻墙</p>
+<p>你也可以在<a href="https://www.khronos.org/opengl/wiki/Getting_Started" target="_blank" rel="noopener">此处</a>找到其他opengl官方推荐的资料、教程网站，推荐先用<a href="https://learnopengl-cn.github.io/" target="_blank" rel="noopener">LearnOpenGL CN</a>入门，再去看其他的</p>
+<a id="more"></a>
+<h1>wavefront的obj文件格式</h1>
+<p>了解一下wavefront的obj文件格式。推荐的<a href="https://free3d.com/" target="_blank" rel="noopener">3d模型下载网站</a></p>
+<p>obj文件为文本，内容格式如下</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 带'#'号的为注释</span></span><br><span class="line"><span class="comment"># 顶点的列表，每个顶点占一行，用v开头，v后跟随3个数字分别表示右手坐标系的(x,y,z)坐标，第四个w分量可选，默认为1</span></span><br><span class="line">v 0.123 0.234 0.345 1.0</span><br><span class="line">v ...</span><br><span class="line">...</span><br><span class="line"><span class="comment"># 纹理坐标列表，vt开头，使用(u,v,w)坐标，取值0-1，v，w可选，默认为0</span></span><br><span class="line">vt 0.500 1 [0]</span><br><span class="line">vt ...</span><br><span class="line">...</span><br><span class="line"><span class="comment"># 顶点法向量列表，xyz坐标，可能不是单位向量</span></span><br><span class="line">vn 0.707 0.000 0.707</span><br><span class="line">vn ...</span><br><span class="line">...</span><br><span class="line"><span class="comment"># 参数空间顶点列表（Parameter space vertices,了解有限，不知道这是什么可能翻译有错），uvw坐标，定义参数空间中曲线或面上的点</span></span><br><span class="line">vp 0.310000 3.210000 2.100000</span><br><span class="line">vp ...</span><br><span class="line">...</span><br><span class="line"><span class="comment"># 多边形表面元素，以f开头，后面跟随的每组数字为顶点的各项要素坐标索引，格式为v[/[vt]/vn]，每个表面后跟随3到n组这样的数字</span></span><br><span class="line"><span class="comment"># 数值为正是顺数，为负是倒数</span></span><br><span class="line">f 1 2 3 <span class="comment">#即该面由第1、2、3个顶点组成</span></span><br><span class="line">f 3/1 4/2 -1/3 <span class="comment">#即该面由第3、4、以及最后一个顶点组成，各个顶点的纹理坐标分别取第1、2、3个纹理坐标</span></span><br><span class="line">f 6/4/1 3/5/3 7/6/5 <span class="comment">#即该面由第6、3、7个顶点组成，各个顶点的纹理坐标分别取第4、5、6个纹理坐标，法向量分别取第1、3、5个法向量</span></span><br><span class="line">f 7//1 8//2 9//3 <span class="comment">#即该面由第7、8、9个顶点组成，法向量分别取第1、2、3个法向量</span></span><br><span class="line">f ...</span><br></pre></td></tr></table></figure>
+<h2 id="材质引用">材质引用</h2>
+<p>材质被定义在外部的.mtl文件中，如下方式引用mtl文件及使用材质</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 引用mtl文件</span></span><br><span class="line">mtllib [mymaterial.mtl]</span><br><span class="line">...</span><br><span class="line"></span><br><span class="line"><span class="comment"># 使用材质，material name在上面引用的mtl文件中定义</span></span><br><span class="line">usemtl [material name]</span><br></pre></td></tr></table></figure>
+<h2 id="其他标签">其他标签</h2>
+<p>如下标签可指定对象、组或启用<a href="https://en.wikipedia.org/wiki/Shading" target="_blank" rel="noopener">平滑着色(smooth shading)</a>等</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 命名对象和组的方式</span></span><br><span class="line">o [object name]</span><br><span class="line">  ...</span><br><span class="line">  g [group name]</span><br><span class="line">  ...</span><br><span class="line"></span><br><span class="line"><span class="comment"># 多边形的平滑着色(smooth shading)通过平滑组启用</span></span><br><span class="line">s 1</span><br><span class="line">  ...</span><br><span class="line">  <span class="comment"># Smooth shading can be disabled as well.</span></span><br><span class="line">  s off</span><br><span class="line">  ...</span><br></pre></td></tr></table></figure>
+<h2 id="相对和绝对索引">相对和绝对索引</h2>
+<p>上文以f开头定义的多边形表面中正数定义的索引是绝对索引，负数定义的是相对索引，可能在不同软件中存在不兼容相对索引或只使用相对索引的情况。</p>
+<h2 id="mtl-Material-template-library-文件">mtl(Material template library)文件</h2>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 环境</span></span><br><span class="line">Ka 1.000 1.000 1.000</span><br><span class="line"><span class="comment"># 漫反射</span></span><br><span class="line">Kd 1.000 1.000 1.000</span><br><span class="line"><span class="comment"># 镜面</span></span><br><span class="line">Ks 1.000 1.000 1.000</span><br><span class="line"><span class="comment"># 镜面高光亮度，范围0-1000</span></span><br><span class="line">Ns 10.000</span><br><span class="line"><span class="comment"># 透明，不像真实的透明度，这个选项的结果不被物体的厚度影响</span></span><br><span class="line">d 0.9</span><br><span class="line"><span class="comment"># 透明度，同上，不过Tr = 1 - d</span></span><br><span class="line">Tr 0.1</span><br><span class="line"><span class="comment"># 设置了透明的材质还可以设置一个传播过滤色(Transmission Filter Color)</span></span><br><span class="line"><span class="comment"># RGB格式</span></span><br><span class="line">Tf 1.0 0.5 0.5</span><br><span class="line"><span class="comment"># CIEXYZ格式，yz可以忽略，忽略时默认等于x</span></span><br><span class="line">Tf xyz 1.0 0.5 0.5 </span><br><span class="line"><span class="comment"># 光学容度(optical dencity)，或者说折射率，玻璃一般是1.5，取1.0时不折射，小于1.0时产生怪异的结果不建议使用</span></span><br><span class="line">Ni 1.45000</span><br></pre></td></tr></table></figure>
+<p>多种照明模型可选，实现透明度不需要设置透明照明模型，并且现在的用法中常常不指定照明模型，下面因为有些部分暂时没学，保留原文</p>
+<ol start="0">
+<li>Color on</li>
+<li>Color on and Ambient on</li>
+<li>Highlight on</li>
+<li>Reflection on and Ray trace on</li>
+<li>Transparency: Glass on, Reflection: Ray trace on</li>
+<li>Reflection: Fresnel on and Ray trace on</li>
+<li>Transparency: Refraction on, Reflection: Fresnel off and Ray trace on</li>
+<li>Transparency: Refraction on, Reflection: Fresnel on and Ray trace on</li>
+<li>Reflection on and Ray trace off</li>
+<li>Transparency: Glass on, Reflection: Ray trace off</li>
+<li>Casts shadows onto invisible surfaces</li>
+</ol>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 指定光照模型</span></span><br><span class="line">illum 2</span><br></pre></td></tr></table></figure>
+<p>纹理材质</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line">newmtl Textured</span><br><span class="line">   Ka 1.000 1.000 1.000</span><br><span class="line">   Kd 1.000 1.000 1.000</span><br><span class="line">   Ks 0.000 0.000 0.000</span><br><span class="line">   d 1.0</span><br><span class="line">   illum 2</span><br><span class="line">   <span class="comment"># the ambient texture map</span></span><br><span class="line">   map_Ka lemur.tga</span><br><span class="line">   </span><br><span class="line">   <span class="comment"># the diffuse texture map (most of the time, it will be the same as the</span></span><br><span class="line">   <span class="comment"># ambient texture map)</span></span><br><span class="line">   map_Kd lemur.tga</span><br><span class="line">   </span><br><span class="line">   <span class="comment"># specular color texture map</span></span><br><span class="line">   map_Ks lemur.tga</span><br><span class="line">   </span><br><span class="line">   <span class="comment"># specular highlight component</span></span><br><span class="line">   map_Ns lemur_spec.tga</span><br><span class="line">   </span><br><span class="line">   <span class="comment"># the alpha texture map</span></span><br><span class="line">   map_d lemur_alpha.tga</span><br><span class="line">   </span><br><span class="line">   <span class="comment"># some implementations use 'map_bump' instead of 'bump' below</span></span><br><span class="line">   map_bump lemur_bump.tga</span><br><span class="line">   </span><br><span class="line">   <span class="comment"># bump map (which by default uses luminance channel of the image)</span></span><br><span class="line">   bump lemur_bump.tga</span><br><span class="line">   </span><br><span class="line">   <span class="comment"># displacement map</span></span><br><span class="line">   disp lemur_disp.tga</span><br><span class="line">   </span><br><span class="line">   <span class="comment"># stencil decal texture (defaults to 'matte' channel of the image)</span></span><br><span class="line">   decal lemur_stencil.tga</span><br></pre></td></tr></table></figure>
+<h1>assimp</h1>
+<blockquote>
+<p>本人用的编译工具是mingw64</p>
+</blockquote>
+<p>assimp是一个用来加载模型的库，接下来下载编译assimp，方法和glfw一样，用cmake-gui配置好路径后第一次configure选择编译器并生成可选参数，第二次configure设置参数，最后generate输出文件，然后编译</p>
+<p>编译时有个选项<code>BUILD_SHARED_LIBS</code>默认是勾选的，编译后生成的是动态库，需要放到合适的路径。</p>
+<p><strong>碰到的错误</strong></p>
+<p>编译时出了如下错误，似乎是链接什么可执行文件时出错了，但仍在<code>输出文件夹/tools/assimp_cmd</code>和<code>输出文件夹/code</code>下生成了libassimp.dll，但似乎没法使用。</p>
+<p><img src="/hexo/image/opengl/compile_error.png" alt="图片无法显示"></p>
+<p>使用的c编译器是mingw64的gcc.exe，c++编译器是mingw64的g++.exe。</p>
+<blockquote>
+<p>解决方案</p>
+</blockquote>
+<p>不要勾选编译动态库选项，生成的libassimp.a可以使用，依赖contrib目录生成的IrrXML和zlib库。不过因为是静态库，程序编译时要链接这个库的话会比较耗时，而且用<code>ld</code>命令把静态文件链接成动态文件后，得到的也仍然是不可用的动态文件。</p>
+<p>这个问题似乎是<a href="https://github.com/assimp/assimp/issues/3261" target="_blank" rel="noopener">Bug</a>，仍没有解决</p>
+<h2 id="assimp加载的模型">assimp加载的模型</h2>
+<p>assimp加载得到其定义的场景数据结构，<br>
+具体结构如下图</p>
+<ul>
+<li>场景对象包括一个树状结构存储节点列表，一个网格列表，一个材质列表</li>
+<li>每个节点存储了一个网格的索引列表，以及子节点列表</li>
+<li>网格则包括顶点、顶点法向量、材质索引、纹理坐标</li>
+</ul>
+<p><img src="/hexo/image/opengl/assimp_structure.png" alt="图片无法显示"></p>
+<h2 id="model类">model类</h2>
+<p>可以根据结点的结构自行编写加载模型的model类，将assimp数据结构转化为自己操作方便的结构，或者直接用assimp的数据结构绘图。</p>
+<blockquote>
+<p>注意：目前可能用不上模型的节点父子关系，可以直接遍历scene的mesh列表来绘制，但最好在自己设置的结构中对节点结构有所体现，方便之后对模型特定部位进行坐标变换。</p>
+</blockquote>
+<p><a href="https://learnopengl-cn.github.io/03%20Model%20Loading/01%20Assimp/" target="_blank" rel="noopener">learnOpenGL CN</a>提供了参考代码。</p>
+<p>另外想找自己需要用到的函数等，可以在assimp的头文件中找。</p>
+<p>部分实现如下（来自learnOpenGL CN，根据自己需要略作修改）</p>
+<p><strong>Mesh.cpp</strong></p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 网格类</span></span><br><span class="line">Mesh::Mesh(<span class="built_in">vector</span>&lt;mesh::Vertex&gt; vertices, <span class="built_in">vector</span>&lt;<span class="keyword">unsigned</span> <span class="keyword">int</span>&gt; indices, <span class="built_in">vector</span>&lt;mesh::Texture&gt; textures, mesh::Material material, <span class="keyword">bool</span> has_texture)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">// 顶点</span></span><br><span class="line">    <span class="keyword">this</span>-&gt;vertices = vertices;</span><br><span class="line">    <span class="comment">// 索引</span></span><br><span class="line">    <span class="keyword">this</span>-&gt;indices = indices;</span><br><span class="line">    <span class="comment">// 材质纹理列表</span></span><br><span class="line">    <span class="keyword">this</span>-&gt;textures = textures;</span><br><span class="line">    <span class="comment">// 材质颜色</span></span><br><span class="line">    <span class="keyword">this</span>-&gt;material = material;</span><br><span class="line">    <span class="comment">// 材质是否是纹理</span></span><br><span class="line">    <span class="keyword">this</span>-&gt;has_texture = has_texture;</span><br><span class="line"></span><br><span class="line">    setupMesh();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// ...</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">void</span> Mesh::draw(Shader &amp;shader)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">unsigned</span> <span class="keyword">int</span> specular_index = <span class="number">1</span>, diffuse_index = <span class="number">1</span>;</span><br><span class="line">    <span class="built_in">std</span>::<span class="built_in">string</span> name, number;</span><br><span class="line">    <span class="keyword">if</span> (has_texture)</span><br><span class="line">    &#123;</span><br><span class="line">        shader.setUniform1i(<span class="string">"material.has_texture"</span>, <span class="number">1</span>);</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">unsigned</span> <span class="keyword">int</span> i = <span class="number">0</span>; i &lt; textures.size(); i++)</span><br><span class="line">        &#123;</span><br><span class="line">            glActiveTexture(GL_TEXTURE0 + i);</span><br><span class="line">            name = textures[i].type;</span><br><span class="line">            <span class="keyword">if</span> (name == <span class="string">"texture_diffuse"</span>)</span><br><span class="line">            &#123;</span><br><span class="line">                number = <span class="built_in">std</span>::to_string(diffuse_index++);</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">else</span> <span class="keyword">if</span> (name == <span class="string">"texture_specular"</span>)</span><br><span class="line">            &#123;</span><br><span class="line">                number = <span class="built_in">std</span>::to_string(specular_index++);</span><br><span class="line">            &#125;</span><br><span class="line">            shader.setUniform1i((<span class="string">"material."</span> + name + number).c_str(), i);</span><br><span class="line">            glBindTexture(GL_TEXTURE_2D, textures[i].id);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">    &#123;</span><br><span class="line">        shader.setUniform1i(<span class="string">"material.has_texture"</span>, <span class="number">0</span>);</span><br><span class="line">        shader.setUniform3f(<span class="string">"material.specular"</span>, material.specular.r, material.specular.g, material.specular.b);</span><br><span class="line">        shader.setUniform3f(<span class="string">"material.ambient"</span>, material.ambient.r, material.ambient.g, material.ambient.b);</span><br><span class="line">        shader.setUniform3f(<span class="string">"material.diffuse"</span>, material.diffuse.r, material.diffuse.g, material.diffuse.b);</span><br><span class="line">    &#125;</span><br><span class="line">    glActiveTexture(GL_TEXTURE0);</span><br><span class="line">    glBindVertexArray(VAO);</span><br><span class="line">    glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, <span class="number">0</span>);</span><br><span class="line">    glBindVertexArray(<span class="number">0</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><strong>Model.cpp</strong></p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// ...</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">void</span> Model::loadModel(<span class="built_in">std</span>::<span class="built_in">string</span> path)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="built_in">std</span>::<span class="built_in">cout</span> &lt;&lt; <span class="string">"start importer"</span> &lt;&lt; <span class="built_in">std</span>::<span class="built_in">endl</span>;</span><br><span class="line">    Assimp::Importer importer;</span><br><span class="line">    <span class="keyword">const</span> aiScene *scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs);</span><br><span class="line">    <span class="keyword">if</span> (!scene || scene-&gt;mFlags &amp; AI_SCENE_FLAGS_INCOMPLETE || !scene-&gt;mRootNode)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="built_in">std</span>::<span class="built_in">cout</span> &lt;&lt; <span class="string">"ERROR::ASSIMP::"</span> &lt;&lt; importer.GetErrorString() &lt;&lt; <span class="built_in">std</span>::<span class="built_in">endl</span>;</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    directory = path.substr(<span class="number">0</span>, path.find_last_of(<span class="string">'/'</span>) + <span class="number">1</span>);</span><br><span class="line">    <span class="built_in">std</span>::<span class="built_in">cout</span> &lt;&lt; <span class="string">"start node processor"</span> &lt;&lt; <span class="built_in">std</span>::<span class="built_in">endl</span>;</span><br><span class="line">    processNode(scene-&gt;mRootNode, scene);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">void</span> Model::processNode(aiNode *node, <span class="keyword">const</span> aiScene *scene)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">unsigned</span> <span class="keyword">int</span> i = <span class="number">0</span>; i &lt; node-&gt;mNumMeshes; i++)</span><br><span class="line">    &#123;</span><br><span class="line">        aiMesh *mesh = scene-&gt;mMeshes[node-&gt;mMeshes[i]];</span><br><span class="line">        meshes.push_back(processMesh(mesh, scene));</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">unsigned</span> <span class="keyword">int</span> i = <span class="number">0</span>; i &lt; node-&gt;mNumChildren; i++)</span><br><span class="line">    &#123;</span><br><span class="line">        processNode(node-&gt;mChildren[i], scene);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">Mesh Model::processMesh(aiMesh *mesh, <span class="keyword">const</span> aiScene *scene)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="built_in">vector</span>&lt;mesh::Vertex&gt; vertices;</span><br><span class="line">    <span class="built_in">vector</span>&lt;<span class="keyword">unsigned</span> <span class="keyword">int</span>&gt; indices;</span><br><span class="line">    <span class="comment">// 网格纹理列表</span></span><br><span class="line">    <span class="built_in">vector</span>&lt;mesh::Texture&gt; textures;</span><br><span class="line">    <span class="comment">// 材质结构体，包含环境、镜面、漫反射颜色</span></span><br><span class="line">    mesh::Material mesh_material;</span><br><span class="line">    <span class="comment">// 标志位</span></span><br><span class="line">    <span class="keyword">bool</span> has_texture = <span class="literal">false</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">unsigned</span> <span class="keyword">int</span> i = <span class="number">0</span>; i &lt; mesh-&gt;mNumVertices; i++)</span><br><span class="line">    &#123;</span><br><span class="line">        mesh::Vertex vertex;</span><br><span class="line">        vertex.Position.x = mesh-&gt;mVertices[i].x;</span><br><span class="line">        vertex.Position.y = mesh-&gt;mVertices[i].y;</span><br><span class="line">        vertex.Position.z = mesh-&gt;mVertices[i].z;</span><br><span class="line">        <span class="keyword">if</span> (mesh-&gt;HasNormals())</span><br><span class="line">        &#123;</span><br><span class="line">            vertex.Normal.x = mesh-&gt;mNormals[i].x;</span><br><span class="line">            vertex.Normal.y = mesh-&gt;mNormals[i].y;</span><br><span class="line">            vertex.Normal.z = mesh-&gt;mNormals[i].z;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span> (mesh-&gt;mTextureCoords[<span class="number">0</span>])</span><br><span class="line">        &#123;</span><br><span class="line">            vertex.TexCoord.x = mesh-&gt;mTextureCoords[<span class="number">0</span>][i].x;</span><br><span class="line">            vertex.TexCoord.y = mesh-&gt;mTextureCoords[<span class="number">0</span>][i].y;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span></span><br><span class="line">        &#123;</span><br><span class="line">            vertex.TexCoord = glm::vec2(<span class="number">0.0f</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        vertices.push_back(vertex);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">unsigned</span> <span class="keyword">int</span> i = <span class="number">0</span>; i &lt; mesh-&gt;mNumFaces; i++)</span><br><span class="line">    &#123;</span><br><span class="line">        aiFace face = mesh-&gt;mFaces[i];</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">unsigned</span> <span class="keyword">int</span> j = <span class="number">0</span>; j &lt; face.mNumIndices; j++)</span><br><span class="line">        &#123;</span><br><span class="line">            indices.push_back(face.mIndices[j]);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (mesh-&gt;mMaterialIndex &gt;= <span class="number">0</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        aiMaterial *material = scene-&gt;mMaterials[mesh-&gt;mMaterialIndex];</span><br><span class="line">        aiString material_name = material-&gt;GetName();</span><br><span class="line">        <span class="keyword">unsigned</span> <span class="keyword">int</span> len = material-&gt;GetTextureCount(aiTextureType_DIFFUSE);</span><br><span class="line">        <span class="comment">// 纹理作为材质时</span></span><br><span class="line">        <span class="keyword">if</span> (len &gt; <span class="number">0</span>)</span><br><span class="line">        &#123;</span><br><span class="line">            has_texture = <span class="literal">true</span>;</span><br><span class="line">            loadMaterialTextures(material, aiTextureType_DIFFUSE, <span class="string">"texture_diffuse"</span>, textures, len);</span><br><span class="line">            loadMaterialTextures(material, aiTextureType_SPECULAR, <span class="string">"texture_specular"</span>, textures, len);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 颜色作为材质时</span></span><br><span class="line">        <span class="keyword">else</span></span><br><span class="line">        &#123;</span><br><span class="line">            aiColor3D diffuse, specular, ambient;</span><br><span class="line">            material-&gt;Get(AI_MATKEY_COLOR_DIFFUSE, diffuse);</span><br><span class="line">            mesh_material.diffuse = diffuse;</span><br><span class="line">            material-&gt;Get(AI_MATKEY_COLOR_SPECULAR, specular);</span><br><span class="line">            mesh_material.specular = specular;</span><br><span class="line">            material-&gt;Get(AI_MATKEY_COLOR_AMBIENT, ambient);</span><br><span class="line">            mesh_material.ambient = ambient;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 创建匿名网格对象</span></span><br><span class="line">    <span class="comment">// 编译时只要启用了优化，返回对象似乎不会对性能有影响</span></span><br><span class="line">    <span class="keyword">return</span> Mesh(vertices, indices, textures, mesh_material, has_texture);</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// ...</span></span><br></pre></td></tr></table></figure>
+<p>成果如下，从<a href="https://free3d.com/" target="_blank" rel="noopener">free3d</a>下载的obj格式的钢铁侠模型，虽然似乎有些地方材质颜色加载失败</p>
+<p><img src="/hexo/image/opengl/model_loading.gif" alt="图片无法显示"></p>
+<h1>参考</h1>
+<ol>
+<li><a href="https://en.wikipedia.org/wiki/Wavefront_.obj_file" target="_blank" rel="noopener">wikipedia:Wavefront .obj file</a></li>
+<li><a href="https://learnopengl-cn.github.io/03%20Model%20Loading/01%20Assimp/" target="_blank" rel="noopener">learnOpenGL CN</a></li>
+</ol>
+
+    </section>
+    <footer class="post-footer">
+      <section class="author">
+    <h4>flyingfisherman</h4>
+    <p>前端工程师，热爱技术，坚信知识技术改变生活。最高兴的场合莫过于学到的技术为自己、亲友或他人提供了些许的便利、帮助。</p>
+</section>
+      <section class="share">
+    <h4>Share this post</h4>
+    <a class="icon-twitter" href="http://twitter.com/share?url=https://github.flyingfishman.io/hexo/2021/02/08/opengl6/"
+       onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+        <span class="hidden">Twitter</span>
+    </a>
+    <a class="icon-facebook" href="https://www.facebook.com/sharer/sharer.php?u=https://github.flyingfishman.io/hexo/2021/02/08/opengl6/"
+       onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+        <span class="hidden">Facebook</span>
+    </a>
+    <a class="icon-google-plus" href="https://plus.google.com/share?url=https://github.flyingfishman.io/hexo/2021/02/08/opengl6/"
+       onclick="window.open(this.href, 'google-plus-share', 'width=490,height=530');return false;">
+        <span class="hidden">Google+</span>
+    </a>
+</section>
+    </footer>
+  </article>
+  <nav class="pagination" role="pagination">
+    
+    <a class="newer-posts" href="/hexo/2021/02/12/opengl7/">
+        ← opengl(7):深度测试、模板测试、混合、面剔除、帧缓冲、立方体贴图
+    </a>
+    
+    <span class="page-number">•</span>
+    
+    <a class="older-posts" href="/hexo/2021/02/04/opengl5/">
+        opengl(5):光照贴图、投光物、多光源 →
+    </a>
+    
+</nav>
+  <div id="comment" class="comments-area">
+    <h1 class="title"><a href="#disqus_comments" name="disqus_comments">Comments</a></h1>
+
+    
+</div>
+</main>
+
+
+  
+<footer class="site-footer">
+  
+  <a class="subscribe icon-feed" href="/rss.xml"><span class="tooltip">Subscribe!</span></a>
+  
+  <div class="inner">
+     <section class="copyright">All content copyright <a href="/hexo/">日常点滴</a> &copy; 2014 &bull; All rights reserved.</section>
+     <section class="poweredby">Proudly published with <a class="icon-ghost" href="http://zespia.tw/hexo/">Hexo</a></section>
+  </div>
+</footer>
+
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+<script type="text/javascript" src="/hexo/js/jquery.fitvids.js"></script>
+<script type="text/javascript" src="/hexo/js/index.js"></script>
+
+
+
+
+
+
+</body>
+</html>

@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html" charset="UTF-8" >
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+  <title>babel学习笔记 | 日常点滴</title>
+  <meta name="description" content="" />
+  <meta name="HandheldFriendly" content="True" />
+  <meta name="MobileOptimized" content="320" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <link rel="stylesheet" type="text/css" href="/hexo/css/screen.css" />
+  <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Noto+Serif:400,700,400italic|Open+Sans:700,400" />
+
+  <meta name="generator" content="日常点滴">
+
+  
+  <link rel="alternate" type="application/rss+xml" title="RSS" href="/rss.xml">
+  
+  
+  <link rel="alternate" type="application/atom+xml" title="Atom 0.3" href="rss.xml">
+  
+  
+
+  
+</head>
+
+
+<body class="post-template">
+
+  <header class="site-head"  style="background-image: url(/image/cover.png)" >
+    <div class="vertical">
+        <div class="site-head-content inner">
+             <a class="blog-logo" href="/hexo/"><img src="https://avatars.githubusercontent.com/u/26755276" alt="Blog Logo"/></a> 
+            <h1 class="blog-title">日常点滴</h1>
+            <h2 class="blog-description"></h2>
+        </div>
+    </div>
+</header>
+  
+
+<main class="content" role="main">
+  <article class="post">
+    <span class="post-meta">
+      <time datetime="2020-01-04T16:00:00.000Z" itemprop="datePublished">
+          2020-01-05
+      </time>
+    
+    
+    | 
+    <a href='/hexo/tags/babel/'>babel</a>
+    
+    
+</span>
+    <h1 class="post-title">babel学习笔记</h1>
+    <section class="post-content">
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.12.0/katex.min.css" /><h1>概述</h1>
+<p><a href="https://www.babeljs.cn/docs/" target="_blank" rel="noopener">官方文档</a><br>
+之前没系统地学习过，现在补回，本笔记基于的版本是 babel7，重点为了在 webpack 中使用，故而略去文档中涉及其他打包工具的部分，以及一些命令行使用方法的部分</p>
+<a id="more"></a>
+<h2 id="概念">概念</h2>
+<p>据官方文档，babel 是一个 js 编译器，将较新的语言规范编译为向后兼容的语言规范，一边运行在旧版浏览器。<br>
+什么都不配置的情况下，babel 做的事近乎于将代码复制一遍，用户根据自己需要兼容什么语法来选用插件(plugin)，当然也可以用别人配置好的插件组合(preset)</p>
+<h2 id="向导">向导</h2>
+<h3 id="基本用法">基本用法</h3>
+<p>以下是不配合框架或打包工具的基本用法</p>
+<ol>
+<li>安装核心库、命令行工具、预设、垫片等**</li>
+</ol>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">npm install -D @babel/core @babel/cli @babel/preset-env</span><br><span class="line">npm install -s @babel/polyfill</span><br></pre></td></tr></table></figure>
+<ol start="2">
+<li>编写配置文件<br>
+后文会说明</li>
+<li>运行命令编译和输出</li>
+</ol>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npx babel src --out-dir lib --presets=@babel/env</span><br></pre></td></tr></table></figure>
+<h3 id="浏览器中">浏览器中</h3>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">id</span>=<span class="string">"output"</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line"><span class="comment">&lt;!-- Load Babel --&gt;</span></span><br><span class="line"><span class="comment">&lt;!-- v6 &lt;script src="https://unpkg.com/babel-standalone@6/babel.min.js"&gt;&lt;/script&gt; --&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">script</span> <span class="attr">src</span>=<span class="string">"https://unpkg.com/@babel/standalone/babel.min.js"</span>&gt;</span><span class="undefined"></span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line"><span class="comment">&lt;!-- Your custom script here --&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">script</span> <span class="attr">type</span>=<span class="string">"text/babel"</span>&gt;</span><span class="undefined"></span></span><br><span class="line"><span class="undefined">  const getMessage = () =&gt; "Hello World";</span></span><br><span class="line"><span class="undefined">  document.getElementById("output").innerHTML = getMessage();</span></span><br><span class="line"><span class="undefined"></span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p><a href="https://www.babeljs.cn/setup#installation" target="_blank" rel="noopener">具体见此</a></p>
+<h3 id="babel-core">@babel/core</h3>
+<p>babel 核心功能所在，安装后可直接在代码中引入使用</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> babel = <span class="built_in">require</span>(<span class="string">"@babel/core"</span>);</span><br><span class="line"></span><br><span class="line">babel.transform(<span class="string">"code"</span>, optionsObject);</span><br></pre></td></tr></table></figure>
+<h3 id="命令行工具">命令行工具</h3>
+<p>@babel/cli，安装后可在命令行使用</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 查看帮助</span></span><br><span class="line">npx babel --help</span><br></pre></td></tr></table></figure>
+<h3 id="插件和预设-plugins-presets">插件和预设(plugins &amp; presets)</h3>
+<p>插件指的是一个个按一定规则转换代码的 js 程序，每个插件都是一个 npm 包，<br>
+预设是一组预定义好的插件组合，减少选用插件的工作，常用的如@babel/preset-env</p>
+<h3 id="配置">配置</h3>
+<p>分为全局(babel.config.json)和相对(.babelrc.json)的配置,也可以直接写在 package.json(全局)中，也可以写成 js 文件作为模块导出</p>
+<h3 id="polyfill">polyfill</h3>
+<p>7.4 以上被废弃，直接引入时，改为引入</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> <span class="string">"core-js/stable"</span>;</span><br><span class="line"><span class="keyword">import</span> <span class="string">"regenerator-runtime/runtime"</span>;</span><br></pre></td></tr></table></figure>
+<p>包括了 corejs 和 regenrator runtime 来模拟 es6 环境。<br>
+提供可以使用 es6 的新内建对象、静态方法、实例方法的环境，另外还有 regenrator runtime 中实现的 generator 函数。</p>
+<p>Polyfill 会污染全局作用域，导致打包结果过大，可以改用 transform-runtime 来避免</p>
+<p>甚至如果你知道你确切地需要什么功能，你可以直接从 core-js 中引入</p>
+<p>另外如果配置了@babel/env 预设，可以为其添加配置选项 useBuiltIns,并指定 corejs 版本,babel 会自动 require 代码中用到的 es6 api 的垫片而不需要在代码开头引入 polyfill</p>
+<h1>配置方式</h1>
+<p>全局配置可以是 json 格式，也可以用 js 导出模块或函数。<br>
+json 格式时可以写在 package.json 中</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="attr">"babel"</span>: &#123;</span><br><span class="line">    <span class="attr">"preset"</span>: [],</span><br><span class="line">    <span class="attr">"plugins"</span>: []</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>也可以在需要用到配置文件的项目根目录创建名为 babel.config.json 的文件</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="attr">"presets"</span>: [],</span><br><span class="line">  <span class="attr">"plugins"</span>: &#123;&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>相对文件的配置.babelrc.json 内容与 babel.config.json 相同，但是可以位于<strong>同一包(package)</strong>（官方文档对使用 monorepo 的特别强调了这一点，因为 Monorepo 一个工程有多个项目(project)）的任何位置，也就是可以对每个子文件夹单独配置，也可以写成 js 文件作为模块导出。</p>
+<blockquote>
+<p>注意：默认情况下，局部配置文件之间会覆盖而不是合并，若在 src 中配置了<code>.babelrc</code>或<code>package.json</code>又在<code>src/utils</code>配置了<code>.babelrc\[.js|.json| \]</code>，src 中的配置都会失效</p>
+</blockquote>
+<p>通过 js 文件导出配置时，导出的可以是返回配置对象的函数，函数会有一个入参，具体见<a href="https://www.babeljs.cn/docs/config-files#supported-file-extensions" target="_blank" rel="noopener">官方文档</a></p>
+<h3 id="命令行工具中配置">命令行工具中配置</h3>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 启用一个plugin</span></span><br><span class="line">babel --plugins @babel/plugin-transform-arrow-functions script.js</span><br></pre></td></tr></table></figure>
+<h3 id="直接引入时配置">直接引入时配置</h3>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">require("@babel/core").transform("code", &#123;</span><br><span class="line">  plugins: ["@babel/plugin-transform-arrow-functions"]</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+<h1>命令行使用</h1>
+<p><a href="https://www.babeljs.cn/docs/babel-cli" target="_blank" rel="noopener">官方文档</a></p>
+<p>摘几个常用的</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 编译文件</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 全局安装</span></span><br><span class="line">babel script.js</span><br><span class="line"><span class="meta">#</span><span class="bash"> 当前项目</span></span><br><span class="line">npx babel script.js</span><br><span class="line"><span class="meta">#</span><span class="bash"> 监听变化--watch,-w，重命名输出文件--out-file,-o</span></span><br><span class="line">npx babel script.js --watch --out-file script-compiled.js</span><br><span class="line"><span class="meta">#</span><span class="bash"> 编译目录,--out-dir或-d输出目录</span></span><br><span class="line">babel src --out-dir output</span><br></pre></td></tr></table></figure>
+<h1>插件和预设</h1>
+<h3 id="插件配置">插件配置</h3>
+<p>不传参</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="attr">"plugins"</span>: [<span class="string">"pluginA"</span>, [<span class="string">"pluginA"</span>], [<span class="string">"pluginA"</span>, &#123;&#125;]]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>传带名字的参数</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="attr">"plugins"</span>: [</span><br><span class="line">    [</span><br><span class="line">      <span class="string">"transform-async-to-module-method"</span>,</span><br><span class="line">      &#123;</span><br><span class="line">        <span class="attr">"module"</span>: <span class="string">"bluebird"</span>,</span><br><span class="line">        <span class="attr">"method"</span>: <span class="string">"coroutine"</span></span><br><span class="line">      &#125;</span><br><span class="line">    ]</span><br><span class="line">  ]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><strong>预设配置模式与之相同</strong></p>
+<h3 id="babel-preset-env">@babel/preset-env</h3>
+<h4 id="browserlist">browserlist</h4>
+<p>这是一个在很多前端工具中都有的配置，可通过<code>@babel/preset-env</code>的<code>targets</code>或<code>targets.browsers</code>配置，不过 babel 官网建议配置在一个指定的<code>.browserlistrc</code>文件中，因为这样可以与其他工具共享配置，<a href="https://github.com/browserslist/browserslist" target="_blank" rel="noopener">browerserlist 配置规则见此处</a></p>
+<p>如果没设置<code>targets</code>,preset-env 默认会查找项目根目录下的<code>.browerserlistrc</code>文件</p>
+<h4 id="targets">targets</h4>
+<p>指定编译目标的环境等，类型可以是<code>string</code>,<code>Array&lt;string&gt;</code>,<code>Object</code>.</p>
+<p>格式为字符串时为上文提到的<code>browserlist</code>的格式只不过用逗号分隔行</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="attr">"targets"</span>: <span class="string">"&gt; 0.25%, not dead"</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>对象格式的配置方式</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="attr">"targets"</span>: &#123;</span><br><span class="line">    <span class="attr">"chrome"</span>: <span class="string">"58"</span>,</span><br><span class="line">    <span class="attr">"ie"</span>: <span class="string">"11"</span></span><br><span class="line">  &#125;</span><br><span class="line">  // 可选chrome, opera, edge, firefox, safari, ie, ios, android, node, electron</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="useBuiltIns">useBuiltIns</h4>
+<p>babel 默认只转化语法（如类的声明），不转化类似 Set,Promise,Map,Proxy,Reflect,Symbol…一些内置的新对象和方法，要使用新的 api，就得用 polyfill。</p>
+<p>决定<code>preset-env</code>如何处理 polyfills(垫片，模拟实现某些新 api 的代码)<br>
+配置这个选项后需要配置 corejs 选项</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">值</th>
+<th style="text-align:left">作用</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><code>false</code></td>
+<td style="text-align:left">不引入 polyfill</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>'entry'</code></td>
+<td style="text-align:left">效果和不引入 polyfill 差不多，由用户在 webpack 的 entry 自行引入,或者 html head 中引入</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>'usage'</code></td>
+<td style="text-align:left">babel 自动按需引入 polyfill</td>
+</tr>
+</tbody>
+</table>
+<h4 id="corejs">corejs</h4>
+<p>指定 corejs 版本号，可以是 2,3 不配时默认使用 2</p>
+<h3 id="babel-polyfill">@babel/polyfill</h3>
+<p>已被废弃，官方建议直接从<code>core-js</code>引入</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> <span class="string">"core-js/shim"</span>; <span class="comment">// included &lt; Stage 4 proposals</span></span><br><span class="line"><span class="keyword">import</span> <span class="string">"regenerator-runtime/runtime"</span>;</span><br></pre></td></tr></table></figure>
+<p>由于 babel 默认</p>
+<p><strong>webpack 中</strong></p>
+<p>polyfill 整个引入会导致打包后的代码过大，可参照上文提到的 useBuiltIns 配置来按需引入。<br>
+useBuiltIns 不同的配置效果如下。<br>
+useBuiltIns 为’usage’时，不用在代码中引入 polyfill<br>
+useBuiltIns 为’entry’时，需要在入口配置文件的最开头引入<br>
+useBuiltIns 为假值时，需要在代码中引入 polyfill</p>
+<p><strong>其他非浏览器环境</strong></p>
+<p>useBuiltIns 不同的配置效果如下。<br>
+useBuiltIns 为’usage’时，不用在代码中引入 polyfill<br>
+useBuiltIns 为’entry’时，不知<br>
+useBuiltIns 为假值时，需要在代码中引入 polyfill</p>
+<p><strong>浏览器</strong><br>
+需要直接在 node_modules 找到 polyfill.js 用 script 标签引入</p>
+<h3 id="babel-plugin-transform-runtime">@babel/plugin-transform-runtime</h3>
+<p>大部分情况下可以用来代替 polyfill，用到一些 api 时无法代替</p>
+<p><strong>与 polyfill 的异同</strong></p>
+<p>polyfill 提供了可以使用<strong>es6 内建对象和方法</strong>以及<strong>原有内建对象原型链上新的方法</strong>(如 Array.prototype.includes)的环境，transform-runtime 创建了可以使用<strong>es6 内置对象和方法</strong>的沙盒环境，polyfill 会污染全局作用域，而 transform-runtime 不会。</p>
+<p>也就是说用到<code>Array.prototype.includes</code>之类的 api 只能引入 polyfill</p>
+<p>transform-runtime 同时能有效减少代码体积：babel 在转化 es6 语法时，会生成一些 helpers 函数，示例如下</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Circle</span> </span>&#123;&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 转化为</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">_classCallCheck</span>(<span class="params">instance, Constructor</span>) </span>&#123;</span><br><span class="line">  <span class="comment">//...</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> Circle = <span class="function"><span class="keyword">function</span> <span class="title">Circle</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  _classCallCheck(<span class="keyword">this</span>, Circle);</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>如果每个文件前重复加入这些 helpers 代码会导致代码体积太大，transform-runtime 可以将其改为对特定模块的引入</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> _classCallCheck = <span class="built_in">require</span>(<span class="string">"@babel/runtime/helpers/classCallCheck"</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> Circle = <span class="function"><span class="keyword">function</span> <span class="title">Circle</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  _classCallCheck(<span class="keyword">this</span>, Circle);</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<h4 id="选项">选项</h4>
+<p><a href="https://www.babeljs.cn/docs/babel-plugin-transform-runtime" target="_blank" rel="noopener">其余见官方文档</a></p>
+<p><strong>corejs</strong></p>
+<p>决定从哪个 runtime 版本引入 helpers</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">值</th>
+<th style="text-align:left">依赖</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">false</td>
+<td style="text-align:left">@babel/runtime</td>
+</tr>
+<tr>
+<td style="text-align:left">2</td>
+<td style="text-align:left">@babel/runtime-corejs2</td>
+</tr>
+<tr>
+<td style="text-align:left">3</td>
+<td style="text-align:left">@babel/runtime-corejs3</td>
+</tr>
+</tbody>
+</table>
+<p><strong>helpers</strong></p>
+<p>是否将 helpers 代码转换为对 helpers 的 require</p>
+<p><strong>regenerator</strong></p>
+<p>generator 函数是否使用不污染全局作用域的 regenerator runtime</p>
+<h3 id="transform-runtime-preset-env-和-polyfill-三者区别示例">transform-runtime,preset-env 和 polyfill 三者区别示例</h3>
+<p>以代码为例代码如下</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ClassName</span> </span>&#123;</span><br><span class="line">  <span class="keyword">constructor</span>() &#123;</span><br><span class="line">    <span class="keyword">let</span> proxy = <span class="keyword">new</span> <span class="built_in">Proxy</span>(&#123;&#125;, &#123;&#125;);</span><br><span class="line">    <span class="keyword">let</span> request = <span class="keyword">new</span> <span class="built_in">Promise</span>(<span class="function"><span class="params">()</span> =&gt;</span> &#123;&#125;);</span><br><span class="line">    <span class="keyword">let</span> assign = <span class="built_in">Object</span>.assign(&#123;&#125;);</span><br><span class="line">    <span class="keyword">let</span> isInclude = [<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>].includes(<span class="number">1</span>);</span><br><span class="line">    <span class="keyword">let</span> obj = &#123;</span><br><span class="line">      get name()&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">undefined</span>;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>第一次配置为空</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#123;&#125;</span><br></pre></td></tr></table></figure>
+<p>结果相当于什么都没干</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 语法</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ClassName</span> </span>&#123;</span><br><span class="line">  <span class="keyword">constructor</span>() &#123;</span><br><span class="line">    <span class="comment">// 完全没法处理</span></span><br><span class="line">    <span class="keyword">let</span> proxy = <span class="keyword">new</span> <span class="built_in">Proxy</span>(&#123;&#125;, &#123;&#125;);</span><br><span class="line">    <span class="comment">// 可以处理的</span></span><br><span class="line">    <span class="keyword">let</span> request = <span class="keyword">new</span> <span class="built_in">Promise</span>(<span class="function"><span class="params">()</span> =&gt;</span> &#123;&#125;);</span><br><span class="line">    <span class="keyword">let</span> assign = <span class="built_in">Object</span>.assign(&#123;&#125;);</span><br><span class="line">    <span class="comment">// tranform-runtime没法处理</span></span><br><span class="line">    <span class="keyword">let</span> isInclude = [<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>].includes(<span class="number">1</span>);</span><br><span class="line">    <span class="comment">// getter语法</span></span><br><span class="line">    <span class="keyword">let</span> obj = &#123;</span><br><span class="line">      get name() &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">undefined</span>;</span><br><span class="line">      &#125;</span><br><span class="line"></span><br><span class="line">    &#125;;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>第二次配置<code>preset-env</code>决定转化到哪些目标环境，这里选择ie9,ie9以下babel就管不了了，因为babel没办法处理getter和setter语法，ie9以下不支持getter和setter</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="attr">"presets"</span>: [</span><br><span class="line">    [</span><br><span class="line">      <span class="string">"@babel/preset-env"</span>,</span><br><span class="line">      // 下面不设也可，默认是es6转es5</span><br><span class="line">      &#123;</span><br><span class="line">        <span class="attr">"targets"</span>: &#123;</span><br><span class="line">          <span class="attr">"ie"</span>: <span class="number">9</span></span><br><span class="line">        &#125;</span><br><span class="line">      &#125;</span><br><span class="line">    ]</span><br><span class="line">  ]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>可以看到只转化了语法</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">"use strict"</span>;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">_classCallCheck</span>(<span class="params">instance, Constructor</span>) </span>&#123; <span class="keyword">if</span> (!(instance <span class="keyword">instanceof</span> Constructor)) &#123; <span class="keyword">throw</span> <span class="keyword">new</span> <span class="built_in">TypeError</span>(<span class="string">"Cannot call a class as a function"</span>); &#125; &#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> ClassName = <span class="function"><span class="keyword">function</span> <span class="title">ClassName</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  _classCallCheck(<span class="keyword">this</span>, ClassName);</span><br><span class="line"></span><br><span class="line">  <span class="keyword">var</span> proxy = <span class="keyword">new</span> <span class="built_in">Proxy</span>(&#123;&#125;, &#123;&#125;);</span><br><span class="line">  <span class="keyword">var</span> request = <span class="keyword">new</span> <span class="built_in">Promise</span>(<span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;&#125;);</span><br><span class="line">  <span class="keyword">var</span> assign = <span class="built_in">Object</span>.assign(&#123;&#125;);</span><br><span class="line">  <span class="keyword">var</span> isInclude = [<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>].includes(<span class="number">1</span>);</span><br><span class="line">  <span class="keyword">var</span> obj = &#123;</span><br><span class="line">    get name() &#123;</span><br><span class="line">      <span class="keyword">return</span> <span class="literal">undefined</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">  &#125;;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>第三次通过<code>useBuiltIns: &quot;usage&quot;</code>引入polyfill</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="attr">"presets"</span>: [</span><br><span class="line">    [</span><br><span class="line">      <span class="string">"@babel/preset-env"</span>,</span><br><span class="line">      &#123;</span><br><span class="line">        <span class="attr">"targets"</span>: &#123;</span><br><span class="line">          <span class="attr">"ie"</span>: <span class="number">9</span></span><br><span class="line">        &#125;,</span><br><span class="line">        <span class="attr">"useBuiltIns"</span>: <span class="string">"usage"</span>,</span><br><span class="line">        <span class="attr">"corejs"</span>: <span class="number">3</span></span><br><span class="line">      &#125;</span><br><span class="line">    ]</span><br><span class="line">  ]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>可以看到引入了includes,Object.assign,Promise的polyfill，Proxy由于无法用es5实现所以无法处理</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">"use strict"</span>;</span><br><span class="line"></span><br><span class="line"><span class="built_in">require</span>(<span class="string">"core-js/modules/es.array.includes"</span>);</span><br><span class="line"></span><br><span class="line"><span class="built_in">require</span>(<span class="string">"core-js/modules/es.object.assign"</span>);</span><br><span class="line"></span><br><span class="line"><span class="built_in">require</span>(<span class="string">"core-js/modules/es.object.to-string"</span>);</span><br><span class="line"></span><br><span class="line"><span class="built_in">require</span>(<span class="string">"core-js/modules/es.promise"</span>);</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">_classCallCheck</span>(<span class="params">instance, Constructor</span>) </span>&#123; <span class="keyword">if</span> (!(instance <span class="keyword">instanceof</span> Constructor)) &#123; <span class="keyword">throw</span> <span class="keyword">new</span> <span class="built_in">TypeError</span>(<span class="string">"Cannot call a class as a function"</span>); &#125; &#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> ClassName = <span class="function"><span class="keyword">function</span> <span class="title">ClassName</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  _classCallCheck(<span class="keyword">this</span>, ClassName);</span><br><span class="line"></span><br><span class="line">  <span class="keyword">var</span> proxy = <span class="keyword">new</span> <span class="built_in">Proxy</span>(&#123;&#125;, &#123;&#125;);</span><br><span class="line">  <span class="keyword">var</span> request = <span class="keyword">new</span> <span class="built_in">Promise</span>(<span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;&#125;);</span><br><span class="line">  <span class="keyword">var</span> assign = <span class="built_in">Object</span>.assign(&#123;&#125;);</span><br><span class="line">  <span class="keyword">var</span> isInclude = [<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>].includes(<span class="number">1</span>);</span><br><span class="line">  <span class="keyword">var</span> obj = &#123;</span><br><span class="line">    get name() &#123;</span><br><span class="line">      <span class="keyword">return</span> <span class="literal">undefined</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">  &#125;;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>第四次改为使用transform-runtime会如何呢</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="attr">"presets"</span>: [</span><br><span class="line">    [</span><br><span class="line">      <span class="string">"@babel/preset-env"</span>,</span><br><span class="line">      &#123;</span><br><span class="line">        <span class="attr">"targets"</span>: &#123;</span><br><span class="line">          <span class="attr">"ie"</span>: <span class="number">9</span></span><br><span class="line">        &#125;,</span><br><span class="line">        <span class="attr">"useBuiltIns"</span>: <span class="string">"usage"</span>,</span><br><span class="line">        <span class="attr">"corejs"</span>: <span class="number">3</span></span><br><span class="line">      &#125;</span><br><span class="line">    ]</span><br><span class="line">  ],</span><br><span class="line">  <span class="attr">"plugins"</span>: [</span><br><span class="line">    [</span><br><span class="line">      <span class="string">"@babel/plugin-transform-runtime"</span>,</span><br><span class="line">      &#123;</span><br><span class="line">        // 配置为2的原因是corejs3实现了includes，就没办法看出区别了</span><br><span class="line">        "corejs": 2</span><br><span class="line">      &#125;</span><br><span class="line">    ]</span><br><span class="line">  ]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>得到的结果如下，可以看到transform-runtime实现的api全部改名，不会污染全局作用域(这样的好处是对于js库而言的，别人在es6环境用你的东西时不会导致自己环境下的Promise等等全被你替换成了你自己引入的)。<br>
+你还能发现用了tranform-runtime的代码没法在浏览器下直接跑。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">"use strict"</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> _interopRequireDefault = <span class="built_in">require</span>(<span class="string">"@babel/runtime-corejs2/helpers/interopRequireDefault"</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 因为没实现includes,只能用polyfill</span></span><br><span class="line"><span class="built_in">require</span>(<span class="string">"core-js/modules/es.array.includes"</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> _assign = _interopRequireDefault(<span class="built_in">require</span>(<span class="string">"@babel/runtime-corejs2/core-js/object/assign"</span>));</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> _promise = _interopRequireDefault(<span class="built_in">require</span>(<span class="string">"@babel/runtime-corejs2/core-js/promise"</span>));</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> _classCallCheck2 = _interopRequireDefault(<span class="built_in">require</span>(<span class="string">"@babel/runtime-corejs2/helpers/classCallCheck"</span>));</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> ClassName = <span class="function"><span class="keyword">function</span> <span class="title">ClassName</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  (<span class="number">0</span>, _classCallCheck2.default)(<span class="keyword">this</span>, ClassName);</span><br><span class="line">  <span class="keyword">var</span> proxy = <span class="keyword">new</span> <span class="built_in">Proxy</span>(&#123;&#125;, &#123;&#125;);</span><br><span class="line">  <span class="keyword">var</span> request = <span class="keyword">new</span> _promise.default(<span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;&#125;);</span><br><span class="line">  <span class="keyword">var</span> assign = (<span class="number">0</span>, _assign.default)(&#123;&#125;);</span><br><span class="line">  <span class="keyword">var</span> isInclude = [<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>].includes(<span class="number">1</span>);</span><br><span class="line">  <span class="keyword">var</span> obj = &#123;</span><br><span class="line">    get name() &#123;</span><br><span class="line">      <span class="keyword">return</span> <span class="literal">undefined</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">  &#125;;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<h4 id="总结">总结</h4>
+<ol>
+<li>babel转化语法</li>
+<li>polyfill用代码预先实现api以提供es6环境下的内置对象、变量等</li>
+<li>transform-runtime和polyfill目的相同，但是transform-runtime不污染全局环境，并且transform-runtime对es6环境的模拟不如polyfill完整</li>
+</ol>
+<h1>配置选项</h1>
+<p><a href="https://www.babeljs.cn/docs/options" target="_blank" rel="noopener">官方文档</a></p>
+<h1>升级到 babel7</h1>
+<p>babel6 到 babel7 是一次破坏性升级，有很多东西不一致，鉴于网上很多博客是 babel6 以前的，因此看技术博客前对 6 到 7 的变化有一定的了解是很有必要的，避免采用了错误的配置导出不符合预期，浪费时间</p>
+<ol>
+<li>配置搜索方式的改变<br>
+版本 7 中当遇到子文件夹的 package.json 文件时会停止继续向下搜索，也就是只会搜索单个项目包(package)，并为 monorepo 提供了 babel.config.js 文件来将所有包中的配置集中到一处，当然也可为各个包单独配置，7.1 中还加入了 rootMode 选项来进一步查找。</li>
+<li>年度的预设包被废弃<br>
+babel-preset-es20*全部用 preset-env 代替</li>
+<li>阶段(stage)预设被废弃</li>
+<li>提案垫片(proposal polyfill)从@babel/polyfill 中废弃，要使用提案需要从 core-js 引入</li>
+</ol>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> <span class="string">"core-js/shim"</span>; <span class="comment">// included &lt; Stage 4 proposals</span></span><br><span class="line"><span class="keyword">import</span> <span class="string">"regenerator-runtime/runtime"</span>;</span><br></pre></td></tr></table></figure>
+<p>或者从 corejs 单独引入你需要的垫片，列表见<a href="https://www.babeljs.cn/docs/v7-migration" target="_blank" rel="noopener">官方文档</a> 5. 一些包被重命名<br>
+babylon 重命名为@babel/parser，仍可使用缩写，如<code>@babel/preset-react</code>缩写为<code>@babel/react</code>，但官方不建议缩写并考虑移除。 6. 多数包变为了 scoped 包，<code>babel-</code>变成了<code>@babel/</code> 7. TC39 的提案都带上了<code>-proposal-</code>以表明这是提案。<br>
+例如：</p>
+<blockquote>
+<p><code>@babel/plugin-transform-function-bind</code>改为<code>@babel/plugin-proposal-function-bind</code>。</p>
+</blockquote>
+<blockquote>
+<p>并且提案被确定部署（即到达 stage-4）时这些包又需要被改名。 6. 移除了一些包里的特性提出年份，因为这没有必要</p>
+</blockquote>
+<blockquote>
+<p><code>@babel/plugin-transform-es2015-classes</code>变为<code>@babel/plugin-transform-classes</code>。 7. babel6 将文件作用域下的<code>this</code>转化为<code>undefined</code>并且在模块顶部插入<code>&quot;use strict&quot;</code>,babel7 中仅当文件内部有 es6 的导入导出时才有这种表现，如果需要所有文件自动插入<code>&quot;use strict&quot;</code>，可使用<code>transform-strict-mode</code>插件。 8. 处理 flow 类型注释的预设从 preset-react 中分离出来，现在需要单独引入 9. 配置文件不再允许使用逗号分隔的字符串作为 presets 和 plugins 的值，必须使用数组</p>
+</blockquote>
+
+    </section>
+    <footer class="post-footer">
+      <section class="author">
+    <h4>flyingfisherman</h4>
+    <p>前端工程师，热爱技术，坚信知识技术改变生活。最高兴的场合莫过于学到的技术为自己、亲友或他人提供了些许的便利、帮助。</p>
+</section>
+      <section class="share">
+    <h4>Share this post</h4>
+    <a class="icon-twitter" href="http://twitter.com/share?url=https://github.flyingfishman.io/hexo/2020/01/05/babel/"
+       onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+        <span class="hidden">Twitter</span>
+    </a>
+    <a class="icon-facebook" href="https://www.facebook.com/sharer/sharer.php?u=https://github.flyingfishman.io/hexo/2020/01/05/babel/"
+       onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+        <span class="hidden">Facebook</span>
+    </a>
+    <a class="icon-google-plus" href="https://plus.google.com/share?url=https://github.flyingfishman.io/hexo/2020/01/05/babel/"
+       onclick="window.open(this.href, 'google-plus-share', 'width=490,height=530');return false;">
+        <span class="hidden">Google+</span>
+    </a>
+</section>
+    </footer>
+  </article>
+  <nav class="pagination" role="pagination">
+    
+    <a class="newer-posts" href="/hexo/2020/03/20/eslint/">
+        ← esint、prettier、jest
+    </a>
+    
+    <span class="page-number">•</span>
+    
+    <a class="older-posts" href="/hexo/2019/12/23/ps快捷键/">
+        ps快捷键大全 →
+    </a>
+    
+</nav>
+  <div id="comment" class="comments-area">
+    <h1 class="title"><a href="#disqus_comments" name="disqus_comments">Comments</a></h1>
+
+    
+</div>
+</main>
+
+
+  
+<footer class="site-footer">
+  
+  <a class="subscribe icon-feed" href="/rss.xml"><span class="tooltip">Subscribe!</span></a>
+  
+  <div class="inner">
+     <section class="copyright">All content copyright <a href="/hexo/">日常点滴</a> &copy; 2014 &bull; All rights reserved.</section>
+     <section class="poweredby">Proudly published with <a class="icon-ghost" href="http://zespia.tw/hexo/">Hexo</a></section>
+  </div>
+</footer>
+
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+<script type="text/javascript" src="/hexo/js/jquery.fitvids.js"></script>
+<script type="text/javascript" src="/hexo/js/index.js"></script>
+
+
+
+
+
+
+</body>
+</html>

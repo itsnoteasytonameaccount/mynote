@@ -1,0 +1,57 @@
+div.bdsharebuttonbox.right {
+  position: fixed;
+  right: -40px;
+  top: 30%;
+  overflow: visible;
+  width: 40px; }
+  div.bdsharebuttonbox.right br {
+    line-height: 0; }
+  div.bdsharebuttonbox.right a {
+    display: block;
+    float: none; }
+  div.bdsharebuttonbox.right a.shareto {
+    background-image: url();
+    float: right;
+    top: 0;
+    position: absolute;
+    right: -30px;
+    width: 20px;
+    border-top-left-radius: 15%;
+    border-bottom-left-radius: 15%;
+    display: inline-block;
+    height: auto;
+    color: white;
+    padding: 5px;
+    background-color: #1ebfd1; }
+
+div.bdsharebuttonbox.right:hover {
+  right: 0; }
+
+div.bdsharebuttonbox.left {
+  position: fixed;
+  left: -40px;
+  top: 30%;
+  overflow: visible;
+  width: 40px; }
+  div.bdsharebuttonbox.left br {
+    line-height: 0; }
+  div.bdsharebuttonbox.left a {
+    display: block;
+    float: none; }
+  div.bdsharebuttonbox.left a.shareto {
+    background-image: url();
+    top: 0;
+    float: left;
+    position: absolute;
+    right: -30px;
+    width: 20px;
+    border-top-right-radius: 10%;
+    border-bottom-right-radius: 10%;
+    height: auto;
+    display: inline-block;
+    color: white;
+    padding: 5px;
+    background-color: #1ebfd1; }
+
+div.bdsharebuttonbox.left:hover {
+  left: 0; }

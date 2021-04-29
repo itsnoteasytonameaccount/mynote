@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html" charset="UTF-8" >
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+  <title>利用aria2下载文件 | 日常点滴</title>
+  <meta name="description" content="" />
+  <meta name="HandheldFriendly" content="True" />
+  <meta name="MobileOptimized" content="320" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <link rel="stylesheet" type="text/css" href="/hexo/css/screen.css" />
+  <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Noto+Serif:400,700,400italic|Open+Sans:700,400" />
+
+  <meta name="generator" content="日常点滴">
+
+  
+  <link rel="alternate" type="application/rss+xml" title="RSS" href="/rss.xml">
+  
+  
+  <link rel="alternate" type="application/atom+xml" title="Atom 0.3" href="rss.xml">
+  
+  
+
+  
+</head>
+
+
+<body class="post-template">
+
+  <header class="site-head"  style="background-image: url(/image/cover.png)" >
+    <div class="vertical">
+        <div class="site-head-content inner">
+             <a class="blog-logo" href="/hexo/"><img src="https://avatars.githubusercontent.com/u/26755276" alt="Blog Logo"/></a> 
+            <h1 class="blog-title">日常点滴</h1>
+            <h2 class="blog-description"></h2>
+        </div>
+    </div>
+</header>
+  
+
+<main class="content" role="main">
+  <article class="post">
+    <span class="post-meta">
+      <time datetime="2018-04-11T16:00:00.000Z" itemprop="datePublished">
+          2018-04-12
+      </time>
+    
+    
+    | 
+    <a href='/hexo/tags/aria2/'>aria2</a>,
+    
+    <a href='/hexo/tags/bash/'>bash</a>
+    
+    
+</span>
+    <h1 class="post-title">利用aria2下载文件</h1>
+    <section class="post-content">
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.12.0/katex.min.css" /><h1>前言</h1>
+<p>在长时间使用迅雷下载后，产生替换下载工具的想法，然而不得不承认，迅雷是具有其一定的优势的，要找到替代产品可不容易，这次要提到的aria2是本人在网上找到的一个不错的替代品之一。此文主要讲述Windows上的使用方法。<a id="more"></a></p>
+<h1>内容</h1>
+<h2 id="aria2优势所在">aria2优势所在</h2>
+<ol>
+<li>
+<p>轻便<br>
+作为一款命令行下载程序，aria2的大小总共只有不到5兆，相较于迅雷。。。,完全无法比较</p>
+</li>
+<li>
+<p>功能齐全<br>
+aria2比较类似于linux上的wget命令,支持ftp下载，http下载,种子，磁链等，除了专门的迅雷下载链接，其余迅雷能下的他都能下</p>
+</li>
+<li>
+<p>可能性<br>
+类似于许多优秀的工具，aria2是可扩展的，可以配合插件，或者配合一些库使用，也有不少aria2的受益用户主动为其编写插件，因而其功能或表现可以得到极大的扩展，这便是开源的优势所在</p>
+</li>
+</ol>
+<h2 id="安装">安装</h2>
+<p>可以从github上下载，<a href="https://github.com/aria2/aria2/releases/tag/release-1.33.1" target="_blank" rel="noopener">下载链接在此</a>。</p>
+<p>下载下来的文件是个压缩包，解压后无需安装即可使用。</p>
+<p>下载的压缩包内容如下</p>
+<p><img src="/hexo/image/default.png" alt="图片无法显示"></p>
+<p>双击aria2c.exe可以看到一闪而过的dos窗口，有过编程经验的人的人都能明白这是dos界面的程序，一闪而过是因为输出完后程序运行结束，dos窗口被关闭所致。因而我们需要在命令行内执行该可执行程序。<br>
+打开命令行，我们要用到第二个常识，一般的命令行程序运行时加上-h或-help或–help便是输出帮助信息，我们只需逐个尝试，很幸运aria2c的帮助是-h,我们能看见aria2c拥有许多的参数，aria2c将其参数分类为几种标签，有#base(-h默认)，#help(-h#help之后类推),#advanced,#rpc,#http,#all等等.我们只要知道如何输出帮助，之后参数有什么作用可以慢慢看。</p>
+<p>由于我并不是很熟悉windows命令行操作，我将所有参数的解释复制在了文本中方便查找。<br>
+由于不是所有看这篇文章的都知道，提一下，可以在浏览器，word,文本编辑器等许多浏览文档的地方用ctrl+F查找文本</p>
+<p>为了方便使用我们将aria2c.exe所在路径添加到环境变量path中,例如我的aria2c.exe路径是D:\aria2\aria2c.exe,那么，我将D:\aria2加入path中。（如何添加环境变量请自行百度）<br>
+可以再加一个ARIA2_HOME环境变量（变量名其实无所谓），值设为D:\aria2(视情况而定)，之后提供的现成的配置方案中会用到此参数。</p>
+<h2 id="开始使用">开始使用</h2>
+<p>通过帮助信息我们可以看到一般的下载只需要如下格式便可</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">aria2c [option] url</span><br><span class="line">aria2c -t (path of torrent file)</span><br></pre></td></tr></table></figure>
+<p>但是通过这样的方式并不方便，我们每次下载都需要许多参数，来控制存放路径，并发下载数，最大下载速度等等，重复操作过多<br>
+因而我们需要采用配置文件的方法，配置文件的编写，需要查看aria2c的帮助信息，学习各参数的作用，对于拥有巨量参数的aria2c来说，这并不是一件容易的事，幸而网上有已经配置好的配置文件可以直接拿来用。<br>
+自行百度<em><strong>aria2c配置</strong></em>，查找现成的配置文件,<br>
+配置文件通过</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">--config-path=path</span><br></pre></td></tr></table></figure>
+<p>参数载入，具体如何配置，我下文会给出示例文件的链接</p>
+<h2 id="rpc下载">rpc下载</h2>
+<p>百度了一下，rpc是所谓的远程方法调用，aria2c开启rpc功能后（开启方法:命令行后加参数–rpc-enable=true或配置文件中rpc-enable=true)，不会自动关闭，会一直监听指定端口，供用户调用下载相关的函数。下载相关数据信息通过json传输。网上有配合aria2c rpc服务的aria2的webui.webui我在下文提供的文件中会给出<br>
+rpc相关的参数可通过</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">aria2c -h<span class="comment">#rpc</span></span><br></pre></td></tr></table></figure>
+<p>来查看</p>
+<p>我便是采用了rpc+webUi的方法来下载文件。</p>
+<p>我的文件结构如图</p>
+<p><img src="/hexo/image/file_struct.png" alt="图片无法显示"></p>
+<p>另在windows中,启用rpc服务时，参数-D，或者配置文件中的daemon=true并不能使程序在后台运行，本人为了达成后台运行搜索了许多办法，start /b指令，windows定时任务，mfc程序后台调用系统命令且不显示窗口等等都不能达成目的，最后在别人的博客上看到了vbs脚本启动的方法才行。启动代码如下。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">CreateObject(<span class="string">"WScript.Shell"</span>).Run <span class="string">"aria2c.exe --conf-path=%ARIA2_HOME%/conf/config.conf --dir=%ARIA2_HOME%/downloads --log=%ARIA2_HOME%/log/aria2.log --input-file=%ARIA2_HOME%/session/aria.session --save-session=%ARIA2_HOME%/session/aria.session"</span>,0</span><br><span class="line">//此处用到了之前设置的ARIA2_HOME环境变量，代码根据别人文件改动而来，必须先设置好环境变量</span><br></pre></td></tr></table></figure>
+<p>将蕴含以上代码的文本文件命名为aria2c_run.vbs,并与aria2c.exe放于同一目录下，由于之前设置了环境变量，现在我们可以在命令行中输入aria2c_run来运行aria2c服务了，或者你可以把aria2c_run.vbs文件置于桌面，点击即可启动，之后可以通过webui来确定是否启动成功。</p>
+<h2 id="添加trackers">添加trackers</h2>
+<p>aria2c不添加trackers前，对bt下载是比较慢的。<br>
+tracker我并不理解是什么，似乎是某种p2p链接中继或者高一级的服务节点之类的吧<br>
+添加方法</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">//配置文件</span><br><span class="line">bt-tracker=url1,url2,url3......</span><br></pre></td></tr></table></figure>
+<p><a href="https://github.com/ngosang/trackerslist" target="_blank" rel="noopener">此处有其他人提供的trackers链接</a>（github上的）</p>
+<!-- # 附
+本人的配置文件+主程序等，解压后，按上文配置好环境变量即可使用，配置文件改自网上现成的文件，其中还有help.txt(所有参数的英文解释),webui.html(重定向至某一webui界面)：
+度盘：[https://pan.baidu.com/s/1wo5ndPkT9VFYd4ZT-tXWsQ](https://pan.baidu.com/s/1wo5ndPkT9VFYd4ZT-tXWsQ) 密码：aew0 -->
+
+    </section>
+    <footer class="post-footer">
+      <section class="author">
+    <h4>flyingfisherman</h4>
+    <p>前端工程师，热爱技术，坚信知识技术改变生活。最高兴的场合莫过于学到的技术为自己、亲友或他人提供了些许的便利、帮助。</p>
+</section>
+      <section class="share">
+    <h4>Share this post</h4>
+    <a class="icon-twitter" href="http://twitter.com/share?url=https://github.flyingfishman.io/hexo/2018/04/12/aria2(1)/"
+       onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+        <span class="hidden">Twitter</span>
+    </a>
+    <a class="icon-facebook" href="https://www.facebook.com/sharer/sharer.php?u=https://github.flyingfishman.io/hexo/2018/04/12/aria2(1)/"
+       onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+        <span class="hidden">Facebook</span>
+    </a>
+    <a class="icon-google-plus" href="https://plus.google.com/share?url=https://github.flyingfishman.io/hexo/2018/04/12/aria2(1)/"
+       onclick="window.open(this.href, 'google-plus-share', 'width=490,height=530');return false;">
+        <span class="hidden">Google+</span>
+    </a>
+</section>
+    </footer>
+  </article>
+  <nav class="pagination" role="pagination">
+    
+    <a class="newer-posts" href="/hexo/2018/04/14/nginx_config/">
+        ← 服务器简单的nginx配置(1)
+    </a>
+    
+    <span class="page-number">•</span>
+    
+    <a class="older-posts" href="/hexo/2018/04/10/linux2/">
+        linux常用指令记录(2) →
+    </a>
+    
+</nav>
+  <div id="comment" class="comments-area">
+    <h1 class="title"><a href="#disqus_comments" name="disqus_comments">Comments</a></h1>
+
+    
+</div>
+</main>
+
+
+  
+<footer class="site-footer">
+  
+  <a class="subscribe icon-feed" href="/rss.xml"><span class="tooltip">Subscribe!</span></a>
+  
+  <div class="inner">
+     <section class="copyright">All content copyright <a href="/hexo/">日常点滴</a> &copy; 2014 &bull; All rights reserved.</section>
+     <section class="poweredby">Proudly published with <a class="icon-ghost" href="http://zespia.tw/hexo/">Hexo</a></section>
+  </div>
+</footer>
+
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+<script type="text/javascript" src="/hexo/js/jquery.fitvids.js"></script>
+<script type="text/javascript" src="/hexo/js/index.js"></script>
+
+
+
+
+
+
+</body>
+</html>

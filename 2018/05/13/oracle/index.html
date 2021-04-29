@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html" charset="UTF-8" >
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+  <title>oracle中创建数据库 | 日常点滴</title>
+  <meta name="description" content="" />
+  <meta name="HandheldFriendly" content="True" />
+  <meta name="MobileOptimized" content="320" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <link rel="stylesheet" type="text/css" href="/hexo/css/screen.css" />
+  <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Noto+Serif:400,700,400italic|Open+Sans:700,400" />
+
+  <meta name="generator" content="日常点滴">
+
+  
+  <link rel="alternate" type="application/rss+xml" title="RSS" href="/rss.xml">
+  
+  
+  <link rel="alternate" type="application/atom+xml" title="Atom 0.3" href="rss.xml">
+  
+  
+
+  
+</head>
+
+
+<body class="post-template">
+
+  <header class="site-head"  style="background-image: url(/image/cover.png)" >
+    <div class="vertical">
+        <div class="site-head-content inner">
+             <a class="blog-logo" href="/hexo/"><img src="https://avatars.githubusercontent.com/u/26755276" alt="Blog Logo"/></a> 
+            <h1 class="blog-title">日常点滴</h1>
+            <h2 class="blog-description"></h2>
+        </div>
+    </div>
+</header>
+  
+
+<main class="content" role="main">
+  <article class="post">
+    <span class="post-meta">
+      <time datetime="2018-05-12T16:00:00.000Z" itemprop="datePublished">
+          2018-05-13
+      </time>
+    
+    
+    | 
+    <a href='/hexo/tags/oracle/'>oracle</a>
+    
+    
+</span>
+    <h1 class="post-title">oracle中创建数据库</h1>
+    <section class="post-content">
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.12.0/katex.min.css" /><h1>前言</h1>
+<p>oracle的数据库手动创建比较麻烦，因此记录以下在windows10上的oracle数据库手动创建（命令行）经验，本次创建经验基本依照<a href="https://www.2cto.com/database/201511/449820.html" target="_blank" rel="noopener">此篇博客</a>得到的，因此本文内容很多地方是照搬的，但也有一些地方不同，可以用来对照参考。</p>
+<a id="more"></a>
+<h1>安装</h1>
+<h2 id="概念">概念</h2>
+<p>(以下结论都是我短期学习成果，只具有参考价值)</p>
+<p>oracle数据库与以前用过的mysql不同，一个实例与一个数据库是一一对应的，开启客户端程序连接实例就已经连上数据库，不像mysql，连上了服务，还要用use database选择数据库。Oracle与mysql的‘数据库’意义差不多的应该是‘表空间’这一概念</p>
+<h2 id="步骤">步骤</h2>
+<h3 id="修改init文件">修改init文件</h3>
+<p>修改已有的示例文件中的配置，安装oracle后，会存在示例配置文件，<br>
+一般已有的示例文件名是Init.ora之类的，路径不一定，至少我找到Init.ora的路径与网上给出的都不同，最好还是用一下搜索软件，搜索init.ora或initsmpl.ora,initsample.ora之类的文件名<br>
+我的电脑中路径是<strong>D:\app\Administrator\product\11.2.0\dbhome_1\dbs\init.ora</strong></p>
+<p>修改后的配置文件应当存放在你的oracle_home路径中，并改名为<strong>init+你的实例sid+.ora</strong>形式的文件名，之后startup数据库时需要用到。<br>
+oracle_home的路径也不尽相同，一般结尾都是<strong>products\版本号\db_home或databasehome</strong><br>
+我的电脑中是<strong>D:\app\Administrator\product\11.2.0\dbhome_1</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 本人参照网上博客修改后的配置</span></span><br><span class="line">db_name=<span class="string">'mydata'</span></span><br><span class="line">memory_target=1G</span><br><span class="line">processes = 150</span><br><span class="line">audit_trail =<span class="string">'db'</span></span><br><span class="line">db_block_size=8192</span><br><span class="line">db_domain=<span class="string">''</span></span><br><span class="line">db_recovery_file_dest=<span class="string">'D:\app\Administrator\product\11.2.0\my_database\flash_recovery_area'</span></span><br><span class="line">db_recovery_file_dest_size=2G</span><br><span class="line">diagnostic_dest=<span class="string">'D:\app\Administrator\product\11.2.0\my_database'</span></span><br><span class="line">dispatchers=<span class="string">'(PROTOCOL=TCP) (SERVICE=ORCLXDB)'</span></span><br><span class="line">open_cursors=300</span><br><span class="line">remote_login_passwordfile=<span class="string">'EXCLUSIVE'</span></span><br><span class="line">undo_tablespace=<span class="string">'UNDOTBS1'</span></span><br><span class="line"><span class="comment"># You may want to ensure that control files are created on separate physical</span></span><br><span class="line"><span class="comment"># devices</span></span><br><span class="line">control_files = (<span class="string">'D:\app\Administrator\product\11.2.0\my_database\ora_control1.ctl'</span>, <span class="string">'D:\app\Administrator\product\11.2.0\my_database\ora_control2.ctl'</span>)</span><br><span class="line">compatible =<span class="string">'11.2.0'</span></span><br><span class="line">audit_file_dest=<span class="string">'D:\app\Administrator\product\11.2.0\my_database\adump'</span></span><br><span class="line">core_dump_dest=<span class="string">'D:\app\Administrator\product\11.2.0\my_database\ddump'</span></span><br><span class="line">undo_management=<span class="string">'AUTO'</span></span><br></pre></td></tr></table></figure>
+<p>注意：以上配置文件中你填的路径需要提前创建好，文件不要创建，之后启动数据库时会自动生成<br>
+另外在undo_tablespace这一行填的名称需要在create database时用到</p>
+<h3 id="创建实例">创建实例</h3>
+<p>指令格式为</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">oradim -new -sid 实例sid -initpwd sys用户的密码</span><br><span class="line"><span class="comment"># sid是用来标识实例的，随便起</span></span><br></pre></td></tr></table></figure>
+<p>创建后还要设置环境变量ORACLE_SID=实例sid 才行，否则如果你有多个实例，可能默认连接的不是你创建的这个实例</p>
+<p>实例只是一个空壳子，能连接但做出的操作保存不了，没什么意义（此句照搬一些博客原话，本人未曾尝试）<br>
+就像没通电的插座，能插电器，但是充不了电</p>
+<h3 id="以管理员身份连接实例并创建二进制文件">以管理员身份连接实例并创建二进制文件</h3>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 以下命令顺序执行</span></span><br><span class="line"><span class="comment"># 不进行登陆开启命令工具</span></span><br><span class="line">sqlplus /nolog</span><br><span class="line"></span><br><span class="line"><span class="comment"># sysdba权限登陆</span></span><br><span class="line">connect sys/sys用户的密码 as sysdba</span><br><span class="line"></span><br><span class="line"><span class="comment"># 创建二进制文件</span></span><br><span class="line"><span class="comment"># 默认会在你的%oracle_home%\database路径下寻找名为**init+你的实例sid+.ora**的文件</span></span><br><span class="line"><span class="comment"># 并在%oracle_home%\database路径下生成名为**SPFILE+你的实例名+.ora**的文件</span></span><br><span class="line"><span class="comment"># 生成的文件在create database时会用到</span></span><br><span class="line"><span class="comment"># 这一步如果报错请检查是否是放错了init文件的位置</span></span><br><span class="line">create spfile from pfile;</span><br><span class="line"></span><br><span class="line"><span class="comment"># 以下命令是以不挂载的形式启动数据库</span></span><br><span class="line"><span class="comment"># 具体什么意思不清楚，似乎是暂时不把数据库挂载在实例上</span></span><br><span class="line">startup nomount;</span><br></pre></td></tr></table></figure>
+<h3 id="创建数据库">创建数据库</h3>
+<p>本人创建数据库用的脚本，以sys用户执行，其中所有路径都应视自己计算机情况以及自己需要填写<br>
+以下脚本配置数据库配置文件，控制文件以及日志文件的位置</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">create database mydata</span><br><span class="line">undo tablespace</span><br><span class="line">UNDOTBS1</span><br><span class="line"><span class="comment"># 此处tablespace名称不需要加引号，</span></span><br><span class="line"><span class="comment"># 并且应当与上文中提到的配置文件中undo_tablespace值相同</span></span><br><span class="line"><span class="comment"># ，否则会报错</span></span><br><span class="line">datafile</span><br><span class="line">    <span class="string">'D:\app\Administrator\product\11.2.0\my_database\system_01.dbf'</span> size 100m</span><br><span class="line">     Autoextend on next 10m maxsize unlimited</span><br><span class="line">sysaux datafile</span><br><span class="line">    <span class="string">'D:\app\Administrator\product\11.2.0\my_database\system_02.dbf'</span> size 100m</span><br><span class="line">     Autoextend on next 10m maxsize unlimited</span><br><span class="line">logfile</span><br><span class="line">group 1 (<span class="string">'D:\app\Administrator\product\11.2.0\my_database\logfile1.rdo'</span>) size 10m,</span><br><span class="line">group 2 (<span class="string">'D:\app\Administrator\product\11.2.0\my_database\logfile2.rdo'</span>) size 10m</span><br><span class="line">character <span class="built_in">set</span> utf8;</span><br></pre></td></tr></table></figure>
+<p>如果报如下错误,请检查你的init文件中是否添加了多余的参数<br>
+参考网页<a href="http://www.cnblogs.com/zrcoffee/archive/2012/11/21/2780468.html" target="_blank" rel="noopener">此处</a></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ORA-32004: obsolete or deprecated parameter(s) specified <span class="keyword">for</span> RDBMS instance</span><br></pre></td></tr></table></figure>
+<h3 id="执行sql文件">执行sql文件</h3>
+<p>以下四个文件请自行搜索路径</p>
+<p>catalog.sql  创建系统常用的数据字典试图和同义词<br>
+catproc.sql  建立pl/sql功能的使用环境<br>
+pupbld.sql   使用sqlplus环境时需要(system登陆)<br>
+scott.sql    创建scott模式</p>
+<p>执行方法</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">@ 对应sql文件的绝对路径</span><br></pre></td></tr></table></figure>
+<p>注意：执行第三，四个脚本时需要切换到system用户<br>
+用以下命令切换为system用户</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">connect system/manager</span><br></pre></td></tr></table></figure>
+<h3 id="连接plsql">连接plsql</h3>
+<ol>
+<li>
+<p>安装与oracle数据库位数一致的oracle client和plsql。</p>
+</li>
+<li>
+<p>先不登陆进入Plsql</p>
+</li>
+<li>
+<p>进入tools(工具)-&gt;preferences(首选项)-&gt;connections(连接) 界面</p>
+</li>
+<li>
+<p>找到你oracle client目录下的oci.dll文件</p>
+</li>
+<li>
+<p>修改oci library(oci库)路径为你的oci.dll路径</p>
+</li>
+<li>
+<p>重启plsql,如果数据库名为空，手动填写，默认格式为localhost:1521/你的实例名，再填写对应的用户名密码，连接</p>
+</li>
+<li>
+<p>如果无法连接，用lsnrctl status查看新建的实例是否已注册到监听服务</p>
+</li>
+<li>
+<p>若没有注册，尝试以下方法<br>
+(1)重启：<br>
+lsnrctl stop<br>
+lsnrctl start<br>
+(2)修改配置文件listener.ora,再重启<br>
+配置示例</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">SID_LIST_LISTENER =</span><br><span class="line">(SID_LIST =</span><br><span class="line">   (SID_DESC =</span><br><span class="line">     (GLOBAL_DBNAME = MYDATA)</span><br><span class="line">     (SID_NAME = mydatabase)</span><br><span class="line">    )</span><br><span class="line">   (SID_DESC =</span><br><span class="line">     (SID_NAME = mydatabase)</span><br><span class="line">     (ORACLE_HOME = D:\app\Administrator\product\11.2.0\dbhome_3)</span><br><span class="line">     (ENVS = <span class="string">"EXTPROC_DLLS=ONLY:D:\app\Administrator\product\11.2.0\dbhome_3\bin\oraclr11.dll"</span>)</span><br><span class="line">   )</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+<p>listener.ora路径可在lsnrctl status中看到</p>
+</li>
+</ol>
+<h1>后记</h1>
+<p>感谢上文提到的博客对我学习过程带来的帮助</p>
+
+    </section>
+    <footer class="post-footer">
+      <section class="author">
+    <h4>flyingfisherman</h4>
+    <p>前端工程师，热爱技术，坚信知识技术改变生活。最高兴的场合莫过于学到的技术为自己、亲友或他人提供了些许的便利、帮助。</p>
+</section>
+      <section class="share">
+    <h4>Share this post</h4>
+    <a class="icon-twitter" href="http://twitter.com/share?url=https://github.flyingfishman.io/hexo/2018/05/13/oracle/"
+       onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+        <span class="hidden">Twitter</span>
+    </a>
+    <a class="icon-facebook" href="https://www.facebook.com/sharer/sharer.php?u=https://github.flyingfishman.io/hexo/2018/05/13/oracle/"
+       onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+        <span class="hidden">Facebook</span>
+    </a>
+    <a class="icon-google-plus" href="https://plus.google.com/share?url=https://github.flyingfishman.io/hexo/2018/05/13/oracle/"
+       onclick="window.open(this.href, 'google-plus-share', 'width=490,height=530');return false;">
+        <span class="hidden">Google+</span>
+    </a>
+</section>
+    </footer>
+  </article>
+  <nav class="pagination" role="pagination">
+    
+    <a class="newer-posts" href="/hexo/2018/05/16/oracle2/">
+        ← oracle数据库操作
+    </a>
+    
+    <span class="page-number">•</span>
+    
+    <a class="older-posts" href="/hexo/2018/04/29/ca/">
+        百夫长统计 →
+    </a>
+    
+</nav>
+  <div id="comment" class="comments-area">
+    <h1 class="title"><a href="#disqus_comments" name="disqus_comments">Comments</a></h1>
+
+    
+</div>
+</main>
+
+
+  
+<footer class="site-footer">
+  
+  <a class="subscribe icon-feed" href="/rss.xml"><span class="tooltip">Subscribe!</span></a>
+  
+  <div class="inner">
+     <section class="copyright">All content copyright <a href="/hexo/">日常点滴</a> &copy; 2014 &bull; All rights reserved.</section>
+     <section class="poweredby">Proudly published with <a class="icon-ghost" href="http://zespia.tw/hexo/">Hexo</a></section>
+  </div>
+</footer>
+
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+<script type="text/javascript" src="/hexo/js/jquery.fitvids.js"></script>
+<script type="text/javascript" src="/hexo/js/index.js"></script>
+
+
+
+
+
+
+</body>
+</html>

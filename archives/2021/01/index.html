@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html" charset="UTF-8" >
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+  <title>Archives: 2021/1 | 日常点滴</title>
+  <meta name="description" content="" />
+  <meta name="HandheldFriendly" content="True" />
+  <meta name="MobileOptimized" content="320" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <link rel="stylesheet" type="text/css" href="/hexo/css/screen.css" />
+  <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Noto+Serif:400,700,400italic|Open+Sans:700,400" />
+
+  <meta name="generator" content="日常点滴">
+
+  
+  <link rel="alternate" type="application/rss+xml" title="RSS" href="/rss.xml">
+  
+  
+  <link rel="alternate" type="application/atom+xml" title="Atom 0.3" href="rss.xml">
+  
+  
+
+  
+</head>
+
+
+<body class="home-template">
+
+  <header class="site-head"  style="background-image: url(/image/cover.png)" >
+    <div class="vertical">
+        <div class="site-head-content inner">
+             <a class="blog-logo" href="/hexo/"><img src="https://avatars.githubusercontent.com/u/26755276" alt="Blog Logo"/></a> 
+            <h1 class="blog-title">日常点滴</h1>
+            <h2 class="blog-description"></h2>
+        </div>
+    </div>
+</header>
+  
+<main class="content" role="main">
+  
+  <article class="post">
+    <header class="post-header">
+      <span class="post-meta">
+      <time datetime="2021-01-28T16:00:00.000Z" itemprop="datePublished">
+          2021-01-29
+      </time>
+    
+    
+    | 
+    <a href='/hexo/tags/opengl/'>opengl</a>
+    
+    
+</span>
+      <h2 class="post-title"><a href="/hexo/2021/01/29/opengl4/">opengl(4):颜色、基础光照、材质</a></h2>
+    </header>
+    <section class="post-excerpt">
+      <p>
+      
+        <p>以下内容主要来自<a href="https://learnopengl-cn.github.io/" target="_blank" rel="noopener">LearnOpenGL CN</a>文档，另外<a href="https://learnopengl-cn.github.io/" target="_blank" rel="noopener">LearnOpenGL CN</a>每一节都是有讨论区的，用的disqus，disqus很早就被墙了，想要在评论区寻求帮助需要翻墙</p>
+<p>你也可以在<a href="https://www.khronos.org/opengl/wiki/Getting_Started" target="_blank" rel="noopener">此处</a>找到其他opengl官方推荐的资料、教程网站，推荐先用<a href="https://learnopengl-cn.github.io/" target="_blank" rel="noopener">LearnOpenGL CN</a>入门，再去看其他的</p>
+      
+      </p>
+      
+      <p>
+          <a href="/hexo/2021/01/29/opengl4/" class="excerpt-link">Read More...</a>
+      </p>
+      
+    </section>
+  </article>
+  
+  <article class="post">
+    <header class="post-header">
+      <span class="post-meta">
+      <time datetime="2021-01-27T16:00:00.000Z" itemprop="datePublished">
+          2021-01-28
+      </time>
+    
+    
+    | 
+    <a href='/hexo/tags/c/'>c</a>,
+    
+    <a href='/hexo/tags/makefile/'>makefile</a>
+    
+    
+</span>
+      <h2 class="post-title"><a href="/hexo/2021/01/28/compile/">程序编译</a></h2>
+    </header>
+    <section class="post-excerpt">
+      <p>
+      
+        <p>每次都是这样，要用东西，以前用过，但是现在忘了，又得找半天，才想起要记笔记</p>
+<p>不做深入，简单了解一下</p>
+      
+      </p>
+      
+      <p>
+          <a href="/hexo/2021/01/28/compile/" class="excerpt-link">Read More...</a>
+      </p>
+      
+    </section>
+  </article>
+  
+  <article class="post">
+    <header class="post-header">
+      <span class="post-meta">
+      <time datetime="2021-01-05T16:00:00.000Z" itemprop="datePublished">
+          2021-01-06
+      </time>
+    
+    
+    | 
+    <a href='/hexo/tags/opengl/'>opengl</a>
+    
+    
+</span>
+      <h2 class="post-title"><a href="/hexo/2021/01/06/opengl3/">opengl(3):变换、坐标系统、摄像机</a></h2>
+    </header>
+    <section class="post-excerpt">
+      <p>
+      
+        <p>以下内容主要来自<a href="https://learnopengl-cn.github.io/" target="_blank" rel="noopener">LearnOpenGL CN</a>文档，另外<a href="https://learnopengl-cn.github.io/" target="_blank" rel="noopener">LearnOpenGL CN</a>每一节都是有讨论区的，用的 disqus，disqus 很早就被墙了，想要在评论区寻求帮助需要翻墙</p>
+<p>你也可以在<a href="https://www.khronos.org/opengl/wiki/Getting_Started" target="_blank" rel="noopener">此处</a>找到其他 opengl 官方推荐的资料、教程网站，推荐先用<a href="https://learnopengl-cn.github.io/" target="_blank" rel="noopener">LearnOpenGL CN</a>入门，再去看其他的</p>
+<h1>基础知识</h1>
+<p>构造坐标系统、实现简单摄像机涉及不少向量矩阵方面的知识。由于比较麻烦，此处只列举会用到的简单知识，暂时搁置这方面的学习，把涉及到的知识点放到参考中，以后学习。<br>
+实际上不做很深入地理解思考的话，会一些初高中的数学基础常识就能很好地实现摄像机了。</p>
+      
+      </p>
+      
+      <p>
+          <a href="/hexo/2021/01/06/opengl3/" class="excerpt-link">Read More...</a>
+      </p>
+      
+    </section>
+  </article>
+  
+  <nav class="pagination" role="pagination">
+    
+    <span class="page-number">Page 1 of 1</span>
+    
+  </nav>
+</main>
+
+
+  
+<footer class="site-footer">
+  
+  <a class="subscribe icon-feed" href="/rss.xml"><span class="tooltip">Subscribe!</span></a>
+  
+  <div class="inner">
+     <section class="copyright">All content copyright <a href="/hexo/">日常点滴</a> &copy; 2014 &bull; All rights reserved.</section>
+     <section class="poweredby">Proudly published with <a class="icon-ghost" href="http://zespia.tw/hexo/">Hexo</a></section>
+  </div>
+</footer>
+
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+<script type="text/javascript" src="/hexo/js/jquery.fitvids.js"></script>
+<script type="text/javascript" src="/hexo/js/index.js"></script>
+
+
+
+
+
+
+</body>
+</html>

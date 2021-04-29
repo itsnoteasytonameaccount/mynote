@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html" charset="UTF-8" >
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+  <title>互斥锁 | 日常点滴</title>
+  <meta name="description" content="" />
+  <meta name="HandheldFriendly" content="True" />
+  <meta name="MobileOptimized" content="320" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <link rel="stylesheet" type="text/css" href="/hexo/css/screen.css" />
+  <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Noto+Serif:400,700,400italic|Open+Sans:700,400" />
+
+  <meta name="generator" content="日常点滴">
+
+  
+  <link rel="alternate" type="application/rss+xml" title="RSS" href="/rss.xml">
+  
+  
+  <link rel="alternate" type="application/atom+xml" title="Atom 0.3" href="rss.xml">
+  
+  
+
+  
+</head>
+
+
+<body class="post-template">
+
+  <header class="site-head"  style="background-image: url(/image/cover.png)" >
+    <div class="vertical">
+        <div class="site-head-content inner">
+             <a class="blog-logo" href="/hexo/"><img src="https://avatars.githubusercontent.com/u/26755276" alt="Blog Logo"/></a> 
+            <h1 class="blog-title">日常点滴</h1>
+            <h2 class="blog-description"></h2>
+        </div>
+    </div>
+</header>
+  
+
+<main class="content" role="main">
+  <article class="post">
+    <span class="post-meta">
+      <time datetime="2020-05-01T16:00:00.000Z" itemprop="datePublished">
+          2020-05-02
+      </time>
+    
+    
+    | 
+    <a href='/hexo/tags/c/'>c</a>,
+    
+    <a href='/hexo/tags/算法/'>算法</a>
+    
+    
+</span>
+    <h1 class="post-title">互斥锁</h1>
+    <section class="post-content">
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.12.0/katex.min.css" /><h1>前言</h1>
+<p>互斥锁方面算法，因为毕设有要用到的地方，所以复习了一下，记录成果</p>
+<a id="more"></a>
+<h2 id="例1">例1</h2>
+<h3 id="程序">程序</h3>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> lock = <span class="number">0</span>;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">progress</span><span class="params">()</span></span>&#123;</span><br><span class="line">    <span class="keyword">while</span>(lock) ;</span><br><span class="line">    lock = <span class="number">1</span>; <span class="comment">// (1)</span></span><br><span class="line">    <span class="comment">//dosomething</span></span><br><span class="line">    lock = <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="问题">问题</h3>
+<ol>
+<li>可能多个进程都过临界</li>
+</ol>
+<h2 id="例2">例2</h2>
+<h3 id="程序-2">程序</h3>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> turn = <span class="number">0</span>;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">progress0</span><span class="params">()</span></span>&#123;</span><br><span class="line">    <span class="comment">//turn = 1; //多此一举</span></span><br><span class="line">    <span class="keyword">while</span>(turn == <span class="number">1</span>);</span><br><span class="line">    turn = <span class="number">0</span>; <span class="comment">//(1)</span></span><br><span class="line">    <span class="comment">//dosomething</span></span><br><span class="line">    turn = <span class="number">1</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">progesss1</span><span class="params">()</span></span>&#123;</span><br><span class="line">    <span class="comment">//turn == 0; //多此一举</span></span><br><span class="line">    <span class="keyword">while</span>(turn == <span class="number">0</span>);</span><br><span class="line">    turn = <span class="number">1</span>; <span class="comment">//(1)</span></span><br><span class="line">    <span class="comment">//dosomething</span></span><br><span class="line">    turn = <span class="number">0</span>; <span class="comment">//(2)</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="问题-2">问题</h3>
+<ol>
+<li>同时只能有1个过临界，但进临界后必须等另一个进一次临界才能再次进临界，只有一个出了临界，另一个才能进临界，必须交替执行</li>
+<li>步骤(1)可以无，此处方便理解，步骤(1)上移可能出现两者都过临界</li>
+<li>若turn可以有3个值，turn == 2代表都未到达临界，此时把步骤(2)改为turn = 2，则可能出现两者都过临界，同例1</li>
+</ol>
+<h2 id="例3">例3</h2>
+<h3 id="程序-3">程序</h3>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> flag[<span class="number">2</span>] = &#123;<span class="number">0</span>, <span class="number">0</span>&#125;;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">progress0</span><span class="params">()</span></span>&#123;</span><br><span class="line">    <span class="keyword">while</span>(flag[<span class="number">1</span>]); <span class="comment">//(1)</span></span><br><span class="line">    flag[<span class="number">0</span>] = <span class="number">1</span>; <span class="comment">//(2)</span></span><br><span class="line">    <span class="comment">//dosomething</span></span><br><span class="line">    flag[<span class="number">0</span>] = <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">progress1</span><span class="params">()</span></span>&#123;</span><br><span class="line">    <span class="keyword">while</span>(flag[<span class="number">0</span>]); <span class="comment">//(1)</span></span><br><span class="line">    flag[<span class="number">1</span>] = <span class="number">1</span>; <span class="comment">//(2)</span></span><br><span class="line">    <span class="comment">//dosomething</span></span><br><span class="line">    flag[<span class="number">1</span>] = <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="问题-3">问题</h3>
+<ol>
+<li>同例1</li>
+<li>把(2)移至(1)前可能会死锁</li>
+</ol>
+<h2 id="dekker算法">dekker算法</h2>
+<h3 id="程序-4">程序</h3>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> flag[<span class="number">2</span>] = &#123;<span class="number">0</span>, <span class="number">0</span>&#125;;</span><br><span class="line"><span class="keyword">int</span> turn = <span class="number">0</span>;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">progress0</span><span class="params">()</span></span>&#123;</span><br><span class="line">    flag[<span class="number">0</span>] = <span class="number">1</span>;        <span class="comment">//(1) 执行完此处，另一个不可以过临界</span></span><br><span class="line">    <span class="keyword">while</span>(flag[<span class="number">1</span>])&#123;     <span class="comment">//(2) 分析1</span></span><br><span class="line">        <span class="keyword">if</span>(turn == <span class="number">1</span>)&#123;  <span class="comment">//(3) 分析2</span></span><br><span class="line">            flag[<span class="number">0</span>] = <span class="number">0</span>;<span class="comment">//(4）</span></span><br><span class="line">            <span class="keyword">while</span>(turn == <span class="number">1</span>);</span><br><span class="line">            flag[<span class="number">0</span>] = <span class="number">1</span>;<span class="comment">//(5)</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">//dosomething</span></span><br><span class="line">    turn = <span class="number">1</span>;</span><br><span class="line">    flag[<span class="number">0</span>] = <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">progress1</span><span class="params">()</span></span>&#123;</span><br><span class="line">    flag[<span class="number">1</span>] = <span class="number">1</span>;        <span class="comment">//(1)</span></span><br><span class="line">    <span class="keyword">while</span>(flag[<span class="number">0</span>])&#123;     <span class="comment">//(2)</span></span><br><span class="line">        <span class="keyword">if</span>(turn == <span class="number">0</span>)&#123;  <span class="comment">//(3)</span></span><br><span class="line">            flag[<span class="number">1</span>] = <span class="number">0</span>;<span class="comment">//(4)</span></span><br><span class="line">            <span class="keyword">while</span>(turn == <span class="number">0</span>);</span><br><span class="line">            flag[<span class="number">1</span>] = <span class="number">1</span>;<span class="comment">//(5)</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">//dosomething</span></span><br><span class="line">    turn = <span class="number">0</span>;</span><br><span class="line">    flag[<span class="number">1</span>] = <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="分析">分析</h3>
+<ol>
+<li>三种
+<blockquote>
+<p>当进程1执行完步骤(1),执行外层循环内部代码<br>
+当进程1未执行完步骤(1),直接访问<br>
+当进程1进入内层循环时，跳出循环</p>
+</blockquote>
+</li>
+<li>两种
+<blockquote>
+<p>当两者都执行至此，根据turn值不同一个会跳出循环，一个进入内层循环<br>
+当进程1已开始访问，而turn又不等于1时，进程0会一直执行外部循环判断</p>
+</blockquote>
+</li>
+<li>唯一出现多等待一会的情况：进程0执行一遍后，进程1执行完内层循环，还未执行完步骤(5)，进程0又执行完步骤(2)</li>
+</ol>
+<h2 id="Peterson-s-算法">Peterson`s 算法</h2>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> flag[<span class="number">2</span>] = &#123;<span class="number">0</span>,<span class="number">0</span>&#125;;</span><br><span class="line"><span class="keyword">int</span> turn = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">progress0</span><span class="params">()</span></span>&#123;</span><br><span class="line">    flag[<span class="number">0</span>] = <span class="number">1</span>; <span class="comment">//(1)</span></span><br><span class="line">    turn = <span class="number">1</span>; <span class="comment">//(2)</span></span><br><span class="line">    <span class="keyword">while</span>(flag[<span class="number">1</span>] &amp;&amp; turn == <span class="number">1</span>); <span class="comment">//(3)</span></span><br><span class="line">    <span class="comment">//dosomething</span></span><br><span class="line">    flag[<span class="number">0</span>] = <span class="number">0</span>; <span class="comment">//(4)</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">progress1</span><span class="params">()</span></span>&#123;</span><br><span class="line">    flag[<span class="number">1</span>] = <span class="number">1</span>; <span class="comment">//(1)</span></span><br><span class="line">    turn = <span class="number">0</span>; <span class="comment">//(2)</span></span><br><span class="line">    <span class="keyword">while</span>(flag[<span class="number">0</span>] &amp;&amp; turn == <span class="number">0</span>); <span class="comment">//(3)</span></span><br><span class="line">    <span class="comment">//dosomething</span></span><br><span class="line">    flag[<span class="number">1</span>] = <span class="number">0</span>; <span class="comment">//(4)</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="分析-2">分析</h3>
+<ol>
+<li>当进程0执行到步骤(3),而进程1未执行完(1),直接访问</li>
+<li>当进程0执行到步骤(3),进程1未执行完步骤(2),在进程1执行完步骤(2)之后,进程0优先访问</li>
+<li>当进程0执行到步骤(3),进程1也执行到步骤(3),访问权取决于turn最后的值</li>
+<li>当进程0执行到步骤(3),进程1已开始访问，此时flag[1] = 1,turn = 1必然成立</li>
+<li>当进程0执行到步骤(3),进程1执行完1遍,回到分析1</li>
+</ol>
+
+    </section>
+    <footer class="post-footer">
+      <section class="author">
+    <h4>flyingfisherman</h4>
+    <p>前端工程师，热爱技术，坚信知识技术改变生活。最高兴的场合莫过于学到的技术为自己、亲友或他人提供了些许的便利、帮助。</p>
+</section>
+      <section class="share">
+    <h4>Share this post</h4>
+    <a class="icon-twitter" href="http://twitter.com/share?url=https://github.flyingfishman.io/hexo/2020/05/02/lock/"
+       onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+        <span class="hidden">Twitter</span>
+    </a>
+    <a class="icon-facebook" href="https://www.facebook.com/sharer/sharer.php?u=https://github.flyingfishman.io/hexo/2020/05/02/lock/"
+       onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+        <span class="hidden">Facebook</span>
+    </a>
+    <a class="icon-google-plus" href="https://plus.google.com/share?url=https://github.flyingfishman.io/hexo/2020/05/02/lock/"
+       onclick="window.open(this.href, 'google-plus-share', 'width=490,height=530');return false;">
+        <span class="hidden">Google+</span>
+    </a>
+</section>
+    </footer>
+  </article>
+  <nav class="pagination" role="pagination">
+    
+    <a class="newer-posts" href="/hexo/2020/07/12/vscode/">
+        ← vscode使用
+    </a>
+    
+    <span class="page-number">•</span>
+    
+    <a class="older-posts" href="/hexo/2020/03/28/centos/">
+        centos各环境安装 →
+    </a>
+    
+</nav>
+  <div id="comment" class="comments-area">
+    <h1 class="title"><a href="#disqus_comments" name="disqus_comments">Comments</a></h1>
+
+    
+</div>
+</main>
+
+
+  
+<footer class="site-footer">
+  
+  <a class="subscribe icon-feed" href="/rss.xml"><span class="tooltip">Subscribe!</span></a>
+  
+  <div class="inner">
+     <section class="copyright">All content copyright <a href="/hexo/">日常点滴</a> &copy; 2014 &bull; All rights reserved.</section>
+     <section class="poweredby">Proudly published with <a class="icon-ghost" href="http://zespia.tw/hexo/">Hexo</a></section>
+  </div>
+</footer>
+
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+<script type="text/javascript" src="/hexo/js/jquery.fitvids.js"></script>
+<script type="text/javascript" src="/hexo/js/index.js"></script>
+
+
+
+
+
+
+</body>
+</html>
