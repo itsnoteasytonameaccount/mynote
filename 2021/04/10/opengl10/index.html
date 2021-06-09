@@ -55,7 +55,7 @@
 </span>
     <h1 class="post-title">opengl(10):万向光阴影，CSM</h1>
     <section class="post-content">
-      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.12.0/katex.min.css" /><p>为学懂webgl，从opengl入手。本文内容主要来自<a href="https://learnopengl-cn.github.io/" target="_blank" rel="noopener">LearnOpenGL CN</a>文档，加上个人理解，以及一些细节补充、经验记录。本人学习过程中的详细代码参见<a href="https://github.com/itsnoteasytonameaccount/OpenGL-learning" target="_blank" rel="noopener">此处</a></p>
+      <link rel="stylesheet" href="/mynote/css/katex.min.css" /><p>为学懂webgl，从opengl入手。本文内容主要来自<a href="https://learnopengl-cn.github.io/" target="_blank" rel="noopener">LearnOpenGL CN</a>文档，加上个人理解，以及一些细节补充、经验记录。本人学习过程中的详细代码参见<a href="https://github.com/itsnoteasytonameaccount/OpenGL-learning" target="_blank" rel="noopener">此处</a></p>
 <p>要学习推荐看原文<a href="https://learnopengl-cn.github.io/" target="_blank" rel="noopener">LearnOpenGL CN</a>，有评论区，加载评论区需要翻墙</p>
 <p>另可在<a href="https://www.khronos.org/opengl/wiki/Getting_Started" target="_blank" rel="noopener">此处</a>找到其他opengl官方推荐的资料、教程网站</p>
 <a id="more"></a>
@@ -99,7 +99,7 @@
 <p>最终效果</p>
 <div style="text-align:center" id="img1-1">
 <p style="margin-bottom: 5px"><img style="margin-bottom: 0px" src="/mynote/image/opengl/point_shadows.png" alt="图片加载失败"></p>
-<p style="margin-bottom: 20px; line-height:1.5"><span style="font-size:12px">图1-1: 阴影效果</span></p>
+<p style="margin: 0 0 20px 0;; line-height:1.5"><span style="font-size:12px">图1-1: 阴影效果</span></p>
 </div>
 <h1>CSM（Cascaded Shadow Maps 级联阴影贴图）</h1>
 <p>阴影贴图是游戏引擎中使用非常广泛的用于实现实时阴影的技术。在较大的场景中使用这一技术时，阴影贴图会变得难以调整并且更容易产生失真和锯齿。</p>
@@ -114,14 +114,14 @@
 </ol>
 <div style="text-align:center" id="img2-1">
 <p style="margin-bottom: 5px"><img style="margin-bottom: 0px" src="/mynote/image/opengl/cascaded_shadow_maps.png" alt="图片加载失败"></p>
-<p style="margin-bottom: 20px; line-height:1.5"><span style="font-size:12px">图2-1: 级联阴影贴图划分示例</span></p>
+<p style="margin: 0 0 20px 0;; line-height:1.5"><span style="font-size:12px">图2-1: 级联阴影贴图划分示例</span></p>
 </div>
 <p>观看<a href="#img2-1">图 2-1</a>可以注意到，所有的阴影投射物以及摄像头视锥切片被包含在光锥中，光锥外不应该有需要被渲染的物体。换句话说，光锥是摄像头视锥切片的边界盒子（长方体），它的近平面延伸到足够包裹所有可能的遮蔽物。如果在树上方有个遮蔽物 B，这个盒子就需要被适当地延长，否则 B 不会投射出阴影。</p>
 <h2 id="视锥的分割：平行分片阴影贴图">视锥的分割：平行分片阴影贴图</h2>
 <p>CSM 算法的第一步需要计算出视锥的分割位置，下文取法来自<a href="https://dl.acm.org/doi/10.1145/1128923.1128975" target="_blank" rel="noopener">Parallel-Split Shadow Maps for Large-Scale Virtual Environments</a>，不一定要这样取，不讲究的取法是凭直觉取，也可以用别人总结好的取法。</p>
 <div style="text-align:center" id="img2-2">
 <p style="margin-bottom: 5px"><img style="margin-bottom: 0px" src="/mynote/image/opengl/pssm.png" alt="图片加载失败"></p>
-<p style="margin-bottom: 20px; line-height:1.5"><span style="font-size:12px">图2-2: pssm示意图</span></p>
+<p style="margin: 0 0 20px 0;; line-height:1.5"><span style="font-size:12px">图2-2: pssm示意图</span></p>
 </div>
 <h3 id="推导过程">推导过程</h3>
 <p>下文是我对分割公式的推导过程的理解。</p>
@@ -177,7 +177,7 @@
 <p>对数分割方法的问题在于分割出来的块中，靠近近平面的块的长度会非常小，只能包括非常小一部分对象。这是因为我们之前的公式都是理想情况下的公式，假设了视锥<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false">[</mo><mi>n</mi><mo separator="true">,</mo><mi>f</mi><mo stretchy="false">]</mo></mrow><annotation encoding="application/x-tex">[n, f]</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">[</span><span class="mord mathnormal">n</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord mathnormal" style="margin-right:0.10764em;">f</span><span class="mclose">]</span></span></span></span>范围内的所有内容都可以准确映射到阴影贴图的<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false">[</mo><mn>0</mn><mo separator="true">,</mo><mn>1</mn><mo stretchy="false">]</mo></mrow><annotation encoding="application/x-tex">[0, 1]</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">[</span><span class="mord">0</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord">1</span><span class="mclose">]</span></span></span></span>范围内，阴影贴图既不会漏掉某些内容，也不会包括不可见的内容。这在实践中不可能实现（因为我们仅考虑了深度，其他坐标轴方向的的内容没办法完全贴合的映射到阴影贴图中）。</p>
 <div style="text-align:center" id="img2-3">
 <p style="margin-bottom: 5px"><img style="margin-bottom: 0px" src="/mynote/image/opengl/light_frustum_and_view_frustum.png" alt="图片加载失败"></p>
-<p style="margin-bottom: 20px; line-height:1.5"><span style="font-size:12px">图2-3: 光线的截体包括不可见区域</span></p>
+<p style="margin: 0 0 20px 0;; line-height:1.5"><span style="font-size:12px">图2-3: 光线的截体包括不可见区域</span></p>
 </div>
 <p>上述问题会导致过了视锥的分割区后阴影的清晰度剧烈突变，因为较靠近近平面的视锥区域过采样而较远的视锥欠采样。</p>
 <p><strong>平均分配</strong></p>
@@ -221,7 +221,7 @@
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 标准设备坐标</span></span><br><span class="line"><span class="keyword">const</span> glm::vec4 normalized_pos[<span class="number">8</span>] = &#123;</span><br><span class="line">    glm::vec4(<span class="number">1.0f</span>),</span><br><span class="line">    glm::vec4(<span class="number">-1.0f</span>, <span class="number">1.0f</span>, <span class="number">1.0f</span>, <span class="number">1.0f</span>),</span><br><span class="line">    glm::vec4(<span class="number">1.0f</span>, <span class="number">-1.0f</span>, <span class="number">1.0f</span>, <span class="number">1.0f</span>),</span><br><span class="line">    glm::vec4(<span class="number">-1.0f</span>, <span class="number">-1.0f</span>, <span class="number">1.0f</span>, <span class="number">1.0f</span>),</span><br><span class="line">    glm::vec4(<span class="number">1.0f</span>, <span class="number">1.0f</span>, <span class="number">-1.0f</span>, <span class="number">1.0f</span>),</span><br><span class="line">    glm::vec4(<span class="number">-1.0f</span>, <span class="number">1.0f</span>, <span class="number">-1.0f</span>, <span class="number">1.0f</span>),</span><br><span class="line">    glm::vec4(<span class="number">1.0f</span>, <span class="number">-1.0f</span>, <span class="number">-1.0f</span>, <span class="number">1.0f</span>),</span><br><span class="line">    glm::vec4(<span class="number">-1.0f</span>, <span class="number">-1.0f</span>, <span class="number">-1.0f</span>, <span class="number">1.0f</span>)&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 计算光锥的投影*观察矩阵</span></span><br><span class="line"><span class="keyword">void</span> CSM::computeLightProjection(<span class="keyword">int</span> i, <span class="keyword">float</span> aspect, glm::mat4 &amp;view_inverse)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">float</span> minz, maxz, minx, maxx, miny, maxy, z_near, z_far, z_e;</span><br><span class="line">    glm::vec4 light_space_pos;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 分割块近平面深度</span></span><br><span class="line">    z_near = i &lt; <span class="number">1</span> ? <span class="number">0.1f</span> : z_values[i - <span class="number">1</span>];</span><br><span class="line">    <span class="comment">// 分割块远平面深度</span></span><br><span class="line">    z_far = z_values[i];</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 计算投影矩阵逆矩阵</span></span><br><span class="line">    glm::mat4 projection_inverse = glm::inverse(glm::perspective(glm::radians(<span class="number">45.0f</span>), aspect, z_near, z_far));</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> j = <span class="number">0</span>; j &lt; <span class="number">8</span>; j++)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="comment">// 由于是左手坐标系，深度坐标为负值，其中normalized_pos[j]为标准设备坐标</span></span><br><span class="line">        z_e = normalized_pos[j].z &gt; <span class="number">0</span> ? -z_far : -z_near;</span><br><span class="line">        <span class="comment">// 光线空间下的坐标</span></span><br><span class="line">        light_space_pos = light_view * view_inverse * projection_inverse * (-z_e * normalized_pos[j]);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 比较并保存minx,maxx等八个值。</span></span><br><span class="line">        <span class="comment">// ...</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 创建矩阵，-maxz - 10是为了适当延伸光锥近平面，因为某些遮挡物虽然位于视锥分割块的边界盒外面，但是会在视锥分割快区域范围内产生阴影</span></span><br><span class="line">    light_projection_view[i] = glm::ortho(minx, maxx, miny, maxy, -maxz - <span class="number">10</span>, -minz) * light_view;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <div style="text-align:center" id="img2-4">
 <p style="margin-bottom: 5px"><img style="margin-bottom: 0px" src="/mynote/image/opengl/has_no_stretch.png" alt="图片加载失败"></p>
-<p style="margin-bottom: 20px; line-height:1.5"><span style="font-size:12px">图2-4: 如图如果不适当将光锥向近平面方向延长，就会漏掉一些阴影</span></p>
+<p style="margin: 0 0 20px 0;; line-height:1.5"><span style="font-size:12px">图2-4: 如图如果不适当将光锥向近平面方向延长，就会漏掉一些阴影</span></p>
 </div>
 <h2 id="渲染阴影贴图-2">渲染阴影贴图</h2>
 <p>进行一轮渲染，需要对每个阴影贴图渲染一次<br>
@@ -259,7 +259,7 @@
 <p>最终结果</p>
 <div style="text-align:center" id="img2-5">
 <p style="margin-bottom: 5px"><img style="margin-bottom: 0px" src="/mynote/image/opengl/csm_pcf.png" alt="图片加载失败"></p>
-<p style="margin-bottom: 20px; line-height:1.5"><span style="font-size:12px">图2-5: csm的最终实现结果</span></p>
+<p style="margin: 0 0 20px 0;; line-height:1.5"><span style="font-size:12px">图2-5: csm的最终实现结果</span></p>
 </div>
 <h2 id="仍然存在的问题">仍然存在的问题</h2>
 <ol>
@@ -332,7 +332,7 @@
   <nav class="pagination" role="pagination">
     
     <a class="newer-posts" href="/mynote/2021/05/15/opengl11/">
-        ← opengl(10):法线贴图，视差贴图
+        ← opengl(11):法线贴图，视差贴图
     </a>
     
     <span class="page-number">•</span>
@@ -361,7 +361,8 @@
   </div>
 </footer>
 
-  <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+  <!-- <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script> -->
+<script src="//ajax.aspnetcdn.com/ajax/jQuery/jquery-2.0.3.js"></script>
 
 <script type="text/javascript" src="/mynote/js/jquery.fitvids.js"></script>
 <script type="text/javascript" src="/mynote/js/index.js"></script>
