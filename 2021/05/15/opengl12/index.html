@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html" charset="UTF-8" >
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+  <title>opengl(12):hdr渲染，泛光 | 土壤细流</title>
+  <meta name="description" content="" />
+  <meta name="HandheldFriendly" content="True" />
+  <meta name="MobileOptimized" content="320" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <link rel="stylesheet" type="text/css" href="/mynote/css/screen.css" />
+  <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Noto+Serif:400,700,400italic|Open+Sans:700,400" />
+
+  <meta name="generator" content="土壤细流">
+
+  
+  <link rel="alternate" type="application/rss+xml" title="RSS" href="/rss.xml">
+  
+  
+  <link rel="alternate" type="application/atom+xml" title="Atom 0.3" href="rss.xml">
+  
+  
+
+  
+</head>
+
+
+<body class="post-template">
+
+  <header class="site-head"  style="background-image: url(/mynote/image/cover.jpg)" >
+    <div class="vertical">
+        <div class="site-head-content inner">
+             <a class="blog-logo" href="/mynote/"><img src="https://avatars.githubusercontent.com/u/26755276" alt="Blog Logo"/></a> 
+            <h1 class="blog-title">土壤细流</h1>
+            <h2 class="blog-description"></h2>
+        </div>
+    </div>
+</header>
+  
+
+<main class="content" role="main">
+  <article class="post">
+    <span class="post-meta">
+      <time datetime="2021-05-14T16:00:00.000Z" itemprop="datePublished">
+          2021-05-15
+      </time>
+    
+    
+    | 
+    <a href='/mynote/tags/opengl/'>opengl</a>
+    
+    
+</span>
+    <h1 class="post-title">opengl(12):hdr渲染，泛光</h1>
+    <section class="post-content">
+      <link rel="stylesheet" href="/mynote/css/katex.min.css" /><p>为学懂 webgl，从 opengl 入手。本文内容主要来自<a href="https://learnopengl-cn.github.io/" target="_blank" rel="noopener">LearnOpenGL CN</a>文档，加上个人理解，以及一些细节补充、经验记录。本人学习过程中的详细代码参见<a href="https://github.com/itsnoteasytonameaccount/OpenGL-learning" target="_blank" rel="noopener">此处</a></p>
+<p>要学习推荐看原文<a href="https://learnopengl-cn.github.io/" target="_blank" rel="noopener">LearnOpenGL CN</a>，有评论区，加载评论区需要翻墙</p>
+<p>另可在<a href="https://www.khronos.org/opengl/wiki/Getting_Started" target="_blank" rel="noopener">此处</a>找到其他 opengl 官方推荐的资料、教程网站</p>
+<a id="more"></a>
+<p>hdr和泛光这两部分没什么难点，了解一下直接照着教程代码写就可以了</p>
+<h1>hdr(High Dynamic Range, 高动态范围)渲染</h1>
+<p>在做到opengl光照的时候，想必多少会有点疑问，我们的光照计算是叠加的</p>
+<figure class="highlight glsl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span>(<span class="type">int</span> i = <span class="number">0</span>; i &lt; NR_POINT_LGIHTS; i++)</span><br><span class="line">   &#123;</span><br><span class="line">       result += CalcLight(lights[i], Normal, viewDir, diffuseTexture, specularTexture);</span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure>
+<p>那么如果场景中有非常多的光源，颜色分量范围是<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false">[</mo><mn>0.0</mn><mo separator="true">,</mo><mn>1.0</mn><mo stretchy="false">]</mo></mrow><annotation encoding="application/x-tex">[0.0, 1.0]</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">[</span><span class="mord">0</span><span class="mord">.</span><span class="mord">0</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord">1</span><span class="mord">.</span><span class="mord">0</span><span class="mclose">]</span></span></span></span>，叠加结果超过白色<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>v</mi><mi>e</mi><mi>c</mi><mn>3</mn><mo stretchy="false">(</mo><mn>1.0</mn><mi>f</mi><mo separator="true">,</mo><mn>1.0</mn><mi>f</mi><mo separator="true">,</mo><mn>1.0</mn><mi>f</mi><mo separator="true">,</mo><mn>1.0</mn><mi>f</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">vec3(1.0f, 1.0f, 1.0f, 1.0f)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.03588em;">v</span><span class="mord mathnormal">e</span><span class="mord mathnormal">c</span><span class="mord">3</span><span class="mopen">(</span><span class="mord">1</span><span class="mord">.</span><span class="mord">0</span><span class="mord mathnormal" style="margin-right:0.10764em;">f</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord">1</span><span class="mord">.</span><span class="mord">0</span><span class="mord mathnormal" style="margin-right:0.10764em;">f</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord">1</span><span class="mord">.</span><span class="mord">0</span><span class="mord mathnormal" style="margin-right:0.10764em;">f</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord">1</span><span class="mord">.</span><span class="mord">0</span><span class="mord mathnormal" style="margin-right:0.10764em;">f</span><span class="mclose">)</span></span></span></span>时，很多地方不就成纯白了。hdr就是用来解决这个问题。</p>
+<h2 id="介绍">介绍</h2>
+<blockquote>
+<p>HDR原本只是被运用在摄影上，摄影师对同一个场景采取不同曝光拍多张照片，捕捉大范围的色彩值。这些图片被合成为HDR图片，从而综合不同的曝光等级使得大范围的细节可见。看下面这个例子，左边这张图片在被光照亮的区域充满细节，但是在黑暗的区域就什么都看不见了；但是右边这张图的高曝光却可以让之前看不出来的黑暗区域显现出来。</p>
+</blockquote>
+<blockquote>
+<p>这与我们眼睛工作的原理非常相似，也是HDR渲染的基础。当光线很弱的啥时候，人眼会自动调整从而使过暗和过亮的部分变得更清晰，就像人眼有一个能自动根据场景亮度调整的自动曝光滑块。</p>
+</blockquote>
+<p>借用hdr思想，hdr渲染的原理则是先允许颜色计算结果超过<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false">[</mo><mn>0.0</mn><mo separator="true">,</mo><mn>1.0</mn><mo stretchy="false">]</mo></mrow><annotation encoding="application/x-tex">[0.0, 1.0]</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">[</span><span class="mord">0</span><span class="mord">.</span><span class="mord">0</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord">1</span><span class="mord">.</span><span class="mord">0</span><span class="mclose">]</span></span></span></span>这个范围，保留所有颜色细节，再通过一定的算法将颜色重新映射到范围内。</p>
+<h2 id="步骤">步骤</h2>
+<ol>
+<li>先将绘制出场景颜色信息存放再特定的允许颜色范围超过<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false">[</mo><mn>0.0</mn><mo separator="true">,</mo><mn>1.0</mn><mo stretchy="false">]</mo></mrow><annotation encoding="application/x-tex">[0.0, 1.0]</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">[</span><span class="mord">0</span><span class="mord">.</span><span class="mord">0</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord">1</span><span class="mord">.</span><span class="mord">0</span><span class="mclose">]</span></span></span></span>的缓冲中（渲染hdr场景）。</li>
+<li>绘制占满窗口的矩形，将步骤一中的场景颜色映射到<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false">[</mo><mn>0.0</mn><mo separator="true">,</mo><mn>1.0</mn><mo stretchy="false">]</mo></mrow><annotation encoding="application/x-tex">[0.0, 1.0]</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">[</span><span class="mord">0</span><span class="mord">.</span><span class="mord">0</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord">1</span><span class="mord">.</span><span class="mord">0</span><span class="mclose">]</span></span></span></span>，并绘制到矩形上（hdr场景映射到ldr（低动态范围）场景）。</li>
+</ol>
+<h2 id="浮点帧缓冲">浮点帧缓冲</h2>
+<p>浮点帧缓冲用来允许颜色范围超过<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false">[</mo><mn>0.0</mn><mo separator="true">,</mo><mn>1.0</mn><mo stretchy="false">]</mo></mrow><annotation encoding="application/x-tex">[0.0, 1.0]</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">[</span><span class="mord">0</span><span class="mord">.</span><span class="mord">0</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord">1</span><span class="mord">.</span><span class="mord">0</span><span class="mclose">]</span></span></span></span></p>
+<blockquote>
+<p>当一个帧缓冲的颜色缓冲的内部格式被设定成了GL_RGB16F, GL_RGBA16F, GL_RGB32F 或者GL_RGBA32F时，这些帧缓冲被叫做浮点帧缓冲(Floating Point Framebuffer)，浮点帧缓冲可以存储超过0.0到1.0范围的浮点值，所以非常适合HDR渲染。</p>
+</blockquote>
+<p>浮点帧缓冲的颜色附件创建如下</p>
+<figure class="highlight glsl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">glBindTexture(GL_TEXTURE_2D, colorBuffer);</span><br><span class="line">glTexImage2D(GL_TEXTURE_2D, <span class="number">0</span>, GL_RGB16F, SCR_WIDTH, SCR_HEIGHT, <span class="number">0</span>, GL_RGB, GL_FLOAT, NULL</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>默认的帧缓冲默认一个颜色分量只占用8位(bits)。当使用一个使用32位每颜色分量的浮点帧缓冲时(使用GL_RGB32F 或者GL_RGBA32F)，我们需要四倍的内存来存储这些颜色。所以除非你需要一个非常高的精确度，32位不是必须的，使用GLRGB16F就足够了。</p>
+</blockquote>
+<h2 id="色调映射">色调映射</h2>
+<p>简单的色调映射算法，Reinhard色调映射算法实现如下</p>
+<figure class="highlight glsl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span> main()</span><br><span class="line">&#123;             </span><br><span class="line">    <span class="keyword">const</span> <span class="type">float</span> gamma = <span class="number">2.2</span>;</span><br><span class="line">    <span class="type">vec3</span> hdrColor = <span class="built_in">texture</span>(hdrBuffer, TexCoords).rgb;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Reinhard色调映射</span></span><br><span class="line">    <span class="type">vec3</span> mapped = hdrColor / (hdrColor + <span class="type">vec3</span>(<span class="number">1.0</span>));</span><br><span class="line">    <span class="comment">// Gamma校正</span></span><br><span class="line">    mapped = <span class="built_in">pow</span>(mapped, <span class="type">vec3</span>(<span class="number">1.0</span> / gamma));</span><br><span class="line"></span><br><span class="line">    color = <span class="type">vec4</span>(mapped, <span class="number">1.0</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>可以在色调映射算法里设置一个曝光参数，通过这个参数决定映射表现，一个简单的曝光色调映射算法会像这样：</p>
+<figure class="highlight glsl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">uniform</span> <span class="type">float</span> exposure;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span> main()</span><br><span class="line">&#123;             </span><br><span class="line">    <span class="keyword">const</span> <span class="type">float</span> gamma = <span class="number">2.2</span>;</span><br><span class="line">    <span class="type">vec3</span> hdrColor = <span class="built_in">texture</span>(hdrBuffer, TexCoords).rgb;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 曝光色调映射</span></span><br><span class="line">    <span class="type">vec3</span> mapped = <span class="type">vec3</span>(<span class="number">1.0</span>) - <span class="built_in">exp</span>(-hdrColor * exposure);</span><br><span class="line">    <span class="comment">// Gamma校正 </span></span><br><span class="line">    mapped = <span class="built_in">pow</span>(mapped, <span class="type">vec3</span>(<span class="number">1.0</span> / gamma));</span><br><span class="line"></span><br><span class="line">    color = <span class="type">vec4</span>(mapped, <span class="number">1.0</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="最终成果">最终成果</h2>
+<p>最终成果如下，不知道是不是代码有问题，我渲染出的效果比learn OpenGL教程上的亮一些，曝光系数设为0.2才有learn OpenGL曝光系数1.0的效果</p>
+<div style="text-align:center" id="img1-1">
+<p style="margin-bottom: 5px"><img style="margin-bottom: 0px" src="/mynote/image/opengl/hdr.gif" alt="图片加载失败"></p>
+<p style="margin-bottom: 20px; line-height:1.5"><span style="font-size:12px">图1-1: 最终成果</span></p>
+</div>
+<h1>泛光</h1>
+<blockquote>
+<p>明亮的光源和区域经常很难向观察者表达出来，因为监视器的亮度范围是有限的。一种区分明亮光源的方式是使它们在监视器上发出光芒，光源的光芒向四周发散。这样观察者就会产生光源或亮区的确是强光区。（译注：这个问题的提出简单来说是为了解决这样的问题：例如有一张在阳光下的白纸，白纸在监视器上显示出是出白色，而前方的太阳也是纯白色的，所以基本上白纸和太阳就是一样的了，给太阳加一个光晕，这样太阳看起来似乎就比白纸更亮了）</p>
+</blockquote>
+<p>泛光就是用来产生光晕效果的，比较简单，没有特别难理解的。</p>
+<p>泛光实现步骤如下：</p>
+<ol>
+<li>渲染hdr场景</li>
+<li>取出hdr场景超过一定亮度的片段组成纹理</li>
+<li>对步骤2中得到的新的纹理进行模糊处理，模糊处理对泛光效果的好坏起决定作用</li>
+<li>将hdr场景和模糊处理后的纹理组合，再映射到ldr</li>
+</ol>
+<div style="text-align:center" id="img2-1">
+<p style="margin-bottom: 5px"><img style="margin-bottom: 0px" src="/mynote/image/opengl/bloom_steps.png" alt="图片加载失败"></p>
+<p style="margin-bottom: 20px; line-height:1.5"><span style="font-size:12px">图2-1: 泛光实现步骤</span></p>
+</div>
+<h2 id="提取亮色">提取亮色</h2>
+<p>提取亮色可以使用一个叫多目标渲染的手段，一次渲染输出到两个颜色缓冲</p>
+<p>此时着色器中需要设置一个像素着色器写入到哪个颜色缓冲</p>
+<figure class="highlight glsl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#version 330 core</span></span><br><span class="line"><span class="keyword">layout</span> (<span class="keyword">location</span> = <span class="number">0</span>) <span class="keyword">out</span> <span class="type">vec4</span> FragColor;</span><br><span class="line"><span class="keyword">layout</span> (<span class="keyword">location</span> = <span class="number">1</span>) <span class="keyword">out</span> <span class="type">vec4</span> BrightColor;</span><br><span class="line"></span><br><span class="line">[...]</span><br><span class="line"></span><br><span class="line"><span class="type">void</span> main()</span><br><span class="line">&#123;            </span><br><span class="line">    [...] <span class="comment">// first do normal lighting calculations and output results</span></span><br><span class="line">    FragColor = <span class="type">vec4</span>(lighting, <span class="number">1.0</span>f);</span><br><span class="line">    <span class="comment">// Check whether fragment output is higher than threshold, if so output as brightness color</span></span><br><span class="line">    <span class="type">float</span> brightness = <span class="built_in">dot</span>(FragColor.rgb, <span class="type">vec3</span>(<span class="number">0.2126</span>, <span class="number">0.7152</span>, <span class="number">0.0722</span>));</span><br><span class="line">    <span class="keyword">if</span>(brightness &gt; <span class="number">1.0</span>)</span><br><span class="line">        BrightColor = <span class="type">vec4</span>(FragColor.rgb, <span class="number">1.0</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>自定义帧缓冲应当绑定两个颜色缓冲</p>
+<figure class="highlight glsl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Set up floating point framebuffer to render scene to</span></span><br><span class="line">GLuint hdrFBO;</span><br><span class="line">glGenFramebuffers(<span class="number">1</span>, &amp;hdrFBO);</span><br><span class="line">glBindFramebuffer(GL_FRAMEBUFFER, hdrFBO);</span><br><span class="line">GLuint colorBuffers[<span class="number">2</span>];</span><br><span class="line">glGenTextures(<span class="number">2</span>, colorBuffers);</span><br><span class="line"><span class="keyword">for</span> (GLuint i = <span class="number">0</span>; i &lt; <span class="number">2</span>; i++)</span><br><span class="line">&#123;</span><br><span class="line">    glBindTexture(GL_TEXTURE_2D, colorBuffers[i]);</span><br><span class="line">    glTexImage2D(</span><br><span class="line">        GL_TEXTURE_2D, <span class="number">0</span>, GL_RGB16F, SCR_WIDTH, SCR_HEIGHT, <span class="number">0</span>, GL_RGB, GL_FLOAT, NULL</span><br><span class="line">    );</span><br><span class="line">    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);</span><br><span class="line">    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);</span><br><span class="line">    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);</span><br><span class="line">    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);</span><br><span class="line">    <span class="comment">// attach texture to framebuffer</span></span><br><span class="line">    glFramebufferTexture2D(</span><br><span class="line">        GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, GL_TEXTURE_2D, colorBuffers[i], <span class="number">0</span></span><br><span class="line">    );</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>我们需要显式告知OpenGL我们正在通过glDrawBuffers渲染到多个颜色缓冲，否则OpenGL只会渲染到帧缓冲的第一个颜色附件，而忽略所有其他的。我们可以通过传递多个颜色附件的枚举来做这件事，我们以下面的操作进行渲染：</p>
+<figure class="highlight glsl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">GLuint attachments[<span class="number">2</span>] = &#123; GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 &#125;;</span><br><span class="line">glDrawBuffers(<span class="number">2</span>, attachments);</span><br></pre></td></tr></table></figure>
+<h2 id="高斯模糊">高斯模糊</h2>
+<p>接下来是进行模糊处理，由于模糊处理的效果很大程度上决定了最终的泛光效果，因此不采用之前提到的简单地周围颜色取均值的模糊效果，而是采用高斯模糊。</p>
+<p>高斯模糊简化理解就是对模糊点为中心的所有像素点取加权均值作为模糊点的值，而加权的权重是由某个特定的正态分布函数决定的，中心点的权重最大。由于本人在校期间不学无术，理解止于此，再高深的东西就不懂了，不过理解到这就行了。</p>
+<blockquote>
+<p>要实现高斯模糊过滤我们需要一个二维四方形作为权重，从这个二维高斯曲线方程中去获取它。然而这个过程有个问题，就是很快会消耗极大的性能。以一个32×32的模糊kernel为例，我们必须对每个fragment从一个纹理中采样1024次！</p>
+</blockquote>
+<blockquote>
+<p>高斯方程有个非常巧妙的特性，它允许我们把二维方程分解为两个更小的方程：一个描述水平权重，另一个描述垂直权重。我们首先用水平权重在整个纹理上进行水平模糊，然后在经改变的纹理上进行垂直模糊。利用这个特性，结果是一样的，但是可以节省难以置信的性能，因为我们现在只需做32+32次采样，不再是1024了！这叫做两步高斯模糊。</p>
+</blockquote>
+<p>每次应用模糊效果需要渲染一次。</p>
+<p>着色器中代码如下，代码中权重取值的依据在<a href="https://rastergrid.com/blog/2010/09/efficient-gaussian-blur-with-linear-sampling/" target="_blank" rel="noopener">Efficient Gaussian blur with linear sampling</a>中给出，用二项式系数来计算。<br>
+可惜我看不太懂，现在后悔没学好大学数学已经晚了。正态分布最早是求二项分布的渐近公式时导出的，n越大，二项分布的柱状图顶部连线越接近正态分布，可以用二项分布近似正态分布。</p>
+<figure class="highlight glsl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#version 330 core</span></span><br><span class="line"><span class="keyword">out</span> <span class="type">vec4</span> FragColor;</span><br><span class="line">  </span><br><span class="line"><span class="keyword">in</span> <span class="type">vec2</span> TexCoords;</span><br><span class="line"></span><br><span class="line"><span class="keyword">uniform</span> <span class="type">sampler2D</span> image;</span><br><span class="line">  </span><br><span class="line"><span class="keyword">uniform</span> <span class="type">bool</span> horizontal;</span><br><span class="line"><span class="keyword">uniform</span> <span class="type">float</span> weight[<span class="number">5</span>] = <span class="type">float</span>[] (<span class="number">0.227027</span>, <span class="number">0.1945946</span>, <span class="number">0.1216216</span>, <span class="number">0.054054</span>, <span class="number">0.016216</span>);</span><br><span class="line"></span><br><span class="line"><span class="type">void</span> main()</span><br><span class="line">&#123;             </span><br><span class="line">    <span class="type">vec2</span> tex_offset = <span class="number">1.0</span> / <span class="built_in">textureSize</span>(image, <span class="number">0</span>); <span class="comment">// gets size of single texel</span></span><br><span class="line">    <span class="type">vec3</span> result = <span class="built_in">texture</span>(image, TexCoords).rgb * weight[<span class="number">0</span>]; <span class="comment">// current fragment's contribution</span></span><br><span class="line">    <span class="keyword">if</span>(horizontal)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">for</span>(<span class="type">int</span> i = <span class="number">1</span>; i &lt; <span class="number">5</span>; ++i)</span><br><span class="line">        &#123;</span><br><span class="line">            result += <span class="built_in">texture</span>(image, TexCoords + <span class="type">vec2</span>(tex_offset.x * i, <span class="number">0.0</span>)).rgb * weight[i];</span><br><span class="line">            result += <span class="built_in">texture</span>(image, TexCoords - <span class="type">vec2</span>(tex_offset.x * i, <span class="number">0.0</span>)).rgb * weight[i];</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">for</span>(<span class="type">int</span> i = <span class="number">1</span>; i &lt; <span class="number">5</span>; ++i)</span><br><span class="line">        &#123;</span><br><span class="line">            result += <span class="built_in">texture</span>(image, TexCoords + <span class="type">vec2</span>(<span class="number">0.0</span>, tex_offset.y * i)).rgb * weight[i];</span><br><span class="line">            result += <span class="built_in">texture</span>(image, TexCoords - <span class="type">vec2</span>(<span class="number">0.0</span>, tex_offset.y * i)).rgb * weight[i];</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    FragColor = <span class="type">vec4</span>(result, <span class="number">1.0</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>不管要渲染多少次，创建两个帧缓冲就够了，一个帧缓从另一个帧缓冲的颜色缓冲纹理中读取场景数据，渲染到自己的颜色缓冲纹理，交替执行即可。参考代码如下，共渲染了10次，5次水平5次竖直高斯模糊。</p>
+<figure class="highlight glsl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">bool</span> horizontal = <span class="literal">true</span>, first_iteration = <span class="literal">true</span>;</span><br><span class="line"><span class="type">int</span> amount = <span class="number">10</span>;</span><br><span class="line">shaderBlur.use();</span><br><span class="line"><span class="keyword">for</span> (unsigned <span class="type">int</span> i = <span class="number">0</span>; i &lt; amount; i++)</span><br><span class="line">&#123;</span><br><span class="line">    glBindFramebuffer(GL_FRAMEBUFFER, pingpongFBO[horizontal]); </span><br><span class="line">    shaderBlur.setInt("horizontal", horizontal);</span><br><span class="line">    glBindTexture(</span><br><span class="line">        GL_TEXTURE_2D, first_iteration ? colorBuffers[<span class="number">1</span>] : pingpongBuffers[!horizontal]</span><br><span class="line">    ); </span><br><span class="line">    RenderQuad();</span><br><span class="line">    horizontal = !horizontal;</span><br><span class="line">    <span class="keyword">if</span> (first_iteration)</span><br><span class="line">        first_iteration = <span class="literal">false</span>;</span><br><span class="line">&#125;</span><br><span class="line">glBindFramebuffer(GL_FRAMEBUFFER, <span class="number">0</span>);</span><br></pre></td></tr></table></figure>
+<h2 id="合并">合并</h2>
+<p>最后的步骤就是组合模糊后的纹理和hdr场景纹理</p>
+<figure class="highlight glsl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#version 330 core</span></span><br><span class="line"><span class="keyword">out</span> <span class="type">vec4</span> FragColor;</span><br><span class="line">  </span><br><span class="line"><span class="keyword">in</span> <span class="type">vec2</span> TexCoords;</span><br><span class="line"></span><br><span class="line"><span class="keyword">uniform</span> <span class="type">sampler2D</span> scene;</span><br><span class="line"><span class="keyword">uniform</span> <span class="type">sampler2D</span> bloomBlur;</span><br><span class="line"><span class="keyword">uniform</span> <span class="type">float</span> exposure;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span> main()</span><br><span class="line">&#123;             </span><br><span class="line">    <span class="keyword">const</span> <span class="type">float</span> gamma = <span class="number">2.2</span>;</span><br><span class="line">    <span class="type">vec3</span> hdrColor = <span class="built_in">texture</span>(scene, TexCoords).rgb;      </span><br><span class="line">    <span class="type">vec3</span> bloomColor = <span class="built_in">texture</span>(bloomBlur, TexCoords).rgb;</span><br><span class="line">    hdrColor += bloomColor; <span class="comment">// additive blending</span></span><br><span class="line">    <span class="comment">// tone mapping</span></span><br><span class="line">    <span class="type">vec3</span> result = <span class="type">vec3</span>(<span class="number">1.0</span>) - <span class="built_in">exp</span>(-hdrColor * exposure);</span><br><span class="line">    <span class="comment">// also gamma correct while we're at it       </span></span><br><span class="line">    result = <span class="built_in">pow</span>(result, <span class="type">vec3</span>(<span class="number">1.0</span> / gamma));</span><br><span class="line">    FragColor = <span class="type">vec4</span>(result, <span class="number">1.0</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>最终效果如下，好像要比learn OpenGL CN的要亮一些，一直不知道原因，找不到问题在哪</p>
+<div style="text-align:center" id="img2-2">
+<p style="margin-bottom: 5px"><img style="margin-bottom: 0px" src="/mynote/image/opengl/bloom.png" alt="图片加载失败"></p>
+<p style="margin-bottom: 20px; line-height:1.5"><span style="font-size:12px">图2-2: 泛光效果</span></p>
+</div>
+<h1>参考</h1>
+<ol>
+<li><a href="http://learnopengl.com/#!Advanced-Lighting/Bloom" target="_blank" rel="noopener">Learn OpenGL</a></li>
+<li><a href="https://learnopengl-cn.github.io/05%20Advanced%20Lighting/07%20Bloom/" target="_blank" rel="noopener">Learn OpenGL CN</a></li>
+</ol>
+
+    </section>
+    <footer class="post-footer">
+      <section class="author">
+    <h4>flyingfisherman</h4>
+    <p>千里始足下，高山起微尘。吾道亦如此，行之贵日新</p>
+</section>
+      <section class="share">
+    <h4>Share this post</h4>
+    <a class="icon-twitter" href="http://twitter.com/share?url=https://github.flyingfishman.io/mynote/2021/05/15/opengl12/"
+       onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+        <span class="hidden">Twitter</span>
+    </a>
+    <a class="icon-facebook" href="https://www.facebook.com/sharer/sharer.php?u=https://github.flyingfishman.io/mynote/2021/05/15/opengl12/"
+       onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+        <span class="hidden">Facebook</span>
+    </a>
+    <a class="icon-google-plus" href="https://plus.google.com/share?url=https://github.flyingfishman.io/mynote/2021/05/15/opengl12/"
+       onclick="window.open(this.href, 'google-plus-share', 'width=490,height=530');return false;">
+        <span class="hidden">Google+</span>
+    </a>
+</section>
+    </footer>
+  </article>
+  <nav class="pagination" role="pagination">
+    
+    <a class="newer-posts" href="/mynote/2021/05/15/opengl11/">
+        ← opengl(11):法线贴图，视差贴图
+    </a>
+    
+    <span class="page-number">•</span>
+    
+    <a class="older-posts" href="/mynote/2021/04/10/opengl10/">
+        opengl(10):万向光阴影，CSM →
+    </a>
+    
+</nav>
+  <div id="comment" class="comments-area">
+    <h1 class="title"><a href="#disqus_comments" name="disqus_comments">Comments</a></h1>
+
+    
+</div>
+</main>
+
+
+  
+<footer class="site-footer">
+  
+  <a class="subscribe icon-feed" href="/rss.xml"><span class="tooltip">Subscribe!</span></a>
+  
+  <div class="inner">
+     <section class="copyright">All content copyright <a href="/mynote/">土壤细流</a> &copy; 2014 &bull; All rights reserved.</section>
+     <section class="poweredby">Proudly published with <a class="icon-ghost" href="http://zespia.tw/hexo/">Hexo</a></section>
+  </div>
+</footer>
+
+  <!-- <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script> -->
+<script src="//ajax.aspnetcdn.com/ajax/jQuery/jquery-2.0.3.js"></script>
+
+<script type="text/javascript" src="/mynote/js/jquery.fitvids.js"></script>
+<script type="text/javascript" src="/mynote/js/index.js"></script>
+
+
+
+
+
+
+</body>
+</html>
