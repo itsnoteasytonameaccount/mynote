@@ -231,6 +231,13 @@ makefile中使用参数<code>$(PARAM_NAME)</code></p>
 <h2 id="引入其他文件">引入其他文件</h2>
 <p>相当于用对应文件内容替换include部分</p>
 <figure class="highlight makefile"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">include</span> path/to/file</span><br></pre></td></tr></table></figure>
+<h2 id="头文件搜索路径">头文件搜索路径</h2>
+<p>头文件搜索路径除了编译器默认的路径，以及用户通过-I指定的，还可以用<code>C_INCLUDE_PATH(gcc)</code>和<code>CPLUS_INCLUDE_PATH(g++)</code>来指定，不同路径间用冒号分隔</p>
+<h2 id="cmd下的for循环在make时有问题">cmd下的for循环在make时有问题</h2>
+<p>差点气死，同样一条指令<code>for %l in ('dir /a /b D:\environment\s2client-api\build\bin\*.a') do (ar -x  D:\environment\s2client-api\build\bin/%l)</code>在cmd下执行就行，在makefile里用mingw32-make执行就报错。<br>
+也用<code>for /?</code>测试了makefile里确实调的是cmd里的for。<br>
+也把下面语句在命令行改了一下<code>$()</code>为<code>%%</code>执行是正确的，况且把<code>@</code>符号去掉后，执行mingw32-make时回显的执行语句明明可以直接在命令行执行，不知道什么毛病。</p>
+<figure class="highlight makefile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta"><span class="meta-keyword">.PHONY</span>: exact</span></span><br><span class="line"></span><br><span class="line"><span class="section">libsc2.dll: exact</span></span><br><span class="line">	<span class="variable">$(CC)</span> -shared *.o *.obj</span><br><span class="line"></span><br><span class="line"><span class="section">exact:</span></span><br><span class="line">	@for /f %l in ('dir /a /b <span class="variable">$(LD_LIBRARY_PATH)\*</span>.a') do (ar -x  <span class="variable">$(LD_LIBRARY_PATH)</span>/%l)</span><br></pre></td></tr></table></figure>
 <h1>参考</h1>
 <ol>
 <li><a href="https://zhuanlan.zhihu.com/p/196785332" target="_blank" rel="noopener">GCC 优化级别</a></li>
